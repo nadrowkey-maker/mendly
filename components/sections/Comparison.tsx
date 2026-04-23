@@ -1,0 +1,171 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { ShaderCanvas, SHADER_SRC } from "@/components/radial-shader";
+
+type Row = {
+  feature: string;
+  chatgpt: string;
+  lovable: string;
+  mendly: string;
+};
+
+export function Comparison() {
+  const t = useTranslations("comparison");
+
+  const rows: Row[] = [
+    {
+      feature: t("row1Feature"),
+      chatgpt: t("row1Chatgpt"),
+      lovable: t("row1Lovable"),
+      mendly: t("row1Mendly"),
+    },
+    {
+      feature: t("row2Feature"),
+      chatgpt: t("row2Chatgpt"),
+      lovable: t("row2Lovable"),
+      mendly: t("row2Mendly"),
+    },
+    {
+      feature: t("row3Feature"),
+      chatgpt: t("row3Chatgpt"),
+      lovable: t("row3Lovable"),
+      mendly: t("row3Mendly"),
+    },
+    {
+      feature: t("row4Feature"),
+      chatgpt: t("row4Chatgpt"),
+      lovable: t("row4Lovable"),
+      mendly: t("row4Mendly"),
+    },
+    {
+      feature: t("row5Feature"),
+      chatgpt: t("row5Chatgpt"),
+      lovable: t("row5Lovable"),
+      mendly: t("row5Mendly"),
+    },
+    {
+      feature: t("row6Feature"),
+      chatgpt: t("row6Chatgpt"),
+      lovable: t("row6Lovable"),
+      mendly: t("row6Mendly"),
+    },
+    {
+      feature: t("row7Feature"),
+      chatgpt: t("row7Chatgpt"),
+      lovable: t("row7Lovable"),
+      mendly: t("row7Mendly"),
+    },
+  ];
+
+  return (
+    <section
+      id="comparison"
+      className="relative py-24 md:py-32 px-6 md:px-12 overflow-hidden"
+    >
+      {/* Radial shader as very subtle background texture */}
+      <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
+        <ShaderCanvas fragSource={SHADER_SRC} />
+      </div>
+
+      {/* Vignette so shader fades at edges */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 20%, var(--bg-primary) 80%)",
+        }}
+      />
+
+      <div className="relative z-10 max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true, margin: "-80px" }}
+          className="text-center mb-16"
+        >
+          <p className="text-[10px] font-mono tracking-[0.3em] text-[var(--accent-glow)] mb-4 uppercase">
+            {t("eyebrow")}
+          </p>
+          <h2 className="text-4xl md:text-6xl font-semibold text-[var(--text-primary)] leading-[0.95] tracking-[-0.03em] mb-4">
+            {t("title")}{" "}
+            <span className="italic font-[family-name:var(--font-fraunces)] bg-gradient-to-r from-[var(--accent-glow)] to-[var(--accent-warm)] bg-clip-text text-transparent">
+              {t("titleEm")}
+            </span>
+          </h2>
+          <p className="text-[var(--text-muted)] max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+            {t("sub")}
+          </p>
+        </motion.div>
+
+        {/* Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true, margin: "-80px" }}
+          className="overflow-x-auto"
+        >
+          <table className="w-full min-w-[560px] border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th className="py-4 px-6 text-left text-[10px] font-mono tracking-[0.2em] text-[var(--text-dim)] uppercase border-b border-[var(--border)] w-[36%]">
+                  {t("headerFeature")}
+                </th>
+                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] uppercase border-b border-[var(--border)]">
+                  {t("headerChatgpt")}
+                </th>
+                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] uppercase border-b border-[var(--border)]">
+                  {t("headerLovable")}
+                </th>
+                <th className="py-4 px-6 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--accent-glow)] uppercase bg-[var(--accent-primary)]/10 border-l border-r border-t border-[var(--border-strong)] rounded-t-xl">
+                  {t("headerMendly")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => (
+                <tr key={i}>
+                  <td className="py-4 px-6 text-sm text-[var(--text-primary)] border-b border-[var(--border)]">
+                    {row.feature}
+                  </td>
+                  <td className="py-4 px-4 text-center text-sm text-[var(--text-muted)] border-b border-[var(--border)]">
+                    {row.chatgpt}
+                  </td>
+                  <td className="py-4 px-4 text-center text-sm text-[var(--text-muted)] border-b border-[var(--border)]">
+                    {row.lovable}
+                  </td>
+                  <td
+                    className={[
+                      "py-4 px-6 text-center text-sm font-medium text-[var(--text-primary)]",
+                      "bg-[var(--accent-primary)]/10 border-l border-r border-[var(--border-strong)]",
+                      i === rows.length - 1
+                        ? "border-b border-b-[var(--border-strong)] rounded-b-xl"
+                        : "border-b border-b-[var(--border)]",
+                    ].join(" ")}
+                  >
+                    {row.mendly}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </motion.div>
+
+        {/* Caption */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="mt-8 text-center text-xs font-mono tracking-wider text-[var(--text-dim)] uppercase"
+        >
+          {t("caption")}
+        </motion.p>
+      </div>
+    </section>
+  );
+}

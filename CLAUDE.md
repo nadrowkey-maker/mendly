@@ -100,15 +100,21 @@ lib/
 5. Animate on scroll entrance (Framer Motion's `whileInView`)
 
 ### When using 21st.dev components
-- Use `/ui` command to generate from 21st.dev MCP when available
-- Always customize the generated component to match Mendly's color palette
-- Never leave placeholder Tailwind colors like `bg-blue-500` — replace with our tokens
-- Install via `npx shadcn@latest add <component>` when prompted
+- **FIRST**: Read `@21ST-COMPONENTS-MENDLY.md` to check if there's a pre-approved component for the section/feature you're building.
+- If yes, use that component's URL via `/ui` or `npx shadcn@latest add <url>`.
+- If no pre-approved component fits, use `/ui` to search for alternatives, but prioritize the approved list.
+- **Always customize** the generated component to match Mendly's Cosmic Tech palette (never leave `bg-blue-500`, always use `bg-[var(--accent-primary)]`).
+- **Always respect section ambiance**: each section has its own visual mood (see `21ST-COMPONENTS-MENDLY.md`).
+- Install via `npx shadcn@latest add <component-url>` when prompted.
 
 ### When writing copy
-- Check against the approved copywriting in `COPYWRITING-MENDLY.md`
-- Never invent new copy — use translations in `messages/en.json` and `messages/fr.json`
-- If new copy is needed, write both EN and FR versions
+- **ALWAYS read `@COPYWRITING-MENDLY.md`** for the approved copywriting (humanly readable reference)
+- **ALWAYS use `useTranslations('namespace')` from next-intl** — NEVER hardcode strings
+- All translation keys are already defined in `messages/en.json` and `messages/fr.json` (253 keys, 13 namespaces)
+- Namespaces: `nav`, `hero`, `problem`, `promise`, `howItWorks`, `team`, `action`, `deliverables`, `comparison`, `pricing`, `trust`, `finalCta`, `footer`
+- For each section you code, use the corresponding namespace (e.g. `useTranslations('problem')` for The Problem section)
+- If you need a NEW key that doesn't exist, add it to BOTH `en.json` and `fr.json` (never only one)
+- **NEVER invent copy** that's not in `COPYWRITING-MENDLY.md` — if something is missing, ask the user
 
 ### Forbidden
 - `localStorage` / `sessionStorage` / `cookies` directly
