@@ -16,18 +16,16 @@ export function TubeCursor() {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-[9999]"
-      aria-hidden="true"
-    >
-      <TubesCursor
-        title=""
-        subtitle=""
-        caption=""
-        initialColors={["#8B5CF6", "#06B6D4", "#F0ABFC"]}
-        lightColors={["#A78BFA", "#06B6D4", "#8B5CF6", "#F0ABFC"]}
-        lightIntensity={150}
-        enableRandomizeOnClick={false}
-      />
-    </div>
-  );
-}
+  className="fixed inset-0 pointer-events-none z-[9999] mix-blend-screen"
+  aria-hidden="true"
+>
+  <TubesCursor
+    title=""
+    subtitle=""
+    caption=""
+    initialColors={["#8B5CF6", "#06B6D4", "#F0ABFC"]}
+    lightColors={["#A78BFA", "#06B6D4", "#8B5CF6", "#F0ABFC"]}
+    lightIntensity={150}
+    enableRandomizeOnClick={false}
+  />
+</div> )}
