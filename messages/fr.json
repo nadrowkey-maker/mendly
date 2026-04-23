@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "team": "Équipe",
+    "howItWorks": "Fonctionnement",
+    "pricing": "Tarifs",
+    "manifesto": "Manifeste",
+    "cta": "Rejoindre la liste d'attente"
+  },
+  "hero": {
+    "eyebrow": "8 EXPERTS IA · 1 FONDATEUR · EXÉCUTION INFINIE",
+    "title": "Ton idée mérite une équipe.",
+    "titleEm": "Pas un énième chatbot.",
+    "sub": "Mendly assemble 8 spécialistes IA qui collaborent sur ton projet comme une vraie équipe de startup.",
+    "ctaPrimary": "Rejoindre la liste d'attente",
+    "ctaSecondary": "Voir comment ça marche"
+  }
+}

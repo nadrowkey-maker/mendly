@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "team": "Team",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "manifesto": "Manifesto",
+    "cta": "Join the waitlist"
+  },
+  "hero": {
+    "eyebrow": "8 AI EXECUTIVES · 1 FOUNDER · INFINITE EXECUTION",
+    "title": "Your idea deserves a team.",
+    "titleEm": "Not another chatbot.",
+    "sub": "Mendly assembles 8 AI specialists who collaborate on your project like a real startup team.",
+    "ctaPrimary": "Join the waitlist",
+    "ctaSecondary": "See how it works"
+  }
+}
