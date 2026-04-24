@@ -12,12 +12,12 @@ export function PromiseSection() {
   return (
     <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-black">
       {/* Shader rings — luminous backdrop */}
-      <div className="absolute inset-0 opacity-25 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 opacity-55 overflow-hidden pointer-events-none">
         <ShaderAnimation />
       </div>
 
-      {/* Deep vignette — keeps center legible */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,transparent_10%,black_85%)] pointer-events-none" />
+      {/* Soft vignette — keeps center legible without killing the glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_50%,transparent_25%,rgba(0,0,0,0.55)_70%,black_100%)] pointer-events-none" />
 
       {/* Top / bottom edge fades */}
       <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black to-transparent pointer-events-none" />

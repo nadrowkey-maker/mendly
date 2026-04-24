@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react"; // AJOUT
+import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { motion, useInView } from "framer-motion"; // AJOUT
+import { motion, useInView } from "framer-motion";
+import { Check, X, AlertTriangle } from "lucide-react";
 import { ShaderCanvas, SHADER_SRC } from "@/components/radial-shader";
 
 type Row = {
@@ -12,77 +13,76 @@ type Row = {
   mendly: string;
 };
 
+function CellContent({ text }: { text: string }) {
+  if (text.includes("✅")) {
+    const label = text.replace("✅", "").trim();
+    return (
+      <span className="inline-flex items-center gap-1.5 justify-center">
+        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 shrink-0">
+          <Check className="w-3 h-3 text-emerald-400" />
+        </span>
+        {label && <span className="text-sm text-[var(--text-primary)]">{label}</span>}
+      </span>
+    );
+  }
+  if (text.includes("❌")) {
+    const label = text.replace("❌", "").trim();
+    return (
+      <span className="inline-flex items-center gap-1.5 justify-center">
+        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15 shrink-0">
+          <X className="w-3 h-3 text-red-400" />
+        </span>
+        {label && <span className="text-sm text-[var(--text-muted)]">{label}</span>}
+      </span>
+    );
+  }
+  if (text.includes("⚠")) {
+    const label = text.replace(/⚠️|⚠/g, "").trim();
+    return (
+      <span className="inline-flex items-center gap-1.5 justify-center">
+        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/15 shrink-0">
+          <AlertTriangle className="w-3 h-3 text-amber-400" />
+        </span>
+        {label && <span className="text-sm text-[var(--text-muted)]">{label}</span>}
+      </span>
+    );
+  }
+  return <span className="text-sm text-[var(--text-primary)]">{text}</span>;
+}
+
 export function Comparison() {
   const t = useTranslations("comparison");
 
-  // SÉCURITÉ
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { margin: "200px 0px" });
 
   const rows: Row[] = [
-    {
-      feature: t("row1Feature"),
-      chatgpt: t("row1Chatgpt"),
-      lovable: t("row1Lovable"),
-      mendly: t("row1Mendly"),
-    },
-    {
-      feature: t("row2Feature"),
-      chatgpt: t("row2Chatgpt"),
-      lovable: t("row2Lovable"),
-      mendly: t("row2Mendly"),
-    },
-    {
-      feature: t("row3Feature"),
-      chatgpt: t("row3Chatgpt"),
-      lovable: t("row3Lovable"),
-      mendly: t("row3Mendly"),
-    },
-    {
-      feature: t("row4Feature"),
-      chatgpt: t("row4Chatgpt"),
-      lovable: t("row4Lovable"),
-      mendly: t("row4Mendly"),
-    },
-    {
-      feature: t("row5Feature"),
-      chatgpt: t("row5Chatgpt"),
-      lovable: t("row5Lovable"),
-      mendly: t("row5Mendly"),
-    },
-    {
-      feature: t("row6Feature"),
-      chatgpt: t("row6Chatgpt"),
-      lovable: t("row6Lovable"),
-      mendly: t("row6Mendly"),
-    },
-    {
-      feature: t("row7Feature"),
-      chatgpt: t("row7Chatgpt"),
-      lovable: t("row7Lovable"),
-      mendly: t("row7Mendly"),
-    },
+    { feature: t("row1Feature"), chatgpt: t("row1Chatgpt"), lovable: t("row1Lovable"), mendly: t("row1Mendly") },
+    { feature: t("row2Feature"), chatgpt: t("row2Chatgpt"), lovable: t("row2Lovable"), mendly: t("row2Mendly") },
+    { feature: t("row3Feature"), chatgpt: t("row3Chatgpt"), lovable: t("row3Lovable"), mendly: t("row3Mendly") },
+    { feature: t("row4Feature"), chatgpt: t("row4Chatgpt"), lovable: t("row4Lovable"), mendly: t("row4Mendly") },
+    { feature: t("row5Feature"), chatgpt: t("row5Chatgpt"), lovable: t("row5Lovable"), mendly: t("row5Mendly") },
+    { feature: t("row6Feature"), chatgpt: t("row6Chatgpt"), lovable: t("row6Lovable"), mendly: t("row6Mendly") },
+    { feature: t("row7Feature"), chatgpt: t("row7Chatgpt"), lovable: t("row7Lovable"), mendly: t("row7Mendly") },
   ];
 
   return (
-    // ATTACHE LA RÉFÉRENCE
     <section
       ref={sectionRef}
       id="comparison"
       className="relative py-24 md:py-32 px-6 md:px-12 overflow-hidden"
     >
-      {/* Radial shader as very subtle background texture */}
-      <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
-        {/* LE SHADER S'ÉTEINT QUAND ON PART */}
-       {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
+      {/* Radial shader — boosted opacity */}
+      <div className="absolute inset-0 opacity-[0.22] pointer-events-none">
+        {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
       </div>
 
-      {/* Vignette so shader fades at edges */}
+      {/* Softer vignette so the shader breathes */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 20%, var(--bg-primary) 80%)",
+            "radial-gradient(ellipse 75% 70% at 50% 50%, transparent 25%, var(--bg-primary) 72%)",
         }}
       />
 
@@ -136,26 +136,26 @@ export function Comparison() {
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i}>
+                <tr key={i} className="group/row hover:bg-(--surface)/30 transition-colors duration-150">
                   <td className="py-4 px-6 text-sm text-[var(--text-primary)] border-b border-[var(--border)]">
                     {row.feature}
                   </td>
-                  <td className="py-4 px-4 text-center text-sm text-[var(--text-muted)] border-b border-[var(--border)]">
-                    {row.chatgpt}
+                  <td className="py-4 px-4 text-center border-b border-[var(--border)]">
+                    <CellContent text={row.chatgpt} />
                   </td>
-                  <td className="py-4 px-4 text-center text-sm text-[var(--text-muted)] border-b border-[var(--border)]">
-                    {row.lovable}
+                  <td className="py-4 px-4 text-center border-b border-[var(--border)]">
+                    <CellContent text={row.lovable} />
                   </td>
                   <td
                     className={[
-                      "py-4 px-6 text-center text-sm font-medium text-[var(--text-primary)]",
+                      "py-4 px-6 text-center",
                       "bg-[var(--accent-primary)]/10 border-l border-r border-[var(--border-strong)]",
                       i === rows.length - 1
                         ? "border-b border-b-[var(--border-strong)] rounded-b-xl"
                         : "border-b border-b-[var(--border)]",
                     ].join(" ")}
                   >
-                    {row.mendly}
+                    <CellContent text={row.mendly} />
                   </td>
                 </tr>
               ))}

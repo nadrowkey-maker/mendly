@@ -228,6 +228,15 @@
     "tier4Feature5": "Onboarding personnalisé",
     "tier4Feature6": "SLA 99,9 %",
     "tier4Cta": "Nous contacter",
+    "billingMonthly": "Mensuel",
+    "billingYearly": "Annuel",
+    "yearlyBadge": "Économisez 20%",
+    "tier2PriceYearly": "15 €",
+    "tier2PeriodYearly": "/ mois, facturé annuellement",
+    "tier3PriceYearly": "39 €",
+    "tier3PeriodYearly": "/ mois, facturé annuellement",
+    "tier4PriceYearly": "119 €",
+    "tier4PeriodYearly": "/ mois, facturé annuellement",
     "compareCta": "Comparer les tarifs en détail →"
   },
   "trust": {

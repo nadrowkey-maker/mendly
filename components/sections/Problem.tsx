@@ -43,14 +43,13 @@ export function ProblemSection() {
   return (
     // ATTACHE LA RÉFÉRENCE ICI
     <section ref={sectionRef} className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
-      {/* Cold phosphor background — desaturated for monochrome feel */}
-      <div className="absolute inset-0 opacity-[0.13] grayscale pointer-events-none">
-        {/* LE SHADER S'ÉTEINT QUAND ON PART */}
+      {/* Phosphor background */}
+      <div className="absolute inset-0 opacity-[0.32] pointer-events-none">
         {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
       </div>
 
       {/* Radial vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,transparent_0%,var(--bg-primary)_75%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_10%,var(--bg-primary)_72%)] pointer-events-none" />
 
       {/* Top edge fade */}
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />

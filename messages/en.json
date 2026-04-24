@@ -228,6 +228,15 @@
     "tier4Feature5": "Personalized onboarding",
     "tier4Feature6": "99.9% SLA",
     "tier4Cta": "Contact us",
+    "billingMonthly": "Monthly",
+    "billingYearly": "Yearly",
+    "yearlyBadge": "Save 20%",
+    "tier2PriceYearly": "€15",
+    "tier2PeriodYearly": "/ mo, billed yearly",
+    "tier3PriceYearly": "€39",
+    "tier3PeriodYearly": "/ mo, billed yearly",
+    "tier4PriceYearly": "€119",
+    "tier4PeriodYearly": "/ mo, billed yearly",
     "compareCta": "See full pricing comparison →"
   },
   "trust": {

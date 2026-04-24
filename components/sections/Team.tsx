@@ -163,12 +163,25 @@ export function TeamSection() {
         </motion.div>
 
         {/* LAYER 5 : 8 CARDS */}
-        <div className="absolute inset-x-0 bottom-0 z-10 px-4 md:px-8 pb-8 md:pb-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2.5 md:gap-3">
+        <div className="absolute inset-x-0 bottom-0 z-10 pb-6 md:pb-10">
+          {/* Mobile: horizontal scroll — prevents 4-row overflow inside sticky viewport */}
+          <div className="md:hidden overflow-x-auto px-4 pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
+            <div className="flex gap-2.5 w-max">
               {cards.map((card) => (
-                <AgentCard key={card.id} {...card} />
+                <div key={card.id} className="w-44 shrink-0">
+                  <AgentCard {...card} />
+                </div>
               ))}
+            </div>
+          </div>
+          {/* Desktop: 4×2 grid */}
+          <div className="hidden md:block px-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-4 gap-3">
+                {cards.map((card) => (
+                  <AgentCard key={card.id} {...card} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
