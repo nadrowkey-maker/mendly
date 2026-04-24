@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-fraunces: var(--font-fraunces);
+  --color-brand: var(----brand);
+  --color-color-5: var(----color-5);
+  --color-color-4: var(----color-4);
+  --color-color-3: var(----color-3);
+  --color-color-2: var(----color-2);
+  --color-color-1: var(----color-1);
 }
 
 :root {
@@ -28,6 +36,12 @@
   /* Borders */
   --border: rgba(139, 92, 246, 0.15);
   --border-strong: rgba(139, 92, 246, 0.3);
+  --color-1: hsl(330 100% 40%);
+  --color-2: hsl(140 100% 55%);
+  --color-3: hsl(210 100% 30%);
+  --color-4: hsl(60 100% 70%);
+  --color-5: hsl(295 100% 45%);
+  --brand: hsl(50 100% 50%);
 }
 
 * {
@@ -75,4 +89,49 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.dark {
+  --color-1: hsl(330 100% 40%);
+  --color-2: hsl(140 100% 55%);
+  --color-3: hsl(210 100% 30%);
+  --color-4: hsl(60 100% 70%);
+  --color-5: hsl(295 100% 45%);
+  --brand: hsl(50 100% 50%);
+}
+
+/* GradientText keyframes */
+@keyframes gradient-border {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8%) scale(1.05); }
+}
+@keyframes gradient-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(40%, 40%) rotate(200deg); }
+}
+@keyframes gradient-2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-40%, 40%) rotate(-200deg); }
+}
+@keyframes gradient-3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(40%, -40%) rotate(200deg); }
+}
+@keyframes gradient-4 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-40%, -40%) rotate(-200deg); }
+}
+
+/* SplineScene suspense fallback */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--surface);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }

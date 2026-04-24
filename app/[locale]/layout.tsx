@@ -11,7 +11,7 @@ const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-fraunces',
   style: ['normal', 'italic'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['300', '400', '500', '600', '700', '900'],
 });
 
 export function generateStaticParams() {
@@ -33,7 +33,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
+      className={`dark ${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
     >
       <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

@@ -101,9 +101,9 @@ const TubesCursor = ({
   }, [initialColors, lightColors, lightIntensity, enableRandomizeOnClick]);
 
   return (
-    <div className={`relative h-screen w-screen overflow-hidden ${className}`}>
-      {/* Background canvas */}
-      <canvas ref={canvasRef} className="fixed inset-0 block h-full w-full" />
+    <div className={`relative h-screen w-screen ${className}`}>
+      {/* Background canvas — absolute so CSS mix-blend-mode on parent wrapper works */}
+      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
 
       {/* Hero text */}
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-2 select-none">
