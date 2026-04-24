@@ -63,7 +63,8 @@ const GlowCard: React.FC<GlowCardProps> = ({
   };
 
   const getInlineStyles = () => {
-    const baseStyles = {
+    // On définit le type comme 'any' pour permettre les variables CSS personnalisées (--base, etc.)
+    const baseStyles: any = {
       '--base': base,
       '--spread': spread,
       '--radius': '14',
@@ -90,7 +91,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
       touchAction: 'none' as const,
     };
 
-    // Add width and height if provided
+    // Maintenant, TypeScript ne râlera plus ici
     if (width !== undefined) {
       baseStyles.width = typeof width === 'number' ? `${width}px` : width;
     }
