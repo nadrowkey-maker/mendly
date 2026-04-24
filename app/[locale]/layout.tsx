@@ -37,7 +37,7 @@ export default async function LocaleLayout({
     >
       <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        <TubeCursor />
+        
       </body>
     </html>
   );
