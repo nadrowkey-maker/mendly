@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import DigitalPetalsShader from "@/components/digital-petals-shader";
-import { ShaderCanvas, SHADER_SRC } from "@/components/raidal-2";
 import { GradientText } from "@/components/ui/gradient-text";
 import { LiquidButton } from "@/components/liquid-glass-button";
 
@@ -11,26 +10,24 @@ export function FinalCtaSection() {
 
   return (
     <section className="relative overflow-hidden py-32 md:py-52 px-6 md:px-12">
-      {/* Digital petals — organic, color-rich layer */}
+      {/* CONSEIL STRATÉGIQUE : 
+          On garde UNIQUEMENT DigitalPetalsShader. 
+          L'empilement avec raidal-2 créait une boucle infinie d'événements "Resize".
+      */}
       <div className="absolute inset-0 pointer-events-none">
         <DigitalPetalsShader />
       </div>
 
-      {/* raidal-2 vortex — screen-blended over petals */}
-      <div className="absolute inset-0 opacity-20 mix-blend-screen pointer-events-none">
-        <ShaderCanvas fragSource={SHADER_SRC} />
-      </div>
-
-      {/* Radial vignette — text legibility */}
+      {/* Radial vignette — Pour la lisibilité du texte */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_65%_at_50%_50%,transparent_15%,var(--bg-primary)_80%)] pointer-events-none" />
 
-      {/* Top / bottom fades */}
+      {/* Top / bottom fades — Pour une transition douce avec les autres sections */}
       <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
 
-        {/* ── ONE UNIFIED MANIFESTO BLOCK ── */}
+        {/* ── MANIFESTO BLOCK ── */}
         <motion.div
           initial={{ opacity: 0, y: 48 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,18 +35,14 @@ export function FinalCtaSection() {
           viewport={{ once: true, margin: "-80px" }}
           className="mb-14 md:mb-20"
         >
-          {/* Premise — smaller, dimmed: acts as context */}
           <p className="text-base md:text-lg text-(--text-dim) font-fraunces italic tracking-widest mb-6 uppercase">
             {t("manifesto1")}
           </p>
 
-          {/* Main statement — flows as ONE typographic block */}
           <p className="font-fraunces italic font-bold leading-[1.1] tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-            {/* Line 2 — white, the subject */}
             <span className="text-white">
               {t("manifesto2")}
             </span>
-            {/* Line 3 — gradient punchline, inline continuation */}
             {" "}
             <GradientText as="span" className="bg-transparent dark:bg-transparent">
               {t("manifesto3")}
