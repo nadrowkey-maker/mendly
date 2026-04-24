@@ -50,101 +50,110 @@ function PricingCard({
   const displayPeriod = isYearly && tier.periodYearly ? tier.periodYearly : tier.period;
 
   return (
+    /* Outer wrapper: no overflow-hidden so the badge floats freely above */
     <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={tier.popular ? {} : { y: -4, scale: 1.02 }}
+      whileHover={tier.popular ? {} : { y: -5, scale: 1.02 }}
       transition={{ duration: 0.7, delay: reduced ? 0 : index * 0.09, ease: [0.25, 1, 0.5, 1] }}
       viewport={{ once: true, margin: "-60px" }}
-      className={cn(
-        "rounded-3xl border p-6 flex flex-col gap-5 relative overflow-hidden group/card cursor-pointer",
-        tier.popular
-          ? "bg-(--surface) border-(--accent-primary) shadow-[0_0_60px_rgba(139,92,246,0.32)] lg:scale-[1.04] z-10"
-          : "bg-(--surface)/50 border-(--border) backdrop-blur-sm hover:border-(--accent-primary)/40 transition-colors duration-300"
-      )}
+      className={cn("relative group/card", tier.popular ? "lg:scale-[1.04] z-10" : "")}
     >
-      {/* Mouse-tracking spotlight */}
-      <div
-        className={cn(
-          "absolute inset-0 rounded-3xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none",
-          tier.popular
-            ? "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.18)_0%,transparent_60%)]"
-            : "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.10)_0%,transparent_55%)]"
-        )}
-      />
-
-      {/* Gradient shimmer on the border for popular card */}
-      {tier.popular && (
-        <div className="absolute inset-0 rounded-3xl pointer-events-none [background:linear-gradient(135deg,rgba(139,92,246,0.12)_0%,transparent_40%,rgba(6,182,212,0.08)_100%)]" />
-      )}
-
+      {/* Badge — sits above the card, outside overflow-hidden */}
       {tier.badge && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-(--accent-primary) text-white text-[11px] font-semibold tracking-[0.1em] whitespace-nowrap shadow-[0_0_24px_rgba(139,92,246,0.6)] z-10">
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-(--accent-primary) text-white text-[11px] font-semibold tracking-[0.1em] whitespace-nowrap shadow-[0_0_24px_rgba(139,92,246,0.6)] z-20">
           {tier.badge}
         </div>
       )}
 
-      {/* Name + price */}
-      <div className={tier.badge ? "mt-2 relative z-10" : "relative z-10"}>
-        <p className="text-[11px] font-mono font-bold tracking-[0.2em] text-(--text-dim) uppercase">{tier.name}</p>
-        <div className="flex items-baseline gap-1.5 mt-2 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={displayPrice}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.22, ease: [0.25, 1, 0.5, 1] }}
-              className="text-3xl font-bold text-white"
-            >
-              {displayPrice}
-            </motion.span>
-          </AnimatePresence>
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={displayPeriod}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-sm text-(--text-dim)"
-            >
-              {displayPeriod}
-            </motion.span>
-          </AnimatePresence>
+      {/* Inner card — has overflow-hidden for spotlight/shimmer */}
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className={cn(
+          "rounded-3xl border p-6 flex flex-col gap-5 overflow-hidden relative cursor-pointer h-full",
+          tier.popular
+            ? "bg-(--surface) border-(--accent-primary) shadow-[0_0_60px_rgba(139,92,246,0.30)]"
+            : "bg-(--surface)/50 border-(--border) backdrop-blur-sm hover:border-(--accent-primary)/40 transition-colors duration-300"
+        )}
+      >
+        {/* Mouse-tracking spotlight */}
+        <div
+          className={cn(
+            "absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none",
+            tier.popular
+              ? "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.20)_0%,transparent_60%)]"
+              : "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.10)_0%,transparent_55%)]"
+          )}
+        />
+
+        {/* Diagonal gradient overlay on popular card */}
+        {tier.popular && (
+          <div className="absolute inset-0 pointer-events-none [background:linear-gradient(135deg,rgba(139,92,246,0.10)_0%,transparent_45%,rgba(6,182,212,0.07)_100%)]" />
+        )}
+
+        {/* Name + price */}
+        <div className={cn("relative z-10", tier.badge ? "mt-2" : "")}>
+          <p className="text-[11px] font-mono font-bold tracking-[0.2em] text-(--text-dim) uppercase">{tier.name}</p>
+          <div className="flex items-baseline gap-1.5 mt-2 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={displayPrice}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+                className="text-3xl font-bold text-white"
+              >
+                {displayPrice}
+              </motion.span>
+            </AnimatePresence>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={displayPeriod}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="text-sm text-(--text-dim)"
+              >
+                {displayPeriod}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+          <p className="text-sm text-(--text-muted) mt-1">{tier.tagline}</p>
         </div>
-        <p className="text-sm text-(--text-muted) mt-1">{tier.tagline}</p>
-      </div>
 
-      {/* Divider */}
-      <div className={cn("h-px relative z-10", tier.popular ? "bg-(--accent-primary)/30" : "bg-(--border)")} />
+        {/* Divider */}
+        <div className={cn("h-px relative z-10", tier.popular ? "bg-(--accent-primary)/30" : "bg-(--border)")} />
 
-      {/* Features */}
-      <ul className="space-y-2.5 flex-1 relative z-10">
-        {tier.features.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-sm text-(--text-muted)">
-            <Check
-              className={cn(
-                "w-4 h-4 shrink-0 mt-0.5",
-                tier.popular ? "text-(--accent-glow)" : "text-(--text-dim) group-hover/card:text-(--accent-glow) transition-colors duration-300"
-              )}
-            />
-            {f}
-          </li>
-        ))}
-      </ul>
+        {/* Features */}
+        <ul className="space-y-2.5 flex-1 relative z-10">
+          {tier.features.map((f) => (
+            <li key={f} className="flex items-start gap-2.5 text-sm text-(--text-muted)">
+              <Check
+                className={cn(
+                  "w-4 h-4 shrink-0 mt-0.5 transition-colors duration-300",
+                  tier.popular
+                    ? "text-(--accent-glow)"
+                    : "text-(--text-dim) group-hover/card:text-(--accent-glow)"
+                )}
+              />
+              {f}
+            </li>
+          ))}
+        </ul>
 
-      {/* CTA */}
-      <div className="relative z-10">
-        <LiquidButton
-          size="lg"
-          className={cn("w-full font-semibold", tier.popular ? "text-white" : "text-(--text-muted)")}
-        >
-          {tier.cta}
-        </LiquidButton>
+        {/* CTA */}
+        <div className="relative z-10">
+          <LiquidButton
+            size="lg"
+            className={cn("w-full font-semibold", tier.popular ? "text-white" : "text-(--text-muted)")}
+          >
+            {tier.cta}
+          </LiquidButton>
+        </div>
       </div>
     </motion.div>
   );
@@ -187,7 +196,7 @@ export function PricingSection() {
 
   return (
     <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-secondary)">
-      {/* Aurora ambient blobs */}
+      {/* Aurora blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[rgba(139,92,246,0.09)] blur-[120px]" />
         <div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-[rgba(6,182,212,0.07)] blur-[100px]" />
@@ -221,29 +230,50 @@ export function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
           viewport={{ once: true }}
-          className="flex items-center justify-center gap-3 mb-14"
+          className="flex items-center justify-center gap-3 mb-16"
         >
-          <span className={cn("text-sm font-medium transition-colors duration-200", !isYearly ? "text-white" : "text-(--text-dim)")}>
+          <button
+            onClick={() => setIsYearly(false)}
+            className={cn(
+              "text-sm font-medium transition-colors duration-200 cursor-pointer",
+              !isYearly ? "text-white" : "text-(--text-dim)"
+            )}
+          >
             {t("billingMonthly")}
-          </span>
+          </button>
+
+          {/* Toggle track */}
           <button
             onClick={() => setIsYearly((v) => !v)}
+            aria-checked={isYearly}
+            role="switch"
             aria-label="Toggle billing period"
-            className={cn(
-              "relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--accent-primary)",
-              isYearly ? "bg-(--accent-primary)" : "bg-(--surface-elevated)"
-            )}
+            className="relative w-12 h-6 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-(--accent-primary) cursor-pointer"
           >
             <span
               className={cn(
-                "absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300",
-                isYearly ? "translate-x-6" : "translate-x-1"
+                "absolute inset-0 rounded-full transition-colors duration-300",
+                isYearly ? "bg-(--accent-primary)" : "bg-(--surface-elevated)"
+              )}
+            />
+            <span
+              className={cn(
+                "absolute top-1 left-0 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300",
+                isYearly ? "translate-x-7" : "translate-x-1"
               )}
             />
           </button>
-          <span className={cn("text-sm font-medium transition-colors duration-200", isYearly ? "text-white" : "text-(--text-dim)")}>
+
+          <button
+            onClick={() => setIsYearly(true)}
+            className={cn(
+              "text-sm font-medium transition-colors duration-200 cursor-pointer",
+              isYearly ? "text-white" : "text-(--text-dim)"
+            )}
+          >
             {t("billingYearly")}
-          </span>
+          </button>
+
           <AnimatePresence>
             {isYearly && (
               <motion.span
@@ -259,7 +289,7 @@ export function PricingSection() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Tier cards */}
+        {/* Cards — py-6 leaves room for the badge to float above */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start py-6">
           {tiers.map((tier, i) => (
             <PricingCard key={tier.name} tier={tier} index={i} reduced={reduced} isYearly={isYearly} />

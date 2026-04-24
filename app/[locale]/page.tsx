@@ -27,6 +27,13 @@ import { Trust } from "@/components/sections/Trust";
 import { FinalCtaSection } from "@/components/sections/FinalCta";
 import { Footer } from "@/components/layout/Footer";
 import { routing } from "@/i18n/routing";
+import {
+  TransitionCrystalRings,
+  TransitionStellarGate,
+  TransitionLightSweep,
+  TransitionEventHorizon,
+  TransitionCosmicIgnite,
+} from "@/components/sections/Transitions";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -39,13 +46,18 @@ export default function HomePage() {
       <main>
         <Hero />
         <ProblemSection />
+        <TransitionCrystalRings />
         <PromiseSection />
         <HowItWorksSection />
+        <TransitionStellarGate />
         <TeamSection />
         <ActionSection />
+        <TransitionLightSweep />
         <DeliverablesSection />
         <Comparison />
+        <TransitionEventHorizon />
         <PricingSection />
+        <TransitionCosmicIgnite />
         <Trust />
         <FinalCtaSection />
       </main>

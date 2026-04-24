@@ -33,13 +33,14 @@ function AgentCard({
   // L'algorithme d'apparition mathématique que tu avais créé (intouché)
   const row = Math.floor(index / 4);
   const colInRow = index % 4;
-  const baseStart = 0.45 + row * 0.1;
-  const start = baseStart + colInRow * 0.02;
-  const end = start + 0.13;
+  // Row 0 starts at 0.22, row 1 at 0.30 — both rows fully visible by ~1.3 screens of scroll
+  const baseStart = 0.22 + row * 0.08;
+  const start = baseStart + colInRow * 0.015;
+  const end = start + 0.10;
 
   const cardOpacity = useTransform(scrollProgress, [start, end], [0, 1]);
-  const cardY = useTransform(scrollProgress, [start, end], [80, 0]);
-  const cardScale = useTransform(scrollProgress, [start, end], [0.85, 1]);
+  const cardY = useTransform(scrollProgress, [start, end], [14, 0]);
+  const cardScale = useTransform(scrollProgress, [start, end], [0.93, 1]);
 
   return (
     <motion.div
@@ -52,15 +53,15 @@ function AgentCard({
           "--glow-b": `${color}28`,
         } as CSSProperties
       }
-      className="group h-full"
+      className="group"
     >
       <TiltCard
         spotlight
         tiltLimit={10}
         scale={1.03}
-        className="rounded-3xl border border-[var(--glow-b)] bg-(--surface)/75 backdrop-blur-xl p-4 h-full"
+        className="rounded-3xl border border-[var(--glow-b)] bg-(--surface)/75 backdrop-blur-xl p-4"
       >
-        <div className="flex flex-col gap-2 h-full">
+        <div className="flex flex-col gap-2 min-h-40 md:min-h-45">
           <span className="text-xl font-bold font-mono tracking-tight text-[var(--glow)] drop-shadow-[0_0_14px_var(--glow)]">
             {role}
           </span>
@@ -101,11 +102,11 @@ export function TeamSection() {
   // Les transformations de scroll originales
   const robotScale = useTransform(scrollYProgress, [0, 0.2, 0.75, 1], [1.12, 1.12, 0.92, 0.92]);
   const robotOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [1, 1, 0.82, 0.82]);
-  const headingOpacity = useTransform(scrollYProgress, [0.2, 0.35], [0, 1]);
-  const headingY = useTransform(scrollYProgress, [0.2, 0.35], [40, 0]);
-  const subOpacity = useTransform(scrollYProgress, [0.32, 0.45], [0, 1]);
-  const subY = useTransform(scrollYProgress, [0.32, 0.45], [30, 0]);
-  const fadeOpacity = useTransform(scrollYProgress, [0, 0.45, 0.75], [0.25, 0.55, 1]);
+  const headingOpacity = useTransform(scrollYProgress, [0.08, 0.20], [0, 1]);
+  const headingY = useTransform(scrollYProgress, [0.08, 0.20], [40, 0]);
+  const subOpacity = useTransform(scrollYProgress, [0.15, 0.24], [0, 1]);
+  const subY = useTransform(scrollYProgress, [0.15, 0.24], [30, 0]);
+  const fadeOpacity = useTransform(scrollYProgress, [0, 0.22, 0.60], [0.20, 0.50, 1]);
 
   const cards = AGENTS.map((agent, index) => ({
     id: agent.id,
@@ -122,7 +123,7 @@ export function TeamSection() {
   }));
 
   return (
-    <section ref={sectionRef} className="relative bg-(--bg-primary)" style={{ height: "500vh" }}>
+    <section ref={sectionRef} className="relative bg-(--bg-primary)" style={{ height: "320vh" }}>
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
         {/* LAYER 0 : ROBOT */}

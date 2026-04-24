@@ -3,15 +3,15 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { Fraunces } from 'next/font/google';
+import { Cormorant_Garamond } from 'next/font/google';
 import { TubeCursor } from '@/components/ui/TubeCursor';
 import '../globals.css';
 
-const fraunces = Fraunces({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   variable: '--font-fraunces',
   style: ['normal', 'italic'],
-  weight: ['300', '400', '500', '600', '700', '900'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 export function generateStaticParams() {
@@ -33,11 +33,11 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`dark ${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
+      className={`dark ${GeistSans.variable} ${GeistMono.variable} ${cormorant.variable}`}
     >
       <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        
+
       </body>
     </html>
   );
