@@ -1,5 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
+import { useRef } from "react"; // AJOUT
+import { motion, useInView } from "framer-motion"; // AJOUT
 import { useTranslations } from "next-intl";
 import DigitalPetalsShader from "@/components/digital-petals-shader";
 import { GradientText } from "@/components/ui/gradient-text";
@@ -8,14 +9,20 @@ import { LiquidButton } from "@/components/liquid-glass-button";
 export function FinalCtaSection() {
   const t = useTranslations("finalCta");
 
+  // SÉCURITÉ
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "200px 0px" });
+
   return (
-    <section className="relative overflow-hidden py-32 md:py-52 px-6 md:px-12">
+    // ATTACHE LA RÉFÉRENCE ICI
+    <section ref={sectionRef} className="relative overflow-hidden py-32 md:py-52 px-6 md:px-12">
       {/* CONSEIL STRATÉGIQUE : 
           On garde UNIQUEMENT DigitalPetalsShader. 
           L'empilement avec raidal-2 créait une boucle infinie d'événements "Resize".
       */}
       <div className="absolute inset-0 pointer-events-none">
-        <DigitalPetalsShader />
+        {/* LE SHADER NE SE LANCE QUE TOUT EN BAS DU SITE */}
+        {isInView && <DigitalPetalsShader />}
       </div>
 
       {/* Radial vignette — Pour la lisibilité du texte */}

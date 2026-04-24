@@ -1,5 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
+import { useRef } from "react"; // AJOUT
+import { motion, useInView } from "framer-motion"; // AJOUT de useInView
 import { useTranslations } from "next-intl";
 import { ShaderCanvas, SHADER_SRC } from "@/components/phosphor-30";
 import { GlowCard } from "@/components/spotlight-card";
@@ -13,6 +14,10 @@ const FADE_UP = (delay: number) => ({
 
 export function ProblemSection() {
   const t = useTranslations("problem");
+  
+  // SÉCURITÉ
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "200px 0px" });
 
   const cards = [
     {
@@ -36,10 +41,12 @@ export function ProblemSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
+    // ATTACHE LA RÉFÉRENCE ICI
+    <section ref={sectionRef} className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
       {/* Cold phosphor background — desaturated for monochrome feel */}
       <div className="absolute inset-0 opacity-[0.13] grayscale pointer-events-none">
-        <ShaderCanvas fragSource={SHADER_SRC} />
+        {/* LE SHADER S'ÉTEINT QUAND ON PART */}
+        {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
       </div>
 
       {/* Radial vignette */}

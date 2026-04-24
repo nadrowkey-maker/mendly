@@ -1,7 +1,8 @@
 "use client";
 
+import { useRef } from "react"; // AJOUT
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion"; // AJOUT
 import { ShaderCanvas, SHADER_SRC } from "@/components/radial-shader";
 
 type Row = {
@@ -13,6 +14,10 @@ type Row = {
 
 export function Comparison() {
   const t = useTranslations("comparison");
+
+  // SÉCURITÉ
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "200px 0px" });
 
   const rows: Row[] = [
     {
@@ -60,13 +65,16 @@ export function Comparison() {
   ];
 
   return (
+    // ATTACHE LA RÉFÉRENCE
     <section
+      ref={sectionRef}
       id="comparison"
       className="relative py-24 md:py-32 px-6 md:px-12 overflow-hidden"
     >
       {/* Radial shader as very subtle background texture */}
       <div className="absolute inset-0 opacity-[0.07] pointer-events-none">
-        <ShaderCanvas fragSource={SHADER_SRC} />
+        {/* LE SHADER S'ÉTEINT QUAND ON PART */}
+       {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
       </div>
 
       {/* Vignette so shader fades at edges */}

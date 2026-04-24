@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useInView } from "framer-motion"; // AJOUT DE useInView
+import { useEffect, useState, useRef } from "react"; // AJOUT DE useRef
 import { AnimatedShaderBg } from "@/components/ui/AnimatedShaderBg";
 import VaporizeTextCycle, { Tag } from "@/components/vapour-text-effect";
 import { LiquidButton } from "@/components/liquid-glass-button";
@@ -10,15 +10,20 @@ import { LiquidButton } from "@/components/liquid-glass-button";
 export function Hero() {
   const t = useTranslations("hero");
   const [reducedMotion, setReducedMotion] = useState(false);
+  
+  // LA MAGIE EST ICI : On crée la référence et on vérifie la visibilité
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "200px 0px" });
 
   useEffect(() => {
     setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 md:px-12">
-      {/* WebGL2 aurora — Mendly palette, mouse-reactive */}
-      <AnimatedShaderBg />
+    // On attache la référence à la section
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 md:px-12">
+      {/* ON COUPE LE SHADER SI ON NE LE VOIT PAS */}
+      {isInView && <AnimatedShaderBg />}
 
       {/* Grid overlay */}
       <div
