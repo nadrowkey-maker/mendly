@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { Sheet, SheetContent } from "@/components/sheet";
 import { MenuToggle } from "@/components/menu-toggle";
-import { LiquidButton } from "@/components/liquid-glass-button";
+import { PremiumButton } from "@/components/ui/PremiumButton";
 
 export function Nav() {
   const t = useTranslations("nav");
@@ -90,9 +90,9 @@ export function Nav() {
               ))}
             </div>
 
-            <LiquidButton className="rounded-full bg-[var(--accent-primary)]/80 text-white font-semibold text-sm">
+            <PremiumButton variant="primary" size="sm">
               {t("cta")}
-            </LiquidButton>
+            </PremiumButton>
           </div>
 
           {/* Mobile drawer */}
@@ -146,9 +146,9 @@ export function Nav() {
                     </button>
                   ))}
                 </div>
-                <LiquidButton className="w-full rounded-full bg-[var(--accent-primary)]/80 text-white font-semibold text-sm">
+                <PremiumButton variant="primary" size="sm" className="w-full justify-center">
                   {t("cta")}
-                </LiquidButton>
+                </PremiumButton>
               </div>
             </SheetContent>
           </Sheet>

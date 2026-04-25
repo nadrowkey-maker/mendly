@@ -5,6 +5,7 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Cormorant_Garamond } from 'next/font/google';
 import { TubeCursor } from '@/components/ui/TubeCursor';
+import { TransitionPortal } from '@/components/ui/TransitionPortal';
 import '../globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -35,9 +36,10 @@ export default async function LocaleLayout({
       lang={locale}
       className={`dark ${GeistSans.variable} ${GeistMono.variable} ${cormorant.variable}`}
     >
-      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+      <body className="antialiased bg-(--bg-primary) text-(--text-primary) font-sans">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
-
+        <TubeCursor />
+        <TransitionPortal />
       </body>
     </html>
   );

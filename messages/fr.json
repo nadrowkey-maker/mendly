@@ -13,7 +13,7 @@
     "sub": "Mendly assemble 8 spécialistes IA — une direction complète de CEO, CTO, CMO et 5 autres — qui collaborent sur ton projet comme une vraie équipe de startup. Pas des prompts. Une équipe.",
     "ctaPrimary": "Rejoindre la liste d'attente",
     "ctaSecondary": "Voir comment ça marche",
-    "trust": "Propulsé par Claude, GPT-4 et Gemini · Pensé pour les fondateurs qui livrent"
+    "trust": "Pensé pour les fondateurs qui livrent"
   },
   "problem": {
     "eyebrow": "LA MALÉDICTION DU FONDATEUR SOLO",
@@ -286,6 +286,6 @@
     "col4Link3": "Cookies",
     "col4Link4": "Mentions légales",
     "bottomLine1": "© 2026 Mendly. Fait par des fondateurs, pour des fondateurs.",
-    "bottomLine2": "Propulsé par Claude, GPT-4 et Gemini."
+    "bottomLine2": "Mendly."
   }
 }

@@ -64,8 +64,8 @@ export function ShaderAnimation() {
           
           // --- Creative Coloring ---
           // Define a cool and a warm color
-          vec3 color1 = vec3(0.0, 0.5, 1.0); // Electric Blue
-          vec3 color2 = vec3(1.0, 0.2, 0.5); // Magenta/Pink
+          vec3 color1 = vec3(0.545, 0.361, 0.965); // violet #8B5CF6
+          vec3 color2 = vec3(0.024, 0.714, 0.831); // cyan #06B6D4
           
           // Mix colors based on UV position and time for a dynamic gradient
           vec3 baseColor = mix(color1, color2, sin(length(uv) * 2.0 - t) * 0.5 + 0.5);

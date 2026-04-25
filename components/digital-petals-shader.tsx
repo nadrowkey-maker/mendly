@@ -48,9 +48,9 @@ const DigitalPetalsShader = () => {
         petalShape = pow(abs(petalShape), 0.5);
         float flow = sin(r * 10.0 - t * 2.0);
         float pattern = mix(petalShape, flow, 0.5) + bloom * 0.5;
-        vec3 color1 = vec3(0.8, 0.1, 0.5);
-        vec3 color2 = vec3(0.2, 0.4, 0.9);
-        vec3 highlightColor = vec3(1.0);
+        vec3 color1 = vec3(0.545, 0.361, 0.965);
+        vec3 color2 = vec3(0.024, 0.714, 0.831);
+        vec3 highlightColor = vec3(0.941, 0.671, 0.988);
         vec3 finalColor = mix(color1, color2, smoothstep(0.5, 0.8, r + random(vec2(t, t)) * 0.1)) * pattern;
         finalColor += highlightColor * pow(pattern, 10.0) * (1.0 + bloom);
         gl_FragColor = vec4(finalColor, 1.0);

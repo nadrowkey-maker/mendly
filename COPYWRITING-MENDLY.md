@@ -81,7 +81,7 @@ de startup. Pas des prompts. Une équipe.
 
 **Trust strip**
 ```
-Propulsé par Claude, GPT-4 et Gemini · Pensé pour les fondateurs qui livrent
+Pensé pour les fondateurs qui livrent
 ```
 
 ---
