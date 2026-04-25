@@ -1,18 +1,3 @@
-// Section order:
-// 0.  Nav          — sticky header, locale switcher, CTA
-// 1.  Hero         — aurora shader bg, vapour text, PremiumButton CTAs
-// 2.  Problem      — cold phosphor bg, GlowCard stat cards
-// 3.  Promise      — shader-animation rings bg, GradientText, Fraunces editorial
-// 4.  HowItWorks   — horizontal connected timeline, ambient violet glow
-// 5.  Team         — Spline robot fullscreen, scroll-driven 8 agent cards (no wrapper — has own sticky scroll)
-// 6.  Action       — agent chat mockup, staggered messages, typing indicator
-// 7.  Deliverables — 2-row perspective infinite marquee
-// 8.  Comparison   — table, radial-shader bg
-// 9.  Pricing      — 4-tier cards, popular badge, PremiumButton CTAs
-// 10. Trust        — cobe-globe, neno-shader, trust cards
-// 11. Final CTA    — digital-petals + radial-2 bg, manifesto, PremiumButton
-// 12. Footer       — 4-column links
-
 import { Nav } from "@/components/layout/Nav";
 import { Hero } from "@/components/sections/Hero";
 import { ProblemSection } from "@/components/sections/Problem";
@@ -38,12 +23,16 @@ export default function HomePage() {
     <>
       <Nav />
       <main>
-        <SectionTransition><Hero /></SectionTransition>
+        {/* 🚨 LA CORRECTION EST ICI : Le Hero n'a plus de SectionTransition ! */}
+        <Hero /> 
+        
         <SectionTransition><ProblemSection /></SectionTransition>
         <SectionTransition><PromiseSection /></SectionTransition>
         <SectionTransition><HowItWorksSection /></SectionTransition>
+        
         {/* TeamSection: has its own 500vh sticky scroll animation — must not be wrapped */}
         <TeamSection />
+        
         <SectionTransition><ActionSection /></SectionTransition>
         <SectionTransition><DeliverablesSection /></SectionTransition>
         <SectionTransition><Comparison /></SectionTransition>

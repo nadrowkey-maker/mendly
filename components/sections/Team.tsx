@@ -5,6 +5,7 @@ import {
   useScroll,
   useTransform,
   MotionValue,
+  useInView // ✅ IMPORTÉ ICI
 } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRef, type CSSProperties } from "react";
@@ -40,16 +41,11 @@ function AgentCard({
   reduced,
   scrollProgress,
 }: AgentCardProps) {
-  // ═══ TIMING COMPRESSÉ POUR APPARITION PRÉCOCE ═══
   const row = Math.floor(index / 4);
   const colInRow = index % 4;
   
-  // L'apparition de toutes les cartes est avancée
-  // Première ligne (row 0) : démarre à 22%
-  // Deuxième ligne (row 1) : démarre à 30% (beaucoup plus tôt qu'avant)
   const baseStart = 0.22 + row * 0.08; 
   const start = baseStart + colInRow * 0.015;
-  // L'apparition est plus rapide (12% du scroll) pour un "allumage" net
   const end = start + 0.12; 
 
   const cardOpacity = useTransform(scrollProgress, [start, end], [0, 1]);
@@ -66,13 +62,13 @@ function AgentCard({
           "--glow": color,
         } as CSSProperties
       }
-      className="group pointer-events-auto h-full" /* <-- 1. AJOUTE "h-full" ICI */
+      className="group pointer-events-auto h-full"
     >
       <TiltCard
         spotlight
         tiltLimit={10}
         scale={1.03}
-        className="rounded-3xl border bg-(--surface)/85 backdrop-blur-xl p-4 transition-all duration-500 h-full flex flex-col justify-between" /* <-- 2. AJOUTE "h-full flex flex-col justify-between" ICI */
+        className="rounded-3xl border bg-(--surface)/85 backdrop-blur-xl p-4 transition-all duration-500 h-full flex flex-col justify-between"
         style={{
           borderColor: `${color}66`,
           boxShadow: `0 0 60px ${color}26, inset 0 0 22px ${color}14`,
@@ -128,24 +124,25 @@ export function TeamSection() {
   const learnMore = t("learnMore");
 
   const sectionRef = useRef<HTMLElement>(null);
+  
+  // ✅ DÉTECTION VISIBILITÉ ICI
+  const isInView = useInView(sectionRef, { margin: "500px 0px" });
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // ═ TIMINGS GÉNÉRAUX ÉTALÉS SUR 500VH ═
-  
-  // Le robot rétrécit sur les premiers 25%
+  // ✅ ÉCHELLE ROBOT CORRIGÉE ICI (1.5 max)
   const robotScale = useTransform(
     scrollYProgress,
-    [0, 0.25, 1],
-    [2.8, 1, 0.92]
+    [0, 0.4, 1],
+    [1.5, 1, 0.92]
   );
   
   const robotOpacity = useTransform(
     scrollYProgress,
-    [0, 0.2, 0.85, 1], // Le robot reste visible très longtemps
+    [0, 0.2, 0.85, 1],
     [1, 1, 0.82, 0.82]
   );
 
@@ -155,15 +152,10 @@ export function TeamSection() {
   const subOpacity = useTransform(scrollYProgress, [0.10, 0.20], [0, 1]);
   const subY = useTransform(scrollYProgress, [0.10, 0.20], [30, 0]);
 
-  // ═══ FIX DU DÉGRADÉ NOIR (LAYER 2) ═══
-  // J'ai reculé massivement le dégradé pour qu'il n'assombrisse pas les cartes.
-  // Toutes les cartes sont révélées avant 45% du scroll.
-  // Le dégradé commence à devenir vraiment noir à partir de 80% du scroll,
-  // seulement pour transitionner vers la section suivante.
   const fadeOpacity = useTransform(
     scrollYProgress,
     [0, 0.25, 0.45, 0.80, 0.95],
-    [0.1, 0.3, 0.3, 0.3, 1] // Reste très transparent pendant la lecture
+    [0.1, 0.3, 0.3, 0.3, 1] 
   );
 
   const cards = AGENTS.map((agent, index) => ({
@@ -196,10 +188,13 @@ export function TeamSection() {
             transformOrigin: "center 45%",
           }}
         >
-          <SplineScene
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="w-full h-full"
-          />
+          {/* ✅ LE ROBOT NE CHARGE QUE SI BESOIN */}
+          {isInView && (
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="w-full h-full"
+            />
+          )}
         </motion.div>
 
         {/* LAYER 1 : Ambient violet glow */}
@@ -211,7 +206,7 @@ export function TeamSection() {
           }}
         />
 
-        {/* LAYER 2 : Bottom black fade (CORRIGÉ ET DÉCALÉ) */}
+        {/* LAYER 2 : Bottom black fade */}
         <motion.div
           className="absolute inset-x-0 bottom-0 h-[35%] pointer-events-none z-[2]"
           style={{
@@ -255,9 +250,8 @@ export function TeamSection() {
           </p>
         </motion.div>
 
-        {/* LAYER 5 : 8 CARDS (pointer-events-none ajouté ici, bottom remonté) */}
+        {/* LAYER 5 : 8 CARDS */}
         <div className="absolute inset-x-0 bottom-[8%] md:bottom-[12%] z-10 pb-6 md:pb-10 pointer-events-none">
-          {/* Mobile */}
           <div className="md:hidden overflow-x-auto px-4 pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
             <div className="flex gap-2.5 w-max">
               {cards.map((card) => (
@@ -267,7 +261,6 @@ export function TeamSection() {
               ))}
             </div>
           </div>
-          {/* Desktop */}
           <div className="hidden md:block px-8">
             <div className="max-w-7xl mx-auto">
               <div className="grid grid-cols-4 gap-4">

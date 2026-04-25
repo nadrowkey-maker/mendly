@@ -246,15 +246,16 @@ export default function VaporizeTextCycle({
         case "fadingIn": {
           fadeOpacityRef.current += deltaTime * 1000 / animationDurations.FADE_IN_DURATION;
 
-          // Use particles for fade-in
+          // ✅ OPTIMISATION MAJEURE : On utilise ctx.globalAlpha au lieu d'une Regex destructrice de RAM
           ctx.save();
           ctx.scale(globalDpr, globalDpr);
           particlesRef.current.forEach(particle => {
             particle.x = particle.originalX;
             particle.y = particle.originalY;
             const opacity = Math.min(fadeOpacityRef.current, 1) * particle.originalAlpha;
-            const color = particle.color.replace(/[\d.]+\)$/, `${opacity})`);
-            ctx.fillStyle = color;
+            
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = particle.color;
             ctx.fillRect(particle.x / globalDpr, particle.y / globalDpr, 1, 1);
           });
           ctx.restore();
@@ -593,10 +594,10 @@ const createParticles = (
   const data = imageData.data;
 
   // Calculate sampling rate based on DPR and density to maintain consistent particle density
-  const baseDPR = 3; // Base DPR we're optimizing for
+  const baseDPR = 3; 
   const currentDPR = canvas.width / parseInt(canvas.style.width);
   const baseSampleRate = Math.max(1, Math.round(currentDPR / baseDPR));
-  const sampleRate = Math.max(1, Math.round(baseSampleRate)); // Adjust sample rate by density
+  const sampleRate = Math.max(1, Math.round(baseSampleRate)); 
 
   // Sample the text pixels and create particles
   for (let y = 0; y < canvas.height; y += sampleRate) {
@@ -612,7 +613,8 @@ const createParticles = (
           y,
           originalX: x,
           originalY: y,
-          color: `rgba(${data[index]}, ${data[index + 1]}, ${data[index + 2]}, ${originalAlpha})`,
+          // ✅ OPTIMISATION MAJEURE : On stocke la couleur de base SANS l'opacité (RGB pur)
+          color: `rgb(${data[index]}, ${data[index + 1]}, ${data[index + 2]})`,
           opacity: originalAlpha,
           originalAlpha,
           // Animation properties
@@ -660,9 +662,6 @@ const updateParticles = (
         particle.velocityX = Math.cos(particle.angle) * particle.speed;
         particle.velocityY = Math.sin(particle.angle) * particle.speed;
         
-        // Determine if particle should fade quickly based on density
-        // density of 1 means all particles animate normally
-        // density of 0.5 means 50% of particles fade quickly
         particle.shouldFadeQuickly = Math.random() > density;
       }
       
@@ -723,14 +722,16 @@ const updateParticles = (
   return allParticlesVaporized;
 };
 
+// ✅ OPTIMISATION MAJEURE ICI
 const renderParticles = (ctx: CanvasRenderingContext2D, particles: Particle[], globalDpr: number) => {
   ctx.save();
   ctx.scale(globalDpr, globalDpr);
   
   particles.forEach(particle => {
     if (particle.opacity > 0) {
-      const color = particle.color.replace(/[\d.]+\)$/, `${particle.opacity})`);
-      ctx.fillStyle = color;
+      // On n'utilise plus Regex qui saturait la mémoire :
+      ctx.globalAlpha = particle.opacity;
+      ctx.fillStyle = particle.color;
       ctx.fillRect(particle.x / globalDpr, particle.y / globalDpr, 1, 1);
     }
   });
@@ -753,25 +754,20 @@ const resetParticles = (particles: Particle[]) => {
 // CALCULATE VAPORIZE SPREAD
 // ------------------------------------------------------------ //
 const calculateVaporizeSpread = (fontSize: number) => {
-  // Convert font size string to number if needed
   const size = typeof fontSize === "string" ? parseInt(fontSize) : fontSize;
   
-  // Define our known points for interpolation
   const points = [
     { size: 20, spread: 0.2 },
     { size: 50, spread: 0.5 },
     { size: 100, spread: 1.5 }
   ];
   
-  // Handle edge cases
   if (size <= points[0].size) return points[0].spread;
   if (size >= points[points.length - 1].size) return points[points.length - 1].spread;
   
-  // Find the two points to interpolate between
   let i = 0;
   while (i < points.length - 1 && points[i + 1].size < size) i++;
   
-  // Linear interpolation between the two closest points
   const p1 = points[i];
   const p2 = points[i + 1];
   
@@ -781,34 +777,22 @@ const calculateVaporizeSpread = (fontSize: number) => {
 // ------------------------------------------------------------ //
 // PARSE COLOR
 // ------------------------------------------------------------ //
-/**
- * Extracts RGB/RGBA values from a color string format
- * @param color - Color string (e.g. "rgb(12, 250, 163)")
- * @returns Valid RGBA color string
- */
 const parseColor = (color: string) => {
-  // Try to match rgb/rgba pattern
   const rgbMatch = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
   const rgbaMatch = color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
   
   if (rgbaMatch) {
-    // If RGBA format
     const [_, r, g, b, a] = rgbaMatch;
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   } else if (rgbMatch) {
-    // If RGB format
     const [_, r, g, b] = rgbMatch;
     return `rgba(${r}, ${g}, ${b}, 1)`;
   }
   
-  // Fallback to black if parsing fails
   console.warn("Could not parse color:", color);
   return "rgba(0, 0, 0, 1)";
 };
 
-/**
- * Maps a value from one range to another, optionally clamping the result.
- */
 function transformValue(input: number, inputRange: number[], outputRange: number[], clamp = false): number {
   const [inputMin, inputMax] = inputRange;
   const [outputMin, outputMax] = outputRange;
@@ -827,9 +811,6 @@ function transformValue(input: number, inputRange: number[], outputRange: number
   return result;
 }
 
-/**
- * Custom hook to check if an element is in the viewport
- */
 function useIsInView(ref: React.RefObject<HTMLElement>) {
   const [isInView, setIsInView] = useState(false);
 
