@@ -37,15 +37,26 @@ const GlowCard: React.FC<GlowCardProps> = ({
   const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // ✅ FIX: Calculate mouse position RELATIVE to each card (not global)
+    // The previous code stored window-absolute coordinates, which only worked
+    // when the mouse was near (0,0) of the viewport.
     const syncPointer = (e: PointerEvent) => {
-      const { clientX: x, clientY: y } = e;
-      
-      if (cardRef.current) {
-        cardRef.current.style.setProperty('--x', x.toFixed(2));
-        cardRef.current.style.setProperty('--xp', (x / window.innerWidth).toFixed(2));
-        cardRef.current.style.setProperty('--y', y.toFixed(2));
-        cardRef.current.style.setProperty('--yp', (y / window.innerHeight).toFixed(2));
-      }
+      const card = cardRef.current;
+      if (!card) return;
+
+      const rect = card.getBoundingClientRect();
+      // Position of the mouse RELATIVE to the card's top-left corner
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Normalized values for the hue calculation (0 → 1 across the card)
+      const xp = rect.width > 0 ? x / rect.width : 0;
+      const yp = rect.height > 0 ? y / rect.height : 0;
+
+      card.style.setProperty('--x', x.toFixed(2));
+      card.style.setProperty('--y', y.toFixed(2));
+      card.style.setProperty('--xp', xp.toFixed(2));
+      card.style.setProperty('--yp', yp.toFixed(2));
     };
 
     document.addEventListener('pointermove', syncPointer);
@@ -63,7 +74,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
   };
 
   const getInlineStyles = () => {
-    // On définit le type comme 'any' pour permettre les variables CSS personnalisées (--base, etc.)
     const baseStyles: any = {
       '--base': base,
       '--spread': spread,
@@ -85,13 +95,14 @@ const GlowCard: React.FC<GlowCardProps> = ({
       backgroundColor: 'var(--backdrop, transparent)',
       backgroundSize: 'calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)))',
       backgroundPosition: '50% 50%',
-      backgroundAttachment: 'fixed',
+      // ✅ FIX: removed `backgroundAttachment: 'fixed'` — was anchoring the gradient
+      // to the viewport, which combined with the global mouse coords created the bug.
+      // Now the gradient is anchored to the card itself.
       border: 'var(--border-size) solid var(--backup-border)',
       position: 'relative' as const,
       touchAction: 'none' as const,
     };
 
-    // Maintenant, TypeScript ne râlera plus ici
     if (width !== undefined) {
       baseStyles.width = typeof width === 'number' ? `${width}px` : width;
     }
@@ -102,6 +113,8 @@ const GlowCard: React.FC<GlowCardProps> = ({
     return baseStyles;
   };
 
+  // ✅ FIX: removed `background-attachment: fixed` from ::before and ::after too
+  // so border glows track the card, not the viewport.
   const beforeAfterStyles = `
     [data-glow]::before,
     [data-glow]::after {
@@ -111,7 +124,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
       inset: calc(var(--border-size) * -1);
       border: var(--border-size) solid transparent;
       border-radius: calc(var(--radius) * 1px);
-      background-attachment: fixed;
       background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
       background-repeat: no-repeat;
       background-position: 50% 50%;
