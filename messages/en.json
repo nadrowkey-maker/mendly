@@ -441,5 +441,36 @@
     "disclaimer": "No spam. No credit card. Just early access.",
     "metaTitle": "Join the Mendly Waitlist",
     "metaDescription": "Be among the first founders to access Mendly — your AI C-suite that ships."
+  },
+  "auth": {
+    "loginTitle": "Welcome back.",
+    "loginSubtitle": "Sign in to access your team.",
+    "loginCta": "Sign in",
+    "loginLoading": "Signing in…",
+    "loginLink": "Sign in",
+    "signupTitle": "Build your team.",
+    "signupSubtitle": "Seconds away from your 8 AI specialists.",
+    "signupCta": "Create my account",
+    "signupLoading": "Creating…",
+    "signupLink": "Create an account",
+    "signupSuccessTitle": "Check your email.",
+    "signupSuccessBody": "We sent you a confirmation link. Click it to activate your account.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 6 characters",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "backHome": "← Back to home",
+    "errorInvalidCredentials": "Invalid email or password.",
+    "errorPasswordTooShort": "Password must be at least 6 characters."
+  },
+  "dashboard": {
+    "welcome": "Hey founder.",
+    "signOut": "Sign out",
+    "emptyTitle": "Your team is ready.",
+    "emptyBody": "You don't have any projects yet. Create your first project to meet your CEO, CTO, and CMO.",
+    "loggedInAs": "Logged in as",
+    "createProjectSoon": "Create a project (soon)"
   }
 }

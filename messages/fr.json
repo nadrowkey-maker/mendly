@@ -441,5 +441,36 @@
     "disclaimer": "Pas de spam. Pas de CB. Juste un accès anticipé.",
     "metaTitle": "Rejoindre la liste d'attente Mendly",
     "metaDescription": "Fais partie des premiers fondateurs à accéder à Mendly — ton C-suite IA qui livre."
+},
+  "auth": {
+    "loginTitle": "Bon retour.",
+    "loginSubtitle": "Connecte-toi pour accéder à ton équipe.",
+    "loginCta": "Se connecter",
+    "loginLoading": "Connexion…",
+    "loginLink": "Se connecter",
+    "signupTitle": "Crée ton équipe.",
+    "signupSubtitle": "Quelques secondes et tu as accès à 8 spécialistes IA.",
+    "signupCta": "Créer mon compte",
+    "signupLoading": "Création…",
+    "signupLink": "Créer un compte",
+    "signupSuccessTitle": "Vérifie ton email.",
+    "signupSuccessBody": "On t'a envoyé un lien de confirmation. Clique dessus pour activer ton compte.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "ton@email.com",
+    "passwordLabel": "Mot de passe",
+    "passwordHint": "Minimum 6 caractères",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Tu as déjà un compte ?",
+    "backHome": "← Retour à l'accueil",
+    "errorInvalidCredentials": "Email ou mot de passe incorrect.",
+    "errorPasswordTooShort": "Le mot de passe doit faire au moins 6 caractères."
+  },
+  "dashboard": {
+    "welcome": "Salut chef.",
+    "signOut": "Déconnexion",
+    "emptyTitle": "Ton équipe est prête.",
+    "emptyBody": "Tu n'as pas encore de projet. Crée ton premier projet pour rencontrer ton CEO, CTO et CMO.",
+    "loggedInAs": "Connecté en tant que",
+    "createProjectSoon": "Créer un projet (bientôt)"
   }
 }

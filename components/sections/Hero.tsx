@@ -4,11 +4,10 @@ import { useRef, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { AnimatedShaderBg } from "@/components/ui/AnimatedShaderBg";
+// import { AnimatedShaderBg } from "@/components/ui/AnimatedShaderBg"; // ← TEST: disabled
 import VaporizeTextCycle, { Tag } from "@/components/vapour-text-effect";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 
-// Configuration des pilules décoratives
 const AGENT_PILLS = [
   { label: "CEO · Strategy", color: "#8B5CF6", side: "left", top: "18%" },
   { label: "CTO · Architecture", color: "#06B6D4", side: "right", top: "22%" },
@@ -20,12 +19,10 @@ export function Hero() {
   const t = useTranslations("hero");
   const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
-  
+
   const isInView = useInView(sectionRef, { margin: "100px 0px" });
   const reduced = useReducedMotion() ?? false;
 
-  // Stagger VaporizeTextCycle 250ms after mount so AnimatedShaderBg's WebGL loop
-  // stabilizes before the canvas particle loop starts — prevents competing RAF jank.
   const [showVaporize, setShowVaporize] = useState(false);
   useEffect(() => {
     const id = setTimeout(() => setShowVaporize(true), 250);
@@ -37,33 +34,41 @@ export function Hero() {
       ref={sectionRef}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 md:px-12 bg-(--bg-primary)"
     >
-      {/* ─── LAYER 0: SHADER WEBGL (Aurora) ─── */}
+      {/* ─── LAYER 0: SHADER WEBGL — DISABLED FOR DIAGNOSTIC ─── */}
+      {/* If freeze disappears with this commented out, the shader is the culprit */}
+      {/*
       {isInView && (
         <div className="absolute inset-0 z-0 opacity-60">
           <AnimatedShaderBg />
         </div>
       )}
+      */}
 
-      {/* ─── LAYER 1: SVG AURORAS (Performances max) ─── */}
+      {/* ─── LAYER 1: SVG AURORAS (cheap, static) ─── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-[1]">
         <svg
-          className="absolute inset-0 w-full h-full opacity-40"
+          className="absolute inset-0 w-full h-full opacity-60"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid slice"
           viewBox="0 0 1920 1080"
         >
           <defs>
             <radialGradient id="hero-violet" cx="20%" cy="30%" r="50%">
-              <stop offset="0%" stopColor="rgba(139, 92, 246, 0.4)" />
+              <stop offset="0%" stopColor="rgba(139, 92, 246, 0.55)" />
               <stop offset="100%" stopColor="rgba(139, 92, 246, 0)" />
             </radialGradient>
             <radialGradient id="hero-cyan" cx="80%" cy="25%" r="45%">
-              <stop offset="0%" stopColor="rgba(6, 182, 212, 0.3)" />
+              <stop offset="0%" stopColor="rgba(6, 182, 212, 0.4)" />
               <stop offset="100%" stopColor="rgba(6, 182, 212, 0)" />
+            </radialGradient>
+            <radialGradient id="hero-fuchsia" cx="50%" cy="80%" r="40%">
+              <stop offset="0%" stopColor="rgba(240, 171, 252, 0.3)" />
+              <stop offset="100%" stopColor="rgba(240, 171, 252, 0)" />
             </radialGradient>
           </defs>
           <rect width="1920" height="1080" fill="url(#hero-violet)" />
           <rect width="1920" height="1080" fill="url(#hero-cyan)" />
+          <rect width="1920" height="1080" fill="url(#hero-fuchsia)" />
         </svg>
       </div>
 
@@ -73,8 +78,10 @@ export function Hero() {
         style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)`,
           backgroundSize: "80px 80px",
-          maskImage: "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
         }}
       />
 
@@ -84,10 +91,10 @@ export function Hero() {
           <motion.div
             key={label}
             initial={{ opacity: 0, x: side === "left" ? -30 : 30 }}
-            animate={{ 
-              opacity: 1, 
+            animate={{
+              opacity: 1,
               x: 0,
-              y: reduced ? 0 : [0, -12, 0] 
+              y: reduced ? 0 : [0, -12, 0],
             }}
             transition={{
               opacity: { duration: 0.8, delay: 0.5 + i * 0.15 },
@@ -98,9 +105,8 @@ export function Hero() {
                 ease: "easeInOut",
               },
             }}
-            // On utilise une opacité élevée au lieu du backdrop-blur pour la performance
             className="absolute flex items-center gap-3 px-4 py-2 rounded-full bg-(--surface)/90 border border-(--border-strong) shadow-2xl"
-            style={{ [side]: "6%", top }}
+            style={{ [side]: "6%", top, willChange: "transform" } as any}
           >
             <span
               className="w-2 h-2 rounded-full shadow-[0_0_12px_var(--pill-color)]"
@@ -122,11 +128,7 @@ export function Hero() {
           className="inline-flex items-center gap-3 px-5 py-2 mb-8 rounded-full border border-(--border-strong) bg-(--surface)/80"
         >
           <span className="relative flex h-2.5 w-2.5">
-            <motion.span 
-              animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inline-flex h-full w-full rounded-full bg-(--accent-primary)" 
-            />
+            <span className="absolute inline-flex h-full w-full rounded-full bg-(--accent-primary) opacity-30" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-(--accent-primary)" />
           </span>
           <span className="text-[10px] md:text-xs font-mono font-bold tracking-[0.3em] text-white/60 uppercase">
@@ -151,12 +153,10 @@ export function Hero() {
           transition={{ duration: 1, delay: 0.4 }}
           className="mb-12"
         >
-          {/* Version mobile : texte fixe simple pour éviter le lag sur téléphone */}
           <p className="md:hidden text-3xl italic font-fraunces text-(--accent-glow)">
             {t("titleEm")}
           </p>
-          
-          {/* Version Desktop : L'effet de poussière magique */}
+
           {showVaporize && !reduced && (
             <div className="hidden md:block h-32 w-full">
               <VaporizeTextCycle
@@ -207,9 +207,10 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Bottom Vignette & Scroll */}
+      {/* Bottom Vignette */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_120%,rgba(5,3,14,0.8),transparent_50%)] z-[3]" />
-      
+
+      {/* Scroll indicator */}
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -219,10 +220,10 @@ export function Hero() {
           Scroll to explore
         </span>
         <div className="w-6 h-10 rounded-full border-2 border-white/10 flex justify-center p-1.5">
-          <motion.div 
+          <motion.div
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-2 rounded-full bg-(--accent-glow)" 
+            className="w-1 h-2 rounded-full bg-(--accent-glow)"
           />
         </div>
       </motion.div>

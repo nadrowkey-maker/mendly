@@ -5,7 +5,7 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Cormorant_Garamond } from 'next/font/google';
 // import { TubeCursor } from '@/components/ui/TubeCursor'; // disabled: causes Three.js double-import + global freeze on Hero
-import { TransitionPortal } from '@/components/ui/TransitionPortal';
+// import { TransitionPortal } from '@/components/ui/TransitionPortal'; // disabled: GPU saturation
 import '../globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -39,7 +39,7 @@ export default async function LocaleLayout({
       <body className="antialiased bg-(--bg-primary) text-(--text-primary) font-sans">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
         {/* <TubeCursor /> — disabled: causes Three.js double-import + global freeze on Hero */}
-        <TransitionPortal />
+        {/* <TransitionPortal /> — disabled: WebGL shader running globally was saturating GPU */}
       </body>
     </html>
   );
