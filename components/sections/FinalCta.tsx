@@ -15,13 +15,12 @@ export function FinalCtaSection() {
 
   return (
     // ATTACHE LA RÉFÉRENCE ICI
-    <section ref={sectionRef} className="relative overflow-hidden py-32 md:py-52 px-6 md:px-12">
+    <section id="manifesto" ref={sectionRef} className="relative scroll-mt-20 overflow-hidden py-32 md:py-52 px-6 md:px-12">
       {/* CONSEIL STRATÉGIQUE : 
           On garde UNIQUEMENT DigitalPetalsShader. 
           L'empilement avec raidal-2 créait une boucle infinie d'événements "Resize".
       */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* LE SHADER NE SE LANCE QUE TOUT EN BAS DU SITE */}
+      <div className="absolute inset-0 pointer-events-none opacity-40">
         {isInView && <DigitalPetalsShader />}
       </div>
 
@@ -42,7 +41,7 @@ export function FinalCtaSection() {
           viewport={{ once: true, margin: "-80px" }}
           className="mb-14 md:mb-20"
         >
-          <p className="text-base md:text-lg text-(--text-dim) font-fraunces italic tracking-widest mb-6 uppercase">
+          <p className="text-base md:text-lg text-white/60 font-fraunces italic tracking-widest mb-6 uppercase">
             {t("manifesto1")}
           </p>
 
@@ -63,7 +62,7 @@ export function FinalCtaSection() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
           viewport={{ once: true }}
-          className="text-base md:text-lg text-(--text-muted) mb-10"
+          className="text-base md:text-lg text-white/70 mb-10"
         >
           {t("transition")}
         </motion.p>

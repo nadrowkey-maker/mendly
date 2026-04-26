@@ -195,7 +195,7 @@ export function PricingSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-secondary)">
+    <section id="pricing" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-secondary)">
       {/* Aurora blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[rgba(139,92,246,0.09)] blur-[120px]" />

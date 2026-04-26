@@ -67,7 +67,7 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-primary)">
+    <section id="how-it-works" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-primary)">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_45%,rgba(139,92,246,0.13)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-secondary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-secondary) to-transparent pointer-events-none" />

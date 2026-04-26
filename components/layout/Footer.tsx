@@ -11,43 +11,43 @@ export function Footer() {
     {
       title: t("col1Title"),
       links: [
-        { label: t("col1Link1"), href: "#how-it-works" },
-        { label: t("col1Link2"), href: "#team" },
-        { label: t("col1Link3"), href: "#pricing" },
-        { label: t("col1Link4"), href: "#" },
+        { label: t("col1Link1"), href: "/#how-it-works" },
+        { label: t("col1Link2"), href: "/#team" },
+        { label: t("col1Link3"), href: "/#pricing" },
+        { label: t("col1Link4"), href: "/blog" },
       ],
     },
     {
       title: t("col2Title"),
       links: [
-        { label: t("col2Link1"), href: "#manifesto" },
-        { label: t("col2Link2"), href: "#" },
-        { label: t("col2Link3"), href: "#" },
-        { label: t("col2Link4"), href: "#" },
+        { label: t("col2Link1"), href: "/manifesto" },
+        { label: t("col2Link2"), href: "/blog" },
+        { label: t("col2Link3"), href: "/careers" },
+        { label: t("col2Link4"), href: "/contact" },
       ],
     },
     {
       title: t("col3Title"),
       links: [
-        { label: t("col3Link1"), href: "#" },
-        { label: t("col3Link2"), href: "#" },
-        { label: t("col3Link3"), href: "#" },
-        { label: t("col3Link4"), href: "#" },
+        { label: t("col3Link1"), href: "/help" },
+        { label: t("col3Link2"), href: "/security" },
+        { label: t("col3Link3"), href: "/api-docs" },
+        { label: t("col3Link4"), href: "/status" },
       ],
     },
     {
       title: t("col4Title"),
       links: [
-        { label: t("col4Link1"), href: "#" },
-        { label: t("col4Link2"), href: "#" },
-        { label: t("col4Link3"), href: "#" },
-        { label: t("col4Link4"), href: "#" },
+        { label: t("col4Link1"), href: "/privacy" },
+        { label: t("col4Link2"), href: "/terms" },
+        { label: t("col4Link3"), href: "/cookies" },
+        { label: t("col4Link4"), href: "/imprint" },
       ],
     },
   ];
 
   return (
-    <footer className="relative border-t border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden">
+    <footer className="relative border-t border-(--border) bg-(--bg-secondary) overflow-hidden">
       {/* Top glow line */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 h-px pointer-events-none"
@@ -71,11 +71,11 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link
               href="/"
-              className="font-mono text-base font-bold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--accent-glow)] transition-colors duration-200 block"
+              className="font-mono text-base font-bold tracking-[0.18em] text-(--text-primary) hover:text-(--accent-glow) transition-colors duration-200 block"
             >
               MENDLY
             </Link>
-            <p className="text-sm text-[var(--text-dim)] leading-relaxed mt-3 max-w-[200px]">
+            <p className="text-sm text-(--text-dim) leading-relaxed mt-3 max-w-50">
               {t("tagline")}
             </p>
           </div>
@@ -83,18 +83,18 @@ export function Footer() {
           {/* Link columns */}
           {columns.map((col, i) => (
             <div key={i} className="space-y-4">
-              <p className="text-[10px] font-mono tracking-[0.2em] text-[var(--text-dim)] uppercase">
+              <p className="text-[10px] font-mono tracking-[0.2em] text-(--text-dim) uppercase">
                 {col.title}
               </p>
               <ul className="space-y-3">
                 {col.links.map((link, j) => (
                   <li key={j}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-200"
+                    <Link
+                      href={link.href as never}
+                      className="text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors duration-200"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -103,11 +103,11 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-[var(--border)] flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[var(--text-dim)] font-mono">
+        <div className="mt-16 pt-8 border-t border-(--border) flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-(--text-dim) font-mono">
             {t("bottomLine1")}
           </p>
-          <p className="text-xs text-[var(--text-dim)] font-mono">
+          <p className="text-xs text-(--text-dim) font-mono">
             {t("bottomLine2")}
           </p>
         </div>

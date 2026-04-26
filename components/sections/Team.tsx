@@ -174,8 +174,9 @@ export function TeamSection() {
 
   return (
     <section
+      id="team"
       ref={sectionRef}
-      className="relative bg-(--bg-primary)"
+      className="relative scroll-mt-20 bg-(--bg-primary)"
       style={{ height: "500vh" }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">

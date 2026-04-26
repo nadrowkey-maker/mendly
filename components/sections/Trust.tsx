@@ -11,6 +11,7 @@ import { Globe } from "@/components/ui/cobe-globe";
 import { GradientText } from "@/components/ui/gradient-text";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Zap, Globe as GlobeIcon } from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 const markers = [
   { id: "seoul", label: "Seoul", location: [37.5665, 126.978] as [number, number], size: 0.1 },
@@ -234,6 +235,17 @@ export function Trust() {
                 </motion.div>
               ))}
             </div>
+            <motion.div
+              style={reduced ? undefined : { opacity: card3Opacity, y: card3Y }}
+              className="pointer-events-auto mt-6 text-center"
+            >
+              <Link
+                href="/security"
+                className="text-sm text-(--accent-glow) hover:text-(--accent-warm) transition-colors duration-200"
+              >
+                {t("cta")}
+              </Link>
+            </motion.div>
           </div>
         </div>
       </div>
