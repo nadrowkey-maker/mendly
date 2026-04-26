@@ -2,12 +2,14 @@
 import { useRef } from "react"; // AJOUT
 import { motion, useInView } from "framer-motion"; // AJOUT
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import DigitalPetalsShader from "@/components/digital-petals-shader";
 import { GradientText } from "@/components/ui/gradient-text";
 import { LiquidButton } from "@/components/liquid-glass-button";
 
 export function FinalCtaSection() {
   const t = useTranslations("finalCta");
+  const router = useRouter();
 
   // SÉCURITÉ
   const sectionRef = useRef<HTMLElement>(null);
@@ -75,7 +77,7 @@ export function FinalCtaSection() {
           viewport={{ once: true }}
           className="flex flex-col items-center gap-5"
         >
-          <LiquidButton size="xxl" className="text-white font-semibold tracking-wide px-10">
+          <LiquidButton size="xxl" className="text-white font-semibold tracking-wide px-10" onClick={() => router.push("/waitlist")}>
             {t("cta")}
           </LiquidButton>
 

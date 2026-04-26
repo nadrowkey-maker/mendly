@@ -65,7 +65,7 @@ export function ManifestoContent() {
         className="mt-20 rounded-3xl border border-(--border) bg-(--surface)/50 p-10 md:p-14 text-center"
         style={{ boxShadow: "0 0 60px rgba(139,92,246,0.1)" }}
       >
-        <PremiumButton variant="primary" size="lg" onClick={() => router.push("/")}>
+        <PremiumButton variant="primary" size="lg" onClick={() => router.push("/waitlist")}>
           {t("cta")}
         </PremiumButton>
       </motion.div>

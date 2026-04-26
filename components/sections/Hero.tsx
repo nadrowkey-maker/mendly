@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { AnimatedShaderBg } from "@/components/ui/AnimatedShaderBg";
 import VaporizeTextCycle, { Tag } from "@/components/vapour-text-effect";
@@ -17,6 +18,7 @@ const AGENT_PILLS = [
 
 export function Hero() {
   const t = useTranslations("hero");
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   
   const isInView = useInView(sectionRef, { margin: "100px 0px" });
@@ -196,7 +198,7 @@ export function Hero() {
           transition={{ delay: 0.8 }}
           className="flex flex-col sm:flex-row gap-5 items-center justify-center"
         >
-          <PremiumButton variant="primary" size="lg">
+          <PremiumButton variant="primary" size="lg" onClick={() => router.push("/waitlist")}>
             {t("ctaPrimary")}
           </PremiumButton>
           <PremiumButton variant="secondary" size="lg">

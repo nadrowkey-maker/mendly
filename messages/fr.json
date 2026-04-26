@@ -426,5 +426,20 @@
     "ipBody": "L'ensemble du site (textes, images, logos, marque Mendly) est protégé par le droit d'auteur. Toute reproduction, totale ou partielle, sans autorisation écrite est interdite.",
     "contactTitle": "Contact",
     "contactBody": "Pour toute question légale : legal@mendly.ai"
+  },
+  "waitlist": {
+    "title": "Accès anticipé.",
+    "titleEm": "Rejoins les fondateurs.",
+    "sub": "Fais partie des premiers à lancer avec Mendly. On ouvre par vagues — laisse ton email et tu es dans la file.",
+    "emailPlaceholder": "ton@email.com",
+    "cta": "Réserver ma place",
+    "sending": "Réservation...",
+    "successTitle": "Tu es dans la liste.",
+    "successBody": "Vérifie ta boite mail — on t'a envoyé une confirmation. On te contacte quand c'est ton tour.",
+    "errorGeneric": "Une erreur est survenue. Réessaie.",
+    "errorInvalid": "Ça ne ressemble pas à un email valide.",
+    "disclaimer": "Pas de spam. Pas de CB. Juste un accès anticipé.",
+    "metaTitle": "Rejoindre la liste d'attente Mendly",
+    "metaDescription": "Fais partie des premiers fondateurs à accéder à Mendly — ton C-suite IA qui livre."
   }
 }

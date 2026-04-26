@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/gradient-text";
@@ -18,6 +19,7 @@ interface Tier {
   cta: string;
   popular: boolean;
   badge?: string;
+  ctaOnClick?: () => void;
 }
 
 function PricingCard({
@@ -150,6 +152,7 @@ function PricingCard({
           <LiquidButton
             size="lg"
             className={cn("w-full font-semibold", tier.popular ? "text-white" : "text-(--text-muted)")}
+            onClick={tier.ctaOnClick}
           >
             {tier.cta}
           </LiquidButton>
@@ -161,6 +164,7 @@ function PricingCard({
 
 export function PricingSection() {
   const t = useTranslations("pricing");
+  const router = useRouter();
   const reduced = useReducedMotion() ?? false;
   const [isYearly, setIsYearly] = useState(false);
 
@@ -169,7 +173,7 @@ export function PricingSection() {
       name: t("tier1Name"), price: t("tier1Price"), period: t("tier1Period"),
       tagline: t("tier1Tagline"),
       features: [t("tier1Feature1"), t("tier1Feature2"), t("tier1Feature3"), t("tier1Feature4")],
-      cta: t("tier1Cta"), popular: false,
+      cta: t("tier1Cta"), popular: false, ctaOnClick: () => router.push("/waitlist"),
     },
     {
       name: t("tier2Name"), price: t("tier2Price"), priceYearly: t("tier2PriceYearly"),

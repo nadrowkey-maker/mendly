@@ -30,7 +30,7 @@ export function ComingSoon() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <PremiumButton variant="primary" size="lg" onClick={() => router.push("/")}>
+          <PremiumButton variant="primary" size="lg" onClick={() => router.push("/waitlist")}>
             {t("cta")}
           </PremiumButton>
           <PremiumButton variant="secondary" size="lg" onClick={() => router.push("/")}>

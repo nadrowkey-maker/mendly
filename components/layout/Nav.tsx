@@ -90,7 +90,7 @@ export function Nav() {
               ))}
             </div>
 
-            <PremiumButton variant="primary" size="sm">
+            <PremiumButton variant="primary" size="sm" onClick={() => router.push("/waitlist")}>
               {t("cta")}
             </PremiumButton>
           </div>
@@ -146,7 +146,7 @@ export function Nav() {
                     </button>
                   ))}
                 </div>
-                <PremiumButton variant="primary" size="sm" className="w-full justify-center">
+                <PremiumButton variant="primary" size="sm" className="w-full justify-center" onClick={() => { router.push("/waitlist"); setOpen(false); }}>
                   {t("cta")}
                 </PremiumButton>
               </div>

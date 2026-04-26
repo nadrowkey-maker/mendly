@@ -426,5 +426,20 @@
     "ipBody": "The entire site (text, images, logos, Mendly brand) is protected by copyright. Any reproduction, in whole or in part, without written authorization is prohibited.",
     "contactTitle": "Contact",
     "contactBody": "For any legal question: legal@mendly.ai"
+  },
+  "waitlist": {
+    "title": "Get early access.",
+    "titleEm": "Join the founders.",
+    "sub": "Be among the first to launch with Mendly. We're opening in waves — drop your email and you're in line.",
+    "emailPlaceholder": "your@email.com",
+    "cta": "Secure my spot",
+    "sending": "Securing...",
+    "successTitle": "You're in.",
+    "successBody": "Check your inbox — we've sent you a confirmation. We'll reach out when it's your turn.",
+    "errorGeneric": "Something went wrong. Try again.",
+    "errorInvalid": "That doesn't look like a valid email.",
+    "disclaimer": "No spam. No credit card. Just early access.",
+    "metaTitle": "Join the Mendly Waitlist",
+    "metaDescription": "Be among the first founders to access Mendly — your AI C-suite that ships."
   }
 }
