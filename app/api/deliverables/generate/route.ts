@@ -70,8 +70,25 @@ export async function POST(req: NextRequest) {
       targetLocale
     );
 
-    const result = await geminiFlash.generateContent(prompt);
-    const memoMarkdown = result.response.text();
+    // Retry up to 3 times if Gemini is overloaded (503)
+let result;
+let lastError;
+for (let attempt = 1; attempt <= 3; attempt++) {
+  try {
+    result = await geminiFlash.generateContent(prompt);
+    break;
+  } catch (err: any) {
+    lastError = err;
+    if (err?.status === 503 && attempt < 3) {
+      console.log(`Gemini 503, retry ${attempt}/3 in 2s...`);
+      await new Promise((r) => setTimeout(r, 2000));
+      continue;
+    }
+    throw err;
+  }
+}
+if (!result) throw lastError;
+const memoMarkdown = result.response.text();
 
     // Build PDF
     const now = new Date();
