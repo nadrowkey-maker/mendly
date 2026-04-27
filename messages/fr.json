@@ -525,6 +525,15 @@
     "send": "Envoyer",
     "shortcut": "Entrée pour envoyer · Shift+Entrée pour aller à la ligne",
     "errorGeneric": "Erreur de connexion avec ton CEO. Réessaie."
+  },
+  "account": {
+    "ariaLabel": "Menu compte",
+    "section": "COMPTE",
+    "loggedInAs": "Connecté en tant que",
+    "dashboard": "Mon dashboard",
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "signOut": "Déconnexion"
   }
 }
 

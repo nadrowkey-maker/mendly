@@ -7,19 +7,45 @@ import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { Sheet, SheetContent } from "@/components/sheet";
 import { MenuToggle } from "@/components/menu-toggle";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { AccountMenu } from "@/components/layout/AccountMenu";
+import { createClient } from "@/lib/supabase/client";
+import { LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react";
 
 export function Nav() {
   const t = useTranslations("nav");
+  const tAccount = useTranslations("account");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Track auth state for mobile drawer
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (mounted) setEmail(user?.email ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setEmail(session?.user?.email ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const links = [
@@ -32,6 +58,15 @@ export function Nav() {
   function switchLocale(next: string) {
     router.replace(pathname, { locale: next });
   }
+
+  const handleMobileSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setOpen(false);
+    window.location.href = "/";
+  };
+
+  const isLoggedIn = !!email;
 
   return (
     <motion.header
@@ -90,7 +125,13 @@ export function Nav() {
               ))}
             </div>
 
-            <PremiumButton variant="primary" size="sm" onClick={() => router.push("/waitlist")}>
+            <AccountMenu />
+
+            <PremiumButton
+              variant="primary"
+              size="sm"
+              onClick={() => router.push("/waitlist")}
+            >
               {t("cta")}
             </PremiumButton>
           </div>
@@ -124,6 +165,57 @@ export function Nav() {
                     {link.label}
                   </a>
                 ))}
+
+                {/* Account section in mobile drawer */}
+                <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                  <p className="px-4 py-2 text-[10px] font-mono tracking-widest text-[var(--accent-glow)] uppercase">
+                    {tAccount("section")}
+                  </p>
+                  {isLoggedIn ? (
+                    <>
+                      <div className="px-4 py-2">
+                        <p className="text-xs text-[var(--text-dim)] mb-0.5">
+                          {tAccount("loggedInAs")}
+                        </p>
+                        <p className="text-sm text-white truncate">{email}</p>
+                      </div>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[var(--accent-glow)]" />
+                        {tAccount("dashboard")}
+                      </Link>
+                      <button
+                        onClick={handleMobileSignOut}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        {tAccount("signOut")}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                      >
+                        <LogIn className="w-4 h-4 text-[var(--accent-glow)]" />
+                        {tAccount("signIn")}
+                      </Link>
+                      <Link
+                        href="/signup"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                      >
+                        <UserPlus className="w-4 h-4 text-[var(--accent-glow)]" />
+                        {tAccount("signUp")}
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="px-4 pb-8 flex flex-col gap-3">
@@ -146,7 +238,15 @@ export function Nav() {
                     </button>
                   ))}
                 </div>
-                <PremiumButton variant="primary" size="sm" className="w-full justify-center" onClick={() => { router.push("/waitlist"); setOpen(false); }}>
+                <PremiumButton
+                  variant="primary"
+                  size="sm"
+                  className="w-full justify-center"
+                  onClick={() => {
+                    router.push("/waitlist");
+                    setOpen(false);
+                  }}
+                >
                   {t("cta")}
                 </PremiumButton>
               </div>

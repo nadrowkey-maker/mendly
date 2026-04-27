@@ -525,5 +525,14 @@
     "send": "Send",
     "shortcut": "Enter to send · Shift+Enter for new line",
     "errorGeneric": "Connection error with your CEO. Try again."
+  },
+   "account": {
+    "ariaLabel": "Account menu",
+    "section": "ACCOUNT",
+    "loggedInAs": "Logged in as",
+    "dashboard": "My dashboard",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "signOut": "Sign out"
   }
 }
