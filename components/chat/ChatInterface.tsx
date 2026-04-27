@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { ChatMessage } from "./ChatMessage";
+import { GenerateMemoButton } from "./GenerateMemoButton";
+import { getOrCreateConversation, listMessages } from "@/lib/actions/conversations";
 import type { Message } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
-import { GenerateMemoButton } from "./GenerateMemoButton";
+import type { AgentRole } from "@/lib/types/conversation";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -24,6 +26,27 @@ interface DisplayMessage {
   isStreaming?: boolean;
 }
 
+interface AgentState {
+  conversationId: string;
+  messages: DisplayMessage[];
+  loaded: boolean;
+}
+
+const AGENT_CONFIG: { role: AgentRole; color: string; labelKey: string }[] = [
+  { role: "CEO", color: "#8B5CF6", labelKey: "CEO" },
+  { role: "CTO", color: "#06B6D4", labelKey: "CTO" },
+  { role: "CMO", color: "#F0ABFC", labelKey: "CMO" },
+];
+
+function toDisplayMessages(messages: Message[]): DisplayMessage[] {
+  return messages.map((m) => ({
+    id: m.id,
+    role: m.role as "user" | "assistant",
+    content: m.content,
+    agentRole: m.agent_role,
+  }));
+}
+
 export function ChatInterface({
   project,
   conversationId,
@@ -32,14 +55,16 @@ export function ChatInterface({
 }: ChatInterfaceProps) {
   const t = useTranslations("chat");
 
-  const [messages, setMessages] = useState<DisplayMessage[]>(
-    initialMessages.map((m) => ({
-      id: m.id,
-      role: m.role as "user" | "assistant",
-      content: m.content,
-      agentRole: m.agent_role,
-    }))
-  );
+  const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
+  const [switchingAgent, setSwitchingAgent] = useState(false);
+  const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
+    CEO: {
+      conversationId,
+      messages: toDisplayMessages(initialMessages),
+      loaded: true,
+    },
+  });
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,12 +72,14 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  const activeData = agentData[activeAgent];
+  const activeMessages = activeData?.messages ?? [];
+  const activeConversationId = activeData?.conversationId ?? "";
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [activeMessages, activeAgent]);
 
-  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -60,50 +87,74 @@ export function ChatInterface({
     ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`;
   }, [input]);
 
+  const handleAgentSwitch = async (agent: AgentRole) => {
+    if (agent === activeAgent || isLoading) return;
+    setActiveAgent(agent);
+    setError(null);
+
+    if (agentData[agent]) return; // already loaded
+
+    setSwitchingAgent(true);
+    try {
+      const convo = await getOrCreateConversation(project.id, agent);
+      if (!convo) throw new Error("Failed to create conversation");
+      const msgs = await listMessages(convo.id);
+
+      setAgentData((prev) => ({
+        ...prev,
+        [agent]: {
+          conversationId: convo.id,
+          messages: toDisplayMessages(msgs),
+          loaded: true,
+        },
+      }));
+    } catch (err) {
+      console.error("Agent switch error:", err);
+      setError(t("errorGeneric"));
+      setActiveAgent("CEO");
+    } finally {
+      setSwitchingAgent(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed || isLoading || !activeConversationId) return;
 
     setError(null);
     setInput("");
     setIsLoading(true);
 
-    // Add user message immediately
     const userMsgId = `user-${Date.now()}`;
     const assistantMsgId = `assistant-${Date.now()}`;
 
-    setMessages((prev) => [
+    setAgentData((prev) => ({
       ...prev,
-      {
-        id: userMsgId,
-        role: "user",
-        content: trimmed,
+      [activeAgent]: {
+        ...prev[activeAgent]!,
+        messages: [
+          ...(prev[activeAgent]?.messages ?? []),
+          { id: userMsgId, role: "user", content: trimmed },
+          { id: assistantMsgId, role: "assistant", content: "", agentRole: activeAgent, isStreaming: true },
+        ],
       },
-      {
-        id: assistantMsgId,
-        role: "assistant",
-        content: "",
-        agentRole: "CEO",
-        isStreaming: true,
-      },
-    ]);
+    }));
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          conversationId,
+          conversationId: activeConversationId,
           projectId: project.id,
           userMessage: trimmed,
           locale,
+          agentRole: activeAgent,
         }),
       });
 
-      if (!response.ok || !response.body) {
-        throw new Error("Failed to send message");
-      }
+      if (!response.ok || !response.body) throw new Error("Failed to send message");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -112,31 +163,38 @@ export function ChatInterface({
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        accumulated += decoder.decode(value, { stream: true });
 
-        const chunk = decoder.decode(value, { stream: true });
-        accumulated += chunk;
-
-        // Update the assistant message with accumulated content
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantMsgId
-              ? { ...m, content: accumulated, isStreaming: true }
-              : m
-          )
-        );
+        setAgentData((prev) => ({
+          ...prev,
+          [activeAgent]: {
+            ...prev[activeAgent]!,
+            messages: prev[activeAgent]!.messages.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: accumulated } : m
+            ),
+          },
+        }));
       }
 
-      // Mark streaming as complete
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantMsgId ? { ...m, isStreaming: false } : m
-        )
-      );
+      setAgentData((prev) => ({
+        ...prev,
+        [activeAgent]: {
+          ...prev[activeAgent]!,
+          messages: prev[activeAgent]!.messages.map((m) =>
+            m.id === assistantMsgId ? { ...m, isStreaming: false } : m
+          ),
+        },
+      }));
     } catch (err) {
       console.error("Chat error:", err);
       setError(t("errorGeneric"));
-      // Remove the empty assistant message on error
-      setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId));
+      setAgentData((prev) => ({
+        ...prev,
+        [activeAgent]: {
+          ...prev[activeAgent]!,
+          messages: prev[activeAgent]!.messages.filter((m) => m.id !== assistantMsgId),
+        },
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -149,61 +207,103 @@ export function ChatInterface({
     }
   };
 
+  const activeConfig = AGENT_CONFIG.find((a) => a.role === activeAgent)!;
+
   return (
     <main className="relative flex flex-col h-screen bg-(--bg-primary)">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(139,92,246,0.05) 0%, transparent 70%)",
+          background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${activeConfig.color}08 0%, transparent 70%)`,
+          transition: "background 0.4s ease",
         }}
       />
 
       {/* Header */}
       <header className="relative z-10 border-b border-(--border) bg-(--bg-primary)/80 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between gap-4">
           <Link
             href="/dashboard"
-            className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors"
+            className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors shrink-0"
           >
             ← {t("backToDashboard")}
           </Link>
 
-          <div className="text-center">
-            <p className="text-[10px] font-mono tracking-[0.3em] text-(--accent-glow) uppercase">
-              {t("chattingWith")} CEO
-            </p>
-            <h1 className="text-sm md:text-base font-bold text-white truncate max-w-[200px] md:max-w-none">
-              {project.name}
-            </h1>
+          {/* Agent tabs */}
+          <div className="flex items-center gap-1 p-1 rounded-full border border-(--border) bg-(--surface)/40">
+            {AGENT_CONFIG.map((agent) => {
+              const isActive = activeAgent === agent.role;
+              return (
+                <button
+                  key={agent.role}
+                  onClick={() => handleAgentSwitch(agent.role)}
+                  disabled={isLoading || switchingAgent}
+                  className="relative px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  style={{
+                    color: isActive ? "#05030E" : agent.color,
+                    background: isActive ? agent.color : "transparent",
+                    boxShadow: isActive ? `0 0 20px ${agent.color}60` : "none",
+                  }}
+                >
+                  {agent.role}
+                </button>
+              );
+            })}
           </div>
- 
-          <GenerateMemoButton projectId={project.id} />
+
+          {activeAgent === "CEO" ? (
+            <GenerateMemoButton projectId={project.id} />
+          ) : (
+            <div className="w-[120px]" /> // spacer to keep layout balanced
+          )}
+        </div>
+
+        {/* Project name */}
+        <div className="max-w-4xl mx-auto px-6 md:px-8 pb-2 text-center">
+          <p className="text-xs text-(--text-dim) truncate">{project.name}</p>
         </div>
       </header>
 
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-6 md:px-8 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          {messages.length === 0 ? (
+          {switchingAgent ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-3 text-(--text-dim) text-sm">
+                <span
+                  className="w-4 h-4 rounded-full animate-pulse"
+                  style={{ background: activeConfig.color }}
+                />
+                {t("agentSwitching")}
+              </div>
+            </div>
+          ) : activeMessages.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-12"
             >
-              <div className="text-5xl mb-6">👋</div>
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold font-mono"
+                style={{
+                  background: `${activeConfig.color}20`,
+                  border: `1px solid ${activeConfig.color}40`,
+                  color: activeConfig.color,
+                  boxShadow: `0 0 32px ${activeConfig.color}30`,
+                }}
+              >
+                {activeAgent[0]}
+              </div>
               <h2 className="text-2xl font-bold text-white mb-3">
-                {t("welcomeTitle")}
+                {t(`welcomeTitle`)}
               </h2>
               <p className="text-(--text-muted) max-w-md mx-auto mb-6">
-                {t("welcomeBody", { projectName: project.name })}
+                {t(`welcomeBody${activeAgent}`, { projectName: project.name })}
               </p>
-              <p className="text-xs text-(--text-dim) font-mono">
-                {t("startTyping")}
-              </p>
+              <p className="text-xs text-(--text-dim) font-mono">{t("startTyping")}</p>
             </motion.div>
           ) : (
-            messages.map((m) => (
+            activeMessages.map((m) => (
               <ChatMessage
                 key={m.id}
                 role={m.role}
@@ -229,11 +329,14 @@ export function ChatInterface({
 
       {/* Input */}
       <div className="relative z-10 border-t border-(--border) bg-(--bg-primary)/80 backdrop-blur-xl">
-        <form
-          onSubmit={handleSubmit}
-          className="max-w-4xl mx-auto px-6 md:px-8 py-4"
-        >
-          <div className="flex items-end gap-3 rounded-2xl border border-(--border-strong) bg-(--surface)/40 p-2 focus-within:border-(--accent-glow)/50 transition-colors">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 md:px-8 py-4">
+          <div
+            className="flex items-end gap-3 rounded-2xl border p-2 transition-colors"
+            style={{
+              borderColor: isLoading ? `${activeConfig.color}50` : "var(--border-strong)",
+              background: "var(--surface-elevated, rgba(28,23,54,0.4))",
+            }}
+          >
             <textarea
               ref={textareaRef}
               value={input}
@@ -241,13 +344,17 @@ export function ChatInterface({
               onKeyDown={handleKeyDown}
               placeholder={t("inputPlaceholder")}
               rows={1}
-              disabled={isLoading}
+              disabled={isLoading || switchingAgent}
               className="flex-1 px-3 py-2 bg-transparent text-white placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-40 text-sm leading-relaxed"
             />
             <button
               type="submit"
-              disabled={isLoading || !input.trim()}
-              className="px-4 py-2 rounded-xl bg-(--accent-glow) text-(--bg-primary) font-bold text-sm hover:bg-(--accent-glow)/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2 shrink-0"
+              disabled={isLoading || switchingAgent || !input.trim()}
+              className="px-4 py-2 rounded-xl font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              style={{
+                background: activeConfig.color,
+                color: "#05030E",
+              }}
             >
               {isLoading ? (
                 <span className="flex items-center gap-1.5">

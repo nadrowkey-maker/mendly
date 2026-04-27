@@ -495,7 +495,11 @@
     "inputPlaceholder": "Describe your problem or ask a question…",
     "send": "Send",
     "shortcut": "Enter to send · Shift+Enter for new line",
-    "errorGeneric": "Connection error with your CEO. Try again."
+    "errorGeneric": "Connection error with your CEO. Try again.",
+    "welcomeBodyCEO": "I'm your CEO. I already know the basics about {projectName}. Tell me what's on your mind — I'm here to challenge, prioritize, decide.",
+    "welcomeBodyCTO": "I'm your CTO. Tell me what you're building technically — I'll tell you if it's the right way to do it. No sugarcoating.",
+    "welcomeBodyCMO": "I'm your CMO. Let's talk about your market, your audience, your go-to-market. I'll challenge every assumption.",
+    "agentSwitching": "Loading conversation…"
   },
    "account": {
     "ariaLabel": "Account menu",
