@@ -514,5 +514,16 @@
     "cta": "Create project",
     "ctaLoading": "Creating…",
     "errorGeneric": "Something went wrong. Try again."
+  },
+   "chat": {
+    "backToDashboard": "Dashboard",
+    "chattingWith": "TALKING WITH",
+    "welcomeTitle": "Hey founder.",
+    "welcomeBody": "I'm your CEO. I already know the basics about {projectName}. Tell me what's on your mind — I'm here to challenge, prioritize, decide.",
+    "startTyping": "Type your message below to start.",
+    "inputPlaceholder": "Describe your problem or ask a question…",
+    "send": "Send",
+    "shortcut": "Enter to send · Shift+Enter for new line",
+    "errorGeneric": "Connection error with your CEO. Try again."
   }
 }

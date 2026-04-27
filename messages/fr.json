@@ -514,5 +514,17 @@
     "cta": "Créer le projet",
     "ctaLoading": "Création…",
     "errorGeneric": "Une erreur est survenue. Réessaie."
+  },
+    "chat": {
+    "backToDashboard": "Dashboard",
+    "chattingWith": "TU PARLES AVEC",
+    "welcomeTitle": "Salut chef.",
+    "welcomeBody": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Dis-moi ce qui t'occupe — je suis là pour challenger, prioriser, décider.",
+    "startTyping": "Tape ton message ci-dessous pour démarrer.",
+    "inputPlaceholder": "Décris ton problème ou pose une question…",
+    "send": "Envoyer",
+    "shortcut": "Entrée pour envoyer · Shift+Entrée pour aller à la ligne",
+    "errorGeneric": "Erreur de connexion avec ton CEO. Réessaie."
   }
 }
+
