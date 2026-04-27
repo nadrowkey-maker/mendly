@@ -34,14 +34,13 @@ export default async function ProjectChatPage({ params }: PageProps) {
     notFound();
   }
 
-  // Get or create the CEO conversation for this project
+  // Get or create CEO conversation by default
   const conversation = await getOrCreateConversation(id, "CEO");
 
   if (!conversation) {
     throw new Error("Could not create conversation");
   }
 
-  // Load existing messages
   const messages = await listMessages(conversation.id);
 
   return (

@@ -4,9 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
+import { Zap } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { GenerateMemoButton } from "./GenerateMemoButton";
-import { getOrCreateConversation, listMessages } from "@/lib/actions/conversations";
+import {
+  getOrCreateConversation,
+  listMessages,
+} from "@/lib/actions/conversations";
 import type { Message } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { AgentRole } from "@/lib/types/conversation";
@@ -38,6 +42,12 @@ const AGENT_CONFIG: { role: AgentRole; color: string; labelKey: string }[] = [
   { role: "CMO", color: "#F0ABFC", labelKey: "CMO" },
 ];
 
+const AGENT_COLORS: Record<string, string> = {
+  CEO: "#8B5CF6",
+  CTO: "#06B6D4",
+  CMO: "#F0ABFC",
+};
+
 function toDisplayMessages(messages: Message[]): DisplayMessage[] {
   return messages.map((m) => ({
     id: m.id,
@@ -57,7 +67,9 @@ export function ChatInterface({
 
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
   const [switchingAgent, setSwitchingAgent] = useState(false);
-  const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
+  const [agentData, setAgentData] = useState<
+    Partial<Record<AgentRole, AgentState>>
+  >({
     CEO: {
       conversationId,
       messages: toDisplayMessages(initialMessages),
@@ -67,6 +79,7 @@ export function ChatInterface({
 
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDebating, setIsDebating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -88,11 +101,11 @@ export function ChatInterface({
   }, [input]);
 
   const handleAgentSwitch = async (agent: AgentRole) => {
-    if (agent === activeAgent || isLoading) return;
+    if (agent === activeAgent || isLoading || isDebating) return;
     setActiveAgent(agent);
     setError(null);
 
-    if (agentData[agent]) return; // already loaded
+    if (agentData[agent]) return;
 
     setSwitchingAgent(true);
     try {
@@ -117,10 +130,13 @@ export function ChatInterface({
     }
   };
 
+  /**
+   * Sends a normal message to the active agent (no debate).
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed || isLoading || !activeConversationId) return;
+    if (!trimmed || isLoading || isDebating || !activeConversationId) return;
 
     setError(null);
     setInput("");
@@ -136,7 +152,13 @@ export function ChatInterface({
         messages: [
           ...(prev[activeAgent]?.messages ?? []),
           { id: userMsgId, role: "user", content: trimmed },
-          { id: assistantMsgId, role: "assistant", content: "", agentRole: activeAgent, isStreaming: true },
+          {
+            id: assistantMsgId,
+            role: "assistant",
+            content: "",
+            agentRole: activeAgent,
+            isStreaming: true,
+          },
         ],
       },
     }));
@@ -154,7 +176,8 @@ export function ChatInterface({
         }),
       });
 
-      if (!response.ok || !response.body) throw new Error("Failed to send message");
+      if (!response.ok || !response.body)
+        throw new Error("Failed to send message");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -192,11 +215,168 @@ export function ChatInterface({
         ...prev,
         [activeAgent]: {
           ...prev[activeAgent]!,
-          messages: prev[activeAgent]!.messages.filter((m) => m.id !== assistantMsgId),
+          messages: prev[activeAgent]!.messages.filter(
+            (m) => m.id !== assistantMsgId
+          ),
         },
       }));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /**
+   * Triggers a 3-agent DEBATE. Only available on CEO conversation.
+   * Streams parsed by [[ROUND:XXX]] markers and rendered as separate messages.
+   */
+  const handleDebate = async () => {
+    const trimmed = input.trim();
+    if (
+      !trimmed ||
+      isLoading ||
+      isDebating ||
+      !activeConversationId ||
+      activeAgent !== "CEO"
+    )
+      return;
+
+    setError(null);
+    setInput("");
+    setIsDebating(true);
+
+    const userMsgId = `user-${Date.now()}`;
+
+    setAgentData((prev) => ({
+      ...prev,
+      CEO: {
+        ...prev.CEO!,
+        messages: [
+          ...(prev.CEO?.messages ?? []),
+          { id: userMsgId, role: "user", content: trimmed },
+        ],
+      },
+    }));
+
+    try {
+      const response = await fetch("/api/chat/debate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: activeConversationId,
+          projectId: project.id,
+          userMessage: trimmed,
+          locale,
+        }),
+      });
+
+      if (!response.ok || !response.body) throw new Error("Debate failed");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let currentAgent: string | null = null;
+      let currentMsgId: string | null = null;
+
+      const startNewRound = (agent: string) => {
+        const newId = `${agent.toLowerCase()}-debate-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        currentAgent = agent;
+        currentMsgId = newId;
+        setAgentData((prev) => ({
+          ...prev,
+          CEO: {
+            ...prev.CEO!,
+            messages: [
+              ...prev.CEO!.messages,
+              {
+                id: newId,
+                role: "assistant",
+                content: "",
+                agentRole: agent,
+                isStreaming: true,
+              },
+            ],
+          },
+        }));
+      };
+
+      const appendToCurrent = (text: string) => {
+        if (!currentMsgId) return;
+        const id = currentMsgId;
+        setAgentData((prev) => ({
+          ...prev,
+          CEO: {
+            ...prev.CEO!,
+            messages: prev.CEO!.messages.map((m) =>
+              m.id === id ? { ...m, content: m.content + text } : m
+            ),
+          },
+        }));
+      };
+
+      const finalizeCurrentRound = () => {
+        if (!currentMsgId) return;
+        const id = currentMsgId;
+        setAgentData((prev) => ({
+          ...prev,
+          CEO: {
+            ...prev.CEO!,
+            messages: prev.CEO!.messages.map((m) =>
+              m.id === id ? { ...m, isStreaming: false } : m
+            ),
+          },
+        }));
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process all complete markers found
+        let markerIdx;
+        while ((markerIdx = buffer.indexOf("[[ROUND:")) !== -1) {
+          // Text before the marker belongs to the current round
+          if (markerIdx > 0) {
+            const beforeText = buffer.slice(0, markerIdx);
+            if (currentAgent) appendToCurrent(beforeText);
+            buffer = buffer.slice(markerIdx);
+          }
+
+          // Find end of marker
+          const endIdx = buffer.indexOf("]]");
+          if (endIdx === -1) break; // marker incomplete, wait for next chunk
+
+          const marker = buffer.slice(8, endIdx); // "CTO" / "CMO" / "CEO" / "END"
+          buffer = buffer.slice(endIdx + 2);
+
+          if (marker === "END") {
+            finalizeCurrentRound();
+            currentAgent = null;
+            currentMsgId = null;
+          } else {
+            // Finalize previous round, start new
+            finalizeCurrentRound();
+            startNewRound(marker);
+          }
+        }
+
+        // Any remaining text without a new marker → append to current round
+        if (buffer.length > 0 && currentAgent && !buffer.includes("[[")) {
+          appendToCurrent(buffer);
+          buffer = "";
+        }
+      }
+
+      // Stream ended — finalize any open round
+      if (buffer.length > 0 && currentAgent) {
+        appendToCurrent(buffer);
+      }
+      finalizeCurrentRound();
+    } catch (err) {
+      console.error("Debate error:", err);
+      setError(t("errorGeneric"));
+    } finally {
+      setIsDebating(false);
     }
   };
 
@@ -208,6 +388,7 @@ export function ChatInterface({
   };
 
   const activeConfig = AGENT_CONFIG.find((a) => a.role === activeAgent)!;
+  const busy = isLoading || isDebating || switchingAgent;
 
   return (
     <main className="relative flex flex-col h-screen bg-(--bg-primary)">
@@ -229,7 +410,6 @@ export function ChatInterface({
             ← {t("backToDashboard")}
           </Link>
 
-          {/* Agent tabs */}
           <div className="flex items-center gap-1 p-1 rounded-full border border-(--border) bg-(--surface)/40">
             {AGENT_CONFIG.map((agent) => {
               const isActive = activeAgent === agent.role;
@@ -237,7 +417,7 @@ export function ChatInterface({
                 <button
                   key={agent.role}
                   onClick={() => handleAgentSwitch(agent.role)}
-                  disabled={isLoading || switchingAgent}
+                  disabled={busy}
                   className="relative px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   style={{
                     color: isActive ? "#05030E" : agent.color,
@@ -254,11 +434,10 @@ export function ChatInterface({
           {activeAgent === "CEO" ? (
             <GenerateMemoButton projectId={project.id} />
           ) : (
-            <div className="w-[120px]" /> // spacer to keep layout balanced
+            <div className="w-[120px]" />
           )}
         </div>
 
-        {/* Project name */}
         <div className="max-w-4xl mx-auto px-6 md:px-8 pb-2 text-center">
           <p className="text-xs text-(--text-dim) truncate">{project.name}</p>
         </div>
@@ -295,12 +474,14 @@ export function ChatInterface({
                 {activeAgent[0]}
               </div>
               <h2 className="text-2xl font-bold text-white mb-3">
-                {t(`welcomeTitle`)}
+                {t("welcomeTitle")}
               </h2>
               <p className="text-(--text-muted) max-w-md mx-auto mb-6">
                 {t(`welcomeBody${activeAgent}`, { projectName: project.name })}
               </p>
-              <p className="text-xs text-(--text-dim) font-mono">{t("startTyping")}</p>
+              <p className="text-xs text-(--text-dim) font-mono">
+                {t("startTyping")}
+              </p>
             </motion.div>
           ) : (
             activeMessages.map((m) => (
@@ -329,11 +510,16 @@ export function ChatInterface({
 
       {/* Input */}
       <div className="relative z-10 border-t border-(--border) bg-(--bg-primary)/80 backdrop-blur-xl">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 md:px-8 py-4">
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-4xl mx-auto px-6 md:px-8 py-4"
+        >
           <div
-            className="flex items-end gap-3 rounded-2xl border p-2 transition-colors"
+            className="flex items-end gap-2 rounded-2xl border p-2 transition-colors"
             style={{
-              borderColor: isLoading ? `${activeConfig.color}50` : "var(--border-strong)",
+              borderColor: busy
+                ? `${activeConfig.color}50`
+                : "var(--border-strong)",
               background: "var(--surface-elevated, rgba(28,23,54,0.4))",
             }}
           >
@@ -344,12 +530,42 @@ export function ChatInterface({
               onKeyDown={handleKeyDown}
               placeholder={t("inputPlaceholder")}
               rows={1}
-              disabled={isLoading || switchingAgent}
+              disabled={busy}
               className="flex-1 px-3 py-2 bg-transparent text-white placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-40 text-sm leading-relaxed"
             />
+
+            {/* Debate button — only on CEO */}
+            {activeAgent === "CEO" && (
+              <button
+                type="button"
+                onClick={handleDebate}
+                disabled={busy || !input.trim()}
+                title={t("debateTooltip")}
+                className="px-3 py-2 rounded-xl font-bold text-xs uppercase tracking-wider disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border"
+                style={{
+                  borderColor: "#F0ABFC",
+                  color: isDebating ? "#05030E" : "#F0ABFC",
+                  background: isDebating ? "#F0ABFC" : "transparent",
+                  boxShadow: isDebating ? "0 0 24px #F0ABFC80" : "none",
+                }}
+              >
+                {isDebating ? (
+                  <>
+                    <Zap className="w-3.5 h-3.5 animate-pulse" />
+                    <span className="hidden md:inline">{t("debating")}</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-3.5 h-3.5" />
+                    <span className="hidden md:inline">{t("debate")}</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               type="submit"
-              disabled={isLoading || switchingAgent || !input.trim()}
+              disabled={busy || !input.trim()}
               className="px-4 py-2 rounded-xl font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2 shrink-0 cursor-pointer"
               style={{
                 background: activeConfig.color,
@@ -371,7 +587,7 @@ export function ChatInterface({
             </button>
           </div>
           <p className="text-[10px] text-(--text-dim) text-center mt-2 font-mono">
-            {t("shortcut")}
+            {activeAgent === "CEO" ? t("shortcutWithDebate") : t("shortcut")}
           </p>
         </form>
       </div>

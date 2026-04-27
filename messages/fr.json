@@ -490,12 +490,20 @@
     "backToDashboard": "Dashboard",
     "chattingWith": "TU PARLES AVEC",
     "welcomeTitle": "Salut chef.",
-    "welcomeBody": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Dis-moi ce qui t'occupe — je suis là pour challenger, prioriser, décider.",
+    "welcomeBody": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Dis-moi ce qui t'occupe.",
+    "welcomeBodyCEO": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Balance-moi ce qui t'occupe — stratégie, priorités, décisions, je suis là pour challenger et clarifier.",
+    "welcomeBodyCTO": "Je suis ton CTO. Pour {projectName}, on parle stack, architecture, et décisions techniques. Pas de sur-ingénierie, du concret. Qu'est-ce qu'on regarde ?",
+    "welcomeBodyCMO": "Je suis ton CMO. Pour {projectName}, on parle audience, positionnement, canaux, conversion. Avant tout : c'est qui exactement ton client idéal ?",
     "startTyping": "Tape ton message ci-dessous pour démarrer.",
     "inputPlaceholder": "Décris ton problème ou pose une question…",
     "send": "Envoyer",
     "shortcut": "Entrée pour envoyer · Shift+Entrée pour aller à la ligne",
-    "errorGeneric": "Erreur de connexion avec ton CEO. Réessaie."
+    "errorGeneric": "Erreur de connexion avec ton agent. Réessaie.",
+    "agentSwitching": "Connexion à l'agent…",
+    "debate": "Débat",
+  "debating": "Débat en cours…",
+  "debateTooltip": "Lancer un débat à 3 (CTO + CMO + synthèse CEO)",
+  "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents"
   },
   "account": {
     "ariaLabel": "Menu compte",
