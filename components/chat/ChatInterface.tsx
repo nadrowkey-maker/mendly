@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ChatMessage } from "./ChatMessage";
 import type { Message } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
+import { GenerateMemoButton } from "./GenerateMemoButton";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -176,8 +177,8 @@ export function ChatInterface({
               {project.name}
             </h1>
           </div>
-
-          <div className="w-12" /> {/* Spacer for symmetry */}
+ 
+          <GenerateMemoButton projectId={project.id} />
         </div>
       </header>
 
