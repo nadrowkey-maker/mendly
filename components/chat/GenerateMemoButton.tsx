@@ -123,15 +123,13 @@ export function GenerateMemoButton({ projectId }: GenerateMemoButtonProps) {
                   <p className="text-(--text-muted) text-sm mb-6">
                     {result.title}
                   </p>
-                  <a
-                    href={result.downloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-(--accent-glow) text-(--bg-primary) font-bold text-sm hover:bg-(--accent-glow)/90 transition-all"
-                  >
-                    <Download className="w-4 h-4" />
-                    {t("downloadCta")}
-                  </a>
+                  <button
+  onClick={() => window.open(result.downloadUrl, "_blank")}
+  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-(--accent-glow) text-(--bg-primary) font-bold text-sm hover:bg-(--accent-glow)/90 transition-all cursor-pointer"
+>
+  <Download className="w-4 h-4" />
+  {t("downloadCta")}
+</button>
                 </>
               )}
 
