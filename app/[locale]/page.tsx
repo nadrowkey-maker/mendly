@@ -23,16 +23,11 @@ export default function HomePage() {
     <>
       <Nav />
       <main>
-        {/* 🚨 LA CORRECTION EST ICI : Le Hero n'a plus de SectionTransition ! */}
         <Hero /> 
-        
         <SectionTransition><ProblemSection /></SectionTransition>
         <SectionTransition><PromiseSection /></SectionTransition>
         <SectionTransition><HowItWorksSection /></SectionTransition>
-        
-        {/* TeamSection: has its own 500vh sticky scroll animation — must not be wrapped */}
         <TeamSection />
-        
         <SectionTransition><ActionSection /></SectionTransition>
         <SectionTransition><DeliverablesSection /></SectionTransition>
         <SectionTransition><Comparison /></SectionTransition>

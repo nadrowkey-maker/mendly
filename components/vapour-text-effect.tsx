@@ -176,19 +176,32 @@ export default function VaporizeTextCycle({
   // Start animation cycle when in view
   useEffect(() => {
     if (isInView) {
-      const startAnimationTimeout = setTimeout(() => {
-        setAnimationState("vaporizing");
-      }, 0);
-      return () => clearTimeout(startAnimationTimeout);
+      // Attend que le navigateur soit idle avant de démarrer l'anim
+      const startAnim = () => setAnimationState("vaporizing");
+      
+      let idleId: number | null = null;
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        idleId = (window as any).requestIdleCallback(startAnim, { timeout: 1500 });
+      } else {
+        timeoutId = setTimeout(startAnim, 800);
+      }
+      
+      return () => {
+        if (idleId !== null && "cancelIdleCallback" in window) {
+          (window as any).cancelIdleCallback(idleId);
+        }
+        if (timeoutId !== null) clearTimeout(timeoutId);
+      };
     } else {
-      // When component goes out of view, reset to static state
       setAnimationState("static");
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
     }
-  }, [isInView]);
+}, [isInView]);
 
   // Animation loop - only run when in view
   useEffect(() => {

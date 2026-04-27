@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 
 interface SectionTransitionProps {
   children: ReactNode;
@@ -11,28 +11,25 @@ interface SectionTransitionProps {
 export function SectionTransition({ children, className }: SectionTransitionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion() ?? false;
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
+  
+  // Once: true → l'animation joue UNE fois quand la section entre, puis on arrête tout
+  // margin: démarre légèrement avant pour que ce soit fluide
+  const isInView = useInView(ref, { 
+    once: true, 
+    margin: "-10% 0px -10% 0px" 
   });
 
-  // Entry (0 → 0.2): fade in + remonte doucement
-  // Active (0.2 → 0.8): fully visible
-  // Exit (0.8 → 1): fade out + descend doucement
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [60, 0, 0, -40]);
+  if (reduced) {
+    return <div ref={ref} className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
       ref={ref}
       className={className}
-      style={
-        reduced
-          ? undefined
-          // ✅ OPTIMISATION MAJEURE : On a retiré le filter et le willChange: filter
-          : { opacity, y, willChange: "transform, opacity" } 
-      }
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
