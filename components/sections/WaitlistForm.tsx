@@ -165,7 +165,7 @@ export function WaitlistForm() {
           className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-16"
         >
           {[
-            { value: "247", label: "founders waiting" },
+        
             { value: "48h", label: "to launch" },
             { value: "8", label: "AI executives" },
           ].map(({ value, label }) => (

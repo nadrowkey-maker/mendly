@@ -86,7 +86,7 @@ export function FinalCtaSection() {
           </p>
 
           <p className="text-xs tracking-[0.2em] text-(--accent-glow) uppercase">
-            {t("counter", { count: 247 })}
+            {t("counter", { count: 0 })}
           </p>
         </motion.div>
       </div>
