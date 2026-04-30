@@ -14,13 +14,17 @@ import {
 import type { Message } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { AgentRole } from "@/lib/types/conversation";
+import { UsageBadge } from "./UsageBadge";
+
 
 interface ChatInterfaceProps {
-  project: Project;
-  conversationId: string;
-  initialMessages: Message[];
-  locale: string;
-}
+    project: Project;
+    conversationId: string;
+    initialMessages: Message[];
+    locale: string;
+    initialUsageUsed: number;
+    initialUsageLimit: number;
+  }
 
 interface DisplayMessage {
   id: string;
@@ -68,11 +72,14 @@ function toDisplayMessages(messages: Message[]): DisplayMessage[] {
 }
 
 export function ChatInterface({
-  project,
-  conversationId,
-  initialMessages,
-  locale,
-}: ChatInterfaceProps) {
+    project,
+    conversationId,
+    initialMessages,
+    locale,
+    initialUsageUsed,
+    initialUsageLimit,
+  }: ChatInterfaceProps) {
+  const [usageRefreshKey, setUsageRefreshKey] = useState(0);
   const t = useTranslations("chat");
 
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
@@ -186,8 +193,20 @@ export function ChatInterface({
         }),
       });
 
-      if (!response.ok || !response.body)
-        throw new Error("Failed to send message");
+      if (response.status === 429) {
+    setError(t("errorRateLimited"));
+    setAgentData((prev) => ({
+      ...prev,
+      [activeAgent]: {
+        ...prev[activeAgent]!,
+        messages: prev[activeAgent]!.messages.filter(
+          (m) => m.id !== assistantMsgId && m.id !== userMsgId
+        ),
+      },
+    }));
+    return;
+  }
+  if (!response.ok || !response.body) throw new Error("Failed to send message");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -232,6 +251,7 @@ export function ChatInterface({
       }));
     } finally {
       setIsLoading(false);
+      setUsageRefreshKey((k) => k + 1);
     }
   };
 
@@ -279,7 +299,18 @@ export function ChatInterface({
         }),
       });
 
-      if (!response.ok || !response.body) throw new Error("Debate failed");
+      if (response.status === 429) {
+  setError(t("errorRateLimited"));
+  setAgentData((prev) => ({
+    ...prev,
+    CEO: {
+      ...prev.CEO!,
+      messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId),
+    },
+  }));
+  return;
+}
+if (!response.ok || !response.body) throw new Error("Debate failed");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -387,6 +418,7 @@ export function ChatInterface({
       setError(t("errorGeneric"));
     } finally {
       setIsDebating(false);
+      setUsageRefreshKey((k) => k + 1);
     }
   };
 
@@ -413,12 +445,19 @@ export function ChatInterface({
       {/* Header */}
       <header className="relative z-10 border-b border-(--border) bg-(--bg-primary)/80 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between gap-4">
-          <Link
-            href="/dashboard"
-            className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors shrink-0"
-          >
-            ← {t("backToDashboard")}
-          </Link>
+          <div className="flex items-center gap-3">
+    <Link
+      href="/dashboard"
+      className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors shrink-0"
+    >
+      ← {t("backToDashboard")}
+    </Link>
+    <UsageBadge
+      initialUsed={initialUsageUsed}
+      initialLimit={initialUsageLimit}
+      refreshKey={usageRefreshKey}
+    />
+  </div>
 
           <div className="flex items-center gap-1 p-1 rounded-full border border-(--border) bg-(--surface)/40 overflow-x-auto max-w-[60vw] md:max-w-none scrollbar-thin">
     {AGENT_CONFIG.map((agent) => {

@@ -509,7 +509,8 @@
   "welcomeBodyCFO": "Je suis ton CFO. Pour {projectName}, on parle chiffres, runway, unit economics. Pas de bullshit sur l'argent.",
   "welcomeBodyCDO": "Je suis ton CDO. Pour {projectName}, on parle métriques qui comptent vraiment. Quelle est ta North Star ?",
   "welcomeBodyDEV": "Je suis ton DEV. Pour {projectName}, on parle code concret. Bug à fixer, feature à implémenter, librairie à choisir ?",
-  "welcomeBodyCCO": "Je suis ton CCO. Pour {projectName}, on parle copy, taglines, contenu. Une phrase claire bat trois phrases brillantes."
+  "welcomeBodyCCO": "Je suis ton CCO. Pour {projectName}, on parle copy, taglines, contenu. Une phrase claire bat trois phrases brillantes.",
+   "errorRateLimited": "Tu as atteint la limite de 10 messages aujourd'hui. Reviens demain ou passe à un plan payant."
   },
   "account": {
     "ariaLabel": "Menu compte",
@@ -569,6 +570,40 @@
     "download": "Télécharger",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer ce livrable ? Cette action est définitive."
+  },
+  "rateLimit": {
+    "messagesShort": "msg restants",
+    "limitReachedShort": "Limite · upgrade",
+    "tooltip": "{used}/{limit} messages utilisés aujourd'hui"
+  },
+  "upgrade": {
+    "backToDashboard": "Retour au dashboard",
+    "eyebrow": "PASSER À UN PLAN",
+    "title": "Débloquer toute l'équipe.",
+    "sub": "Free te donne un avant-goût. Les plans payants débloquent les vraies sessions de travail avec ton équipe IA.",
+    "popular": "Le plus pris",
+    "perMonth": "mois",
+    "comingSoon": "Bientôt disponible",
+    "footer": "Stripe arrive très bientôt. Tu pourras choisir ton plan en quelques clics.",
+    "starter": {
+      "f1": "3 projets",
+      "f2": "8 agents complets",
+      "f3": "100 messages / jour",
+      "f4": "Historique illimité"
+    },
+    "pro": {
+      "f1": "10 projets",
+      "f2": "8 agents complets",
+      "f3": "Messages illimités",
+      "f4": "Intégrations (Notion, Slack)",
+      "f5": "Génération de code"
+    },
+    "team": {
+      "f1": "Projets illimités",
+      "f2": "5 sièges utilisateurs",
+      "f3": "Messages illimités",
+      "f4": "Accès API"
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import {
   getOrCreateConversation,
   listMessages,
 } from "@/lib/actions/conversations";
+ import { checkRateLimit } from "@/lib/rate-limit/check";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import type { Project } from "@/lib/types/project";
 
@@ -42,6 +43,7 @@ export default async function ProjectChatPage({ params }: PageProps) {
   }
 
   const messages = await listMessages(conversation.id);
+  const usage = await checkRateLimit(user.id);
 
   return (
     <ChatInterface
@@ -49,6 +51,8 @@ export default async function ProjectChatPage({ params }: PageProps) {
       conversationId={conversation.id}
       initialMessages={messages}
       locale={locale}
+      initialUsageUsed={usage.used}
+      initialUsageLimit={usage.limit}
     />
   );
 }

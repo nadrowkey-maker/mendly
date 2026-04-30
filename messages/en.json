@@ -509,7 +509,8 @@
   "welcomeBodyCFO": "I'm your CFO. For {projectName}, we talk numbers, runway, unit economics. No bullshit on money.",
   "welcomeBodyCDO": "I'm your CDO. For {projectName}, we talk metrics that actually matter. What's your North Star?",
   "welcomeBodyDEV": "I'm your DEV. For {projectName}, we talk concrete code. Bug to fix, feature to implement, library to choose?",
-  "welcomeBodyCCO": "I'm your CCO. For {projectName}, we talk copy, taglines, content. One clear sentence beats three clever ones."
+  "welcomeBodyCCO": "I'm your CCO. For {projectName}, we talk copy, taglines, content. One clear sentence beats three clever ones.",
+   "errorRateLimited": "You've hit today's 10 message limit. Come back tomorrow or upgrade to a paid plan."
   },
    "account": {
     "ariaLabel": "Account menu",
@@ -569,6 +570,40 @@
     "download": "Download",
     "delete": "Delete",
     "confirmDelete": "Delete this deliverable? This action is permanent."
+  },
+  "rateLimit": {
+    "messagesShort": "msg left",
+    "limitReachedShort": "Limit · upgrade",
+    "tooltip": "{used}/{limit} messages used today"
+  },
+  "upgrade": {
+    "backToDashboard": "Back to dashboard",
+    "eyebrow": "UPGRADE YOUR PLAN",
+    "title": "Unlock the full team.",
+    "sub": "Free gives you a taste. Paid plans unlock real work sessions with your AI team.",
+    "popular": "Most popular",
+    "perMonth": "mo",
+    "comingSoon": "Coming soon",
+    "footer": "Stripe is coming very soon. You'll be able to pick your plan in a few clicks.",
+    "starter": {
+      "f1": "3 projects",
+      "f2": "All 8 agents",
+      "f3": "100 messages / day",
+      "f4": "Unlimited history"
+    },
+    "pro": {
+      "f1": "10 projects",
+      "f2": "All 8 agents",
+      "f3": "Unlimited messages",
+      "f4": "Integrations (Notion, Slack)",
+      "f5": "Code generation"
+    },
+    "team": {
+      "f1": "Unlimited projects",
+      "f2": "5 user seats",
+      "f3": "Unlimited messages",
+      "f4": "API access"
+    }
   }
 
 }

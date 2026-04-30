@@ -6,6 +6,7 @@ import {
   buildCmoDebatePrompt,
   buildCeoSynthesisPrompt,
 } from "@/lib/ai/prompts/debate";
+import { checkRateLimit } from "@/lib/rate-limit/check";
 import type { Project } from "@/lib/types/project";
 
 export const runtime = "nodejs";
@@ -13,9 +14,7 @@ export const maxDuration = 90;
 
 /**
  * Streams 3 sequential agent rounds: CTO → CMO → CEO synthesis.
- * Each round is delimited by a special marker so the frontend can split them.
- *
- * Marker format: \n\n[[ROUND:CTO]]\n\n ... \n\n[[ROUND:CMO]]\n\n ... \n\n[[ROUND:CEO]]\n\n ...
+ * Each round delimited by [[ROUND:XXX]] markers parsed by the frontend.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -37,6 +36,24 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // ============= RATE LIMIT CHECK =============
+    const rateLimit = await checkRateLimit(user.id);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "rate_limited",
+          message: "Daily message limit reached",
+          used: rateLimit.used,
+          limit: rateLimit.limit,
+          resetsAt: rateLimit.resetsAt.toISOString(),
+        }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Fetch project
     const { data: project, error: projectErr } = await supabase
       .from("projects")
@@ -49,7 +66,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Save user message FIRST
+    // Save user message FIRST (counts toward rate limit)
     await supabase.from("messages").insert({
       conversation_id: conversationId,
       user_id: user.id,
@@ -87,7 +104,6 @@ export async function POST(req: NextRequest) {
           }
           previousRounds.push({ agent: "CTO", content: ctoFull });
 
-          // Save CTO message
           await supabase.from("messages").insert({
             conversation_id: conversationId,
             user_id: user.id,

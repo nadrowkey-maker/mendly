@@ -12,35 +12,78 @@ import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { Project } from "@/lib/types/project";
 import type { Message } from "@/lib/types/conversation";
 import type { AgentRole } from "@/lib/types/conversation";
+import { checkRateLimit } from "@/lib/rate-limit/check";
 
 export const runtime = "nodejs";
 
-function getSystemPrompt(agentRole: string, project: Project, locale: "fr" | "en") {
-    switch (agentRole) {
-      case "CTO": return buildCtoSystemPrompt(project, locale);
-      case "CMO": return buildCmoSystemPrompt(project, locale);
-      case "CPO": return buildCpoSystemPrompt(project, locale);
-      case "CFO": return buildCfoSystemPrompt(project, locale);
-      case "CDO": return buildCdoSystemPrompt(project, locale);
-      case "DEV": return buildDevSystemPrompt(project, locale);
-      case "CCO": return buildCcoSystemPrompt(project, locale);
-      default: return buildCeoSystemPrompt(project, locale);
-    }
+function getSystemPrompt(
+  agentRole: string,
+  project: Project,
+  locale: "fr" | "en"
+) {
+  switch (agentRole) {
+    case "CTO":
+      return buildCtoSystemPrompt(project, locale);
+    case "CMO":
+      return buildCmoSystemPrompt(project, locale);
+    case "CPO":
+      return buildCpoSystemPrompt(project, locale);
+    case "CFO":
+      return buildCfoSystemPrompt(project, locale);
+    case "CDO":
+      return buildCdoSystemPrompt(project, locale);
+    case "DEV":
+      return buildDevSystemPrompt(project, locale);
+    case "CCO":
+      return buildCcoSystemPrompt(project, locale);
+    default:
+      return buildCeoSystemPrompt(project, locale);
   }
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { conversationId, projectId, userMessage, locale, agentRole = "CEO" } = await req.json();
+    const {
+      conversationId,
+      projectId,
+      userMessage,
+      locale,
+      agentRole = "CEO",
+    } = await req.json();
 
     if (!conversationId || !projectId || !userMessage) {
-      return new Response(JSON.stringify({ error: "Missing parameters" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Missing parameters" }), {
+        status: 400,
+      });
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    }
+
+    // ============= RATE LIMIT CHECK =============
+    const rateLimit = await checkRateLimit(user.id);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "rate_limited",
+          message: "Daily message limit reached",
+          used: rateLimit.used,
+          limit: rateLimit.limit,
+          resetsAt: rateLimit.resetsAt.toISOString(),
+        }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     const { data: project, error: projectErr } = await supabase
@@ -50,7 +93,9 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (projectErr || !project) {
-      return new Response(JSON.stringify({ error: "Project not found" }), { status: 404 });
+      return new Response(JSON.stringify({ error: "Project not found" }), {
+        status: 404,
+      });
     }
 
     const { data: history } = await supabase
@@ -67,7 +112,11 @@ export async function POST(req: NextRequest) {
     });
 
     const targetLocale = locale === "en" ? "en" : "fr";
-    const systemPrompt = getSystemPrompt(agentRole as AgentRole, project as Project, targetLocale);
+    const systemPrompt = getSystemPrompt(
+      agentRole as AgentRole,
+      project as Project,
+      targetLocale
+    );
     const geminiHistory = toGeminiHistory(
       (history ?? []) as Pick<Message, "role" | "content">[]
     );
@@ -78,7 +127,11 @@ export async function POST(req: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of streamGeminiResponse(systemPrompt, geminiHistory, userMessage)) {
+          for await (const chunk of streamGeminiResponse(
+            systemPrompt,
+            geminiHistory,
+            userMessage
+          )) {
             fullResponse += chunk;
             controller.enqueue(encoder.encode(chunk));
           }
@@ -113,6 +166,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("Chat route error:", err);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+    });
   }
 }
