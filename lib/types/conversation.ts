@@ -1,4 +1,4 @@
-export type AgentRole = "CEO" | "CTO" | "CMO" | "CPO" | "CFO" | "CDO" | "DEV" | "CCO";
+ export type AgentRole = "CEO" | "CTO" | "CMO" | "CPO" | "CFO" | "CDO" | "DEV" | "CCO";
 export type MessageRole = "user" | "assistant" | "system";
 
 export interface Conversation {

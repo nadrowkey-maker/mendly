@@ -503,7 +503,13 @@
     "debate": "Débat",
   "debating": "Débat en cours…",
   "debateTooltip": "Lancer un débat à 3 (CTO + CMO + synthèse CEO)",
-  "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents"
+  "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents",
+  "myDeliverables": "Mes livrables",
+  "welcomeBodyCPO": "Je suis ton CPO. Pour {projectName}, on parle scope, priorités, expérience user. Ma question favorite : et si on ne le construit pas ?",
+  "welcomeBodyCFO": "Je suis ton CFO. Pour {projectName}, on parle chiffres, runway, unit economics. Pas de bullshit sur l'argent.",
+  "welcomeBodyCDO": "Je suis ton CDO. Pour {projectName}, on parle métriques qui comptent vraiment. Quelle est ta North Star ?",
+  "welcomeBodyDEV": "Je suis ton DEV. Pour {projectName}, on parle code concret. Bug à fixer, feature à implémenter, librairie à choisir ?",
+  "welcomeBodyCCO": "Je suis ton CCO. Pour {projectName}, on parle copy, taglines, contenu. Une phrase claire bat trois phrases brillantes."
   },
   "account": {
     "ariaLabel": "Menu compte",
@@ -553,6 +559,16 @@
     "errorTitle": "Quelque chose a foiré.",
     "errorGeneric": "Impossible de générer le memo. Réessaie dans une minute.",
     "close": "Fermer"
+  },
+   "deliverablesList": {
+    "backToChat": "Retour au chat",
+    "eyebrow": "TES LIVRABLES",
+    "title": "Tout ce que ton équipe t'a livré",
+    "emptyTitle": "Aucun livrable pour l'instant",
+    "emptyBody": "Lance une discussion avec ton CEO et clique sur \"Générer le memo\" pour produire ton premier livrable.",
+    "download": "Télécharger",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer ce livrable ? Cette action est définitive."
   }
 }
 

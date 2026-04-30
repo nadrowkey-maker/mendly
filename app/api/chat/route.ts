@@ -3,6 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { buildCeoSystemPrompt } from "@/lib/ai/agents/ceo";
 import { buildCtoSystemPrompt } from "@/lib/ai/agents/cto";
 import { buildCmoSystemPrompt } from "@/lib/ai/agents/cmo";
+import { buildCpoSystemPrompt } from "@/lib/ai/agents/cpo";
+import { buildCfoSystemPrompt } from "@/lib/ai/agents/cfo";
+import { buildCdoSystemPrompt } from "@/lib/ai/agents/cdo";
+import { buildDevSystemPrompt } from "@/lib/ai/agents/dev";
+import { buildCcoSystemPrompt } from "@/lib/ai/agents/cco";
 import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { Project } from "@/lib/types/project";
 import type { Message } from "@/lib/types/conversation";
@@ -10,14 +15,18 @@ import type { AgentRole } from "@/lib/types/conversation";
 
 export const runtime = "nodejs";
 
-function getSystemPrompt(agentRole: AgentRole, project: Project, locale: "fr" | "en"): string {
-  switch (agentRole) {
-    case "CTO": return buildCtoSystemPrompt(project, locale);
-    case "CMO": return buildCmoSystemPrompt(project, locale);
-    case "CEO":
-    default:   return buildCeoSystemPrompt(project, locale);
+function getSystemPrompt(agentRole: string, project: Project, locale: "fr" | "en") {
+    switch (agentRole) {
+      case "CTO": return buildCtoSystemPrompt(project, locale);
+      case "CMO": return buildCmoSystemPrompt(project, locale);
+      case "CPO": return buildCpoSystemPrompt(project, locale);
+      case "CFO": return buildCfoSystemPrompt(project, locale);
+      case "CDO": return buildCdoSystemPrompt(project, locale);
+      case "DEV": return buildDevSystemPrompt(project, locale);
+      case "CCO": return buildCcoSystemPrompt(project, locale);
+      default: return buildCeoSystemPrompt(project, locale);
+    }
   }
-}
 
 export async function POST(req: NextRequest) {
   try {

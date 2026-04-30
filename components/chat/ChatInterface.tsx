@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { Zap, FileStack } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { GenerateMemoButton } from "./GenerateMemoButton";
 import {
@@ -37,16 +37,26 @@ interface AgentState {
 }
 
 const AGENT_CONFIG: { role: AgentRole; color: string; labelKey: string }[] = [
-  { role: "CEO", color: "#8B5CF6", labelKey: "CEO" },
-  { role: "CTO", color: "#06B6D4", labelKey: "CTO" },
-  { role: "CMO", color: "#F0ABFC", labelKey: "CMO" },
-];
+    { role: "CEO", color: "#8B5CF6", labelKey: "CEO" },
+    { role: "CTO", color: "#06B6D4", labelKey: "CTO" },
+    { role: "CMO", color: "#F0ABFC", labelKey: "CMO" },
+    { role: "CPO", color: "#FB923C", labelKey: "CPO" },
+    { role: "CFO", color: "#34D399", labelKey: "CFO" },
+    { role: "CDO", color: "#60A5FA", labelKey: "CDO" },
+    { role: "DEV", color: "#FBBF24", labelKey: "DEV" },
+    { role: "CCO", color: "#F472B6", labelKey: "CCO" },
+  ];
 
 const AGENT_COLORS: Record<string, string> = {
-  CEO: "#8B5CF6",
-  CTO: "#06B6D4",
-  CMO: "#F0ABFC",
-};
+    CEO: "#8B5CF6",
+    CTO: "#06B6D4",
+    CMO: "#F0ABFC",
+    CPO: "#FB923C",
+    CFO: "#34D399",
+    CDO: "#60A5FA",
+    DEV: "#FBBF24",
+    CCO: "#F472B6",
+  };
 
 function toDisplayMessages(messages: Message[]): DisplayMessage[] {
   return messages.map((m) => ({
@@ -410,29 +420,39 @@ export function ChatInterface({
             ← {t("backToDashboard")}
           </Link>
 
-          <div className="flex items-center gap-1 p-1 rounded-full border border-(--border) bg-(--surface)/40">
-            {AGENT_CONFIG.map((agent) => {
-              const isActive = activeAgent === agent.role;
-              return (
-                <button
-                  key={agent.role}
-                  onClick={() => handleAgentSwitch(agent.role)}
-                  disabled={busy}
-                  className="relative px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  style={{
-                    color: isActive ? "#05030E" : agent.color,
-                    background: isActive ? agent.color : "transparent",
-                    boxShadow: isActive ? `0 0 20px ${agent.color}60` : "none",
-                  }}
-                >
-                  {agent.role}
-                </button>
-              );
-            })}
-          </div>
+          <div className="flex items-center gap-1 p-1 rounded-full border border-(--border) bg-(--surface)/40 overflow-x-auto max-w-[60vw] md:max-w-none scrollbar-thin">
+    {AGENT_CONFIG.map((agent) => {
+      const isActive = activeAgent === agent.role;
+      return (
+        <button
+          key={agent.role}
+          onClick={() => handleAgentSwitch(agent.role)}
+          disabled={busy}
+          className="relative px-3 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+          style={{
+            color: isActive ? "#05030E" : agent.color,
+            background: isActive ? agent.color : "transparent",
+            boxShadow: isActive ? `0 0 20px ${agent.color}60` : "none",
+          }}
+        >
+          {agent.role}
+        </button>
+      );
+    })}
+  </div>
 
           {activeAgent === "CEO" ? (
-            <GenerateMemoButton projectId={project.id} />
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/dashboard/projects/${project.id}/deliverables`}
+                title={t("myDeliverables")}
+                className="flex items-center gap-2 px-3 py-2 rounded-full border border-(--border-strong) bg-(--surface)/40 hover:bg-(--surface)/60 hover:border-(--accent-glow)/50 transition-all text-xs font-mono uppercase tracking-wider text-(--text-muted) hover:text-white"
+              >
+                <FileStack className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">{t("myDeliverables")}</span>
+              </Link>
+              <GenerateMemoButton projectId={project.id} />
+            </div>
           ) : (
             <div className="w-[120px]" />
           )}

@@ -503,7 +503,13 @@
     "debate": "Debate",
   "debating": "Debating…",
   "debateTooltip": "Trigger a 3-way debate (CTO + CMO + CEO synthesis)",
-  "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate"
+  "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate",
+  "myDeliverables": "My deliverables",
+  "welcomeBodyCPO": "I'm your CPO. For {projectName}, we talk scope, priorities, user experience. My favorite question: what if we don't build it?",
+  "welcomeBodyCFO": "I'm your CFO. For {projectName}, we talk numbers, runway, unit economics. No bullshit on money.",
+  "welcomeBodyCDO": "I'm your CDO. For {projectName}, we talk metrics that actually matter. What's your North Star?",
+  "welcomeBodyDEV": "I'm your DEV. For {projectName}, we talk concrete code. Bug to fix, feature to implement, library to choose?",
+  "welcomeBodyCCO": "I'm your CCO. For {projectName}, we talk copy, taglines, content. One clear sentence beats three clever ones."
   },
    "account": {
     "ariaLabel": "Account menu",
@@ -553,6 +559,16 @@
     "errorTitle": "Something went wrong.",
     "errorGeneric": "Could not generate the memo. Try again in a minute.",
     "close": "Close"
+  },
+   "deliverablesList": {
+    "backToChat": "Back to chat",
+    "eyebrow": "YOUR DELIVERABLES",
+    "title": "Everything your team has delivered",
+    "emptyTitle": "No deliverables yet",
+    "emptyBody": "Start a conversation with your CEO and click \"Generate memo\" to produce your first deliverable.",
+    "download": "Download",
+    "delete": "Delete",
+    "confirmDelete": "Delete this deliverable? This action is permanent."
   }
 
 }
