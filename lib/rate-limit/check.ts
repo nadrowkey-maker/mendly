@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-
-export const FREE_DAILY_LIMIT = 10;
+import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -8,20 +7,44 @@ export interface RateLimitResult {
   remaining: number;
   limit: number;
   resetsAt: Date;
+  plan: PlanTier;
+  unlimited: boolean;
 }
 
 /**
- * Counts how many user messages were sent in the last 24h
- * across all conversations of the current user.
- *
- * Returns rate limit info. allowed = false means user hit the cap.
+ * Counts user messages in the last 24h and returns the rate limit info,
+ * adjusted for the user's current plan.
  */
 export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   const supabase = await createClient();
 
-  // Count user messages in the last 24 hours
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // Fetch user's plan
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("plan")
+    .eq("user_id", userId)
+    .maybeSingle();
 
+  const plan = (subData?.plan as PlanTier) ?? "free";
+  const limit = PLANS[plan].dailyMessageLimit;
+  const tomorrow = new Date();
+  tomorrow.setHours(24, 0, 0, 0);
+
+  // Unlimited plans (Pro, Team)
+  if (limit === -1) {
+    return {
+      allowed: true,
+      used: 0,
+      remaining: -1,
+      limit: -1,
+      resetsAt: tomorrow,
+      plan,
+      unlimited: true,
+    };
+  }
+
+  // Count user messages in last 24h
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { count, error } = await supabase
     .from("messages")
     .select("id", { count: "exact", head: true })
@@ -31,38 +54,35 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
 
   if (error) {
     console.error("Rate limit check error:", error);
-    // Fail open — don't block users if our own check fails
     return {
       allowed: true,
       used: 0,
-      remaining: FREE_DAILY_LIMIT,
-      limit: FREE_DAILY_LIMIT,
-      resetsAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      remaining: limit,
+      limit,
+      resetsAt: tomorrow,
+      plan,
+      unlimited: false,
     };
   }
 
   const used = count ?? 0;
-  const remaining = Math.max(0, FREE_DAILY_LIMIT - used);
-  const allowed = used < FREE_DAILY_LIMIT;
-
-  // resetsAt = the time when the oldest message in window will exit the rolling 24h
-  // Simpler: midnight tonight (close enough for UX)
-  const tomorrow = new Date();
-  tomorrow.setHours(24, 0, 0, 0);
+  const remaining = Math.max(0, limit - used);
+  const allowed = used < limit;
 
   return {
     allowed,
     used,
     remaining,
-    limit: FREE_DAILY_LIMIT,
+    limit,
     resetsAt: tomorrow,
+    plan,
+    unlimited: false,
   };
 }
 
-/**
- * Same check but returns just the count for UI display.
- * Use this in server components to show "X/10 messages today".
- */
 export async function getUsageInfo(userId: string): Promise<RateLimitResult> {
   return checkRateLimit(userId);
 }
+
+// Legacy export for backwards compat
+export const FREE_DAILY_LIMIT = 10;

@@ -576,35 +576,40 @@
     "limitReachedShort": "Limite · upgrade",
     "tooltip": "{used}/{limit} messages utilisés aujourd'hui"
   },
-  "upgrade": {
-    "backToDashboard": "Retour au dashboard",
-    "eyebrow": "PASSER À UN PLAN",
-    "title": "Débloquer toute l'équipe.",
-    "sub": "Free te donne un avant-goût. Les plans payants débloquent les vraies sessions de travail avec ton équipe IA.",
-    "popular": "Le plus pris",
-    "perMonth": "mois",
-    "comingSoon": "Bientôt disponible",
-    "footer": "Stripe arrive très bientôt. Tu pourras choisir ton plan en quelques clics.",
-    "starter": {
-      "f1": "3 projets",
-      "f2": "8 agents complets",
-      "f3": "100 messages / jour",
-      "f4": "Historique illimité"
-    },
-    "pro": {
-      "f1": "10 projets",
-      "f2": "8 agents complets",
-      "f3": "Messages illimités",
-      "f4": "Intégrations (Notion, Slack)",
-      "f5": "Génération de code"
-    },
-    "team": {
-      "f1": "Projets illimités",
-      "f2": "5 sièges utilisateurs",
-      "f3": "Messages illimités",
-      "f4": "Accès API"
-    }
+ "upgrade": {
+  "backToDashboard": "Retour au dashboard",
+  "eyebrow": "PASSER À UN PLAN",
+  "title": "Débloquer toute l'équipe.",
+  "sub": "Free te donne un avant-goût. Les plans payants débloquent les vraies sessions de travail avec ton équipe IA.",
+  "popular": "Le plus pris",
+  "perMonth": "mois",
+  "footer": "Paiement sécurisé via Stripe. Annule à tout moment.",
+  "currentPlan": "Tu es actuellement sur le plan {plan}.",
+  "activeBadge": "Actif",
+  "startCheckout": "Choisir ce plan",
+  "switchTo": "Passer à {plan}",
+  "manage": "Gérer mon abonnement",
+  "loading": "Chargement…",
+  "starter": {
+    "f1": "3 projets",
+    "f2": "8 agents complets",
+    "f3": "100 messages / jour",
+    "f4": "Historique illimité"
+  },
+  "pro": {
+    "f1": "10 projets",
+    "f2": "8 agents complets",
+    "f3": "Messages illimités",
+    "f4": "Intégrations (Notion, Slack)",
+    "f5": "Génération de code"
+  },
+  "team": {
+    "f1": "Projets illimités",
+    "f2": "5 sièges utilisateurs",
+    "f3": "Messages illimités",
+    "f4": "Accès API"
   }
+}
 }
 
 

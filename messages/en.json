@@ -577,33 +577,38 @@
     "tooltip": "{used}/{limit} messages used today"
   },
   "upgrade": {
-    "backToDashboard": "Back to dashboard",
-    "eyebrow": "UPGRADE YOUR PLAN",
-    "title": "Unlock the full team.",
-    "sub": "Free gives you a taste. Paid plans unlock real work sessions with your AI team.",
-    "popular": "Most popular",
-    "perMonth": "mo",
-    "comingSoon": "Coming soon",
-    "footer": "Stripe is coming very soon. You'll be able to pick your plan in a few clicks.",
-    "starter": {
-      "f1": "3 projects",
-      "f2": "All 8 agents",
-      "f3": "100 messages / day",
-      "f4": "Unlimited history"
-    },
-    "pro": {
-      "f1": "10 projects",
-      "f2": "All 8 agents",
-      "f3": "Unlimited messages",
-      "f4": "Integrations (Notion, Slack)",
-      "f5": "Code generation"
-    },
-    "team": {
-      "f1": "Unlimited projects",
-      "f2": "5 user seats",
-      "f3": "Unlimited messages",
-      "f4": "API access"
-    }
+  "backToDashboard": "Back to dashboard",
+  "eyebrow": "UPGRADE YOUR PLAN",
+  "title": "Unlock the full team.",
+  "sub": "Free gives you a taste. Paid plans unlock real work sessions with your AI team.",
+  "popular": "Most popular",
+  "perMonth": "mo",
+  "footer": "Secure payment via Stripe. Cancel anytime.",
+  "currentPlan": "You are currently on the {plan} plan.",
+  "activeBadge": "Active",
+  "startCheckout": "Choose this plan",
+  "switchTo": "Switch to {plan}",
+  "manage": "Manage subscription",
+  "loading": "Loading…",
+  "starter": {
+    "f1": "3 projects",
+    "f2": "All 8 agents",
+    "f3": "100 messages / day",
+    "f4": "Unlimited history"
+  },
+  "pro": {
+    "f1": "10 projects",
+    "f2": "All 8 agents",
+    "f3": "Unlimited messages",
+    "f4": "Integrations (Notion, Slack)",
+    "f5": "Code generation"
+  },
+  "team": {
+    "f1": "Unlimited projects",
+    "f2": "5 user seats",
+    "f3": "Unlimited messages",
+    "f4": "API access"
   }
+}
 
 }
