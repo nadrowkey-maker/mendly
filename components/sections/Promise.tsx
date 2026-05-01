@@ -1,7 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { ShaderAnimation } from "@/components/shader-animation";
 import { GradientText } from "@/components/ui/gradient-text";
 
 const EDITORIAL_LINES = ["body1", "body2", "body3"] as const;
@@ -11,12 +10,14 @@ export function PromiseSection() {
 
   return (
     <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-black">
-      {/* Shader rings — luminous backdrop */}
-      <div className="absolute inset-0 opacity-55 overflow-hidden pointer-events-none">
-        <ShaderAnimation />
-      </div>
-
-      {/* Soft vignette — keeps center legible without killing the glow */}
+      {/* Static ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(139,92,246,0.13) 0%, transparent 70%)",
+        }}
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_50%,transparent_25%,rgba(0,0,0,0.55)_70%,black_100%)] pointer-events-none" />
 
       {/* Top / bottom edge fades */}

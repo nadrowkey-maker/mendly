@@ -77,7 +77,7 @@ function PricingCard({
           "rounded-3xl border p-6 flex flex-col gap-5 overflow-hidden relative cursor-pointer h-full",
           tier.popular
             ? "bg-(--surface) border-(--accent-primary) shadow-[0_0_60px_rgba(139,92,246,0.30)]"
-            : "bg-(--surface)/50 border-(--border) backdrop-blur-sm hover:border-(--accent-primary)/40 transition-colors duration-300"
+            : "bg-(--surface)/60 border-(--border) hover:border-(--accent-primary)/40 transition-colors duration-300"
         )}
       >
         {/* Mouse-tracking spotlight */}
@@ -200,12 +200,14 @@ export function PricingSection() {
 
   return (
     <section id="pricing" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-secondary)">
-      {/* Aurora blobs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[rgba(139,92,246,0.09)] blur-[120px]" />
-        <div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-[rgba(6,182,212,0.07)] blur-[100px]" />
-        <div className="absolute bottom-1/4 left-1/2 w-72 h-72 rounded-full bg-[rgba(240,171,252,0.06)] blur-[90px]" />
-      </div>
+      {/* Static ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)",
+        }}
+      />
       <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
 

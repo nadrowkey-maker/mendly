@@ -1,10 +1,8 @@
 "use client";
 
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { Check, X, AlertTriangle } from "lucide-react";
-import { ShaderCanvas, SHADER_SRC } from "@/components/radial-shader";
 
 type Row = {
   feature: string;
@@ -21,7 +19,7 @@ function CellContent({ text }: { text: string }) {
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 shrink-0">
           <Check className="w-3 h-3 text-emerald-400" />
         </span>
-        {label && <span className="text-sm text-[var(--text-primary)]">{label}</span>}
+        {label && <span className="text-sm text-(--text-primary)">{label}</span>}
       </span>
     );
   }
@@ -32,7 +30,7 @@ function CellContent({ text }: { text: string }) {
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15 shrink-0">
           <X className="w-3 h-3 text-red-400" />
         </span>
-        {label && <span className="text-sm text-[var(--text-muted)]">{label}</span>}
+        {label && <span className="text-sm text-(--text-muted)">{label}</span>}
       </span>
     );
   }
@@ -43,18 +41,15 @@ function CellContent({ text }: { text: string }) {
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/15 shrink-0">
           <AlertTriangle className="w-3 h-3 text-amber-400" />
         </span>
-        {label && <span className="text-sm text-[var(--text-muted)]">{label}</span>}
+        {label && <span className="text-sm text-(--text-muted)">{label}</span>}
       </span>
     );
   }
-  return <span className="text-sm text-[var(--text-primary)]">{text}</span>;
+  return <span className="text-sm text-(--text-primary)">{text}</span>;
 }
 
 export function Comparison() {
   const t = useTranslations("comparison");
-
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { margin: "0px" });
 
   const rows: Row[] = [
     { feature: t("row1Feature"), chatgpt: t("row1Chatgpt"), lovable: t("row1Lovable"), mendly: t("row1Mendly") },
@@ -68,16 +63,17 @@ export function Comparison() {
 
   return (
     <section
-      ref={sectionRef}
       id="comparison"
       className="relative py-24 md:py-32 px-6 md:px-12 overflow-hidden"
     >
-      {/* Radial shader — boosted opacity */}
-      <div className="absolute inset-0 opacity-[0.22] pointer-events-none">
-        {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
-      </div>
-
-      {/* Softer vignette so the shader breathes */}
+      {/* Static ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139,92,246,0.09) 0%, transparent 70%)",
+        }}
+      />
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -95,16 +91,16 @@ export function Comparison() {
           viewport={{ once: true, margin: "-80px" }}
           className="text-center mb-16"
         >
-          <p className="text-[10px] font-mono tracking-[0.3em] text-[var(--accent-glow)] mb-4 uppercase">
+          <p className="text-[10px] font-mono tracking-[0.3em] text-(--accent-glow) mb-4 uppercase">
             {t("eyebrow")}
           </p>
-          <h2 className="text-4xl md:text-6xl font-semibold text-[var(--text-primary)] leading-[0.95] tracking-[-0.03em] mb-4">
+          <h2 className="text-4xl md:text-6xl font-semibold text-(--text-primary) leading-[0.95] tracking-[-0.03em] mb-4">
             {t("title")}{" "}
-            <span className="italic font-[family-name:var(--font-fraunces)] bg-gradient-to-r from-[var(--accent-glow)] to-[var(--accent-warm)] bg-clip-text text-transparent">
+            <span className="italic font-[family-name:var(--font-fraunces)] bg-gradient-to-r from-(--accent-glow) to-(--accent-warm) bg-clip-text text-transparent">
               {t("titleEm")}
             </span>
           </h2>
-          <p className="text-[var(--text-muted)] max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+          <p className="text-(--text-muted) max-w-xl mx-auto text-base md:text-lg leading-relaxed">
             {t("sub")}
           </p>
         </motion.div>
@@ -120,16 +116,16 @@ export function Comparison() {
           <table className="w-full min-w-[560px] border-separate border-spacing-0">
             <thead>
               <tr>
-                <th className="py-4 px-6 text-left text-[10px] font-mono tracking-[0.2em] text-[var(--text-dim)] uppercase border-b border-[var(--border)] w-[36%]">
+                <th className="py-4 px-6 text-left text-[10px] font-mono tracking-[0.2em] text-(--text-dim) uppercase border-b border-(--border) w-[36%]">
                   {t("headerFeature")}
                 </th>
-                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] uppercase border-b border-[var(--border)]">
+                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-(--text-muted) uppercase border-b border-(--border)">
                   {t("headerChatgpt")}
                 </th>
-                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] uppercase border-b border-[var(--border)]">
+                <th className="py-4 px-4 text-center text-[10px] font-mono tracking-[0.2em] text-(--text-muted) uppercase border-b border-(--border)">
                   {t("headerLovable")}
                 </th>
-                <th className="py-4 px-6 text-center text-[10px] font-mono tracking-[0.2em] text-[var(--accent-glow)] uppercase bg-[var(--accent-primary)]/10 border-l border-r border-t border-[var(--border-strong)] rounded-t-xl">
+                <th className="py-4 px-6 text-center text-[10px] font-mono tracking-[0.2em] text-(--accent-glow) uppercase bg-(--accent-primary)/10 border-l border-r border-t border-(--border-strong) rounded-t-xl">
                   {t("headerMendly")}
                 </th>
               </tr>
@@ -137,22 +133,22 @@ export function Comparison() {
             <tbody>
               {rows.map((row, i) => (
                 <tr key={i} className="group/row hover:bg-(--surface)/30 transition-colors duration-150">
-                  <td className="py-4 px-6 text-sm text-[var(--text-primary)] border-b border-[var(--border)]">
+                  <td className="py-4 px-6 text-sm text-(--text-primary) border-b border-(--border)">
                     {row.feature}
                   </td>
-                  <td className="py-4 px-4 text-center border-b border-[var(--border)]">
+                  <td className="py-4 px-4 text-center border-b border-(--border)">
                     <CellContent text={row.chatgpt} />
                   </td>
-                  <td className="py-4 px-4 text-center border-b border-[var(--border)]">
+                  <td className="py-4 px-4 text-center border-b border-(--border)">
                     <CellContent text={row.lovable} />
                   </td>
                   <td
                     className={[
                       "py-4 px-6 text-center",
-                      "bg-[var(--accent-primary)]/10 border-l border-r border-[var(--border-strong)]",
+                      "bg-(--accent-primary)/10 border-l border-r border-(--border-strong)",
                       i === rows.length - 1
-                        ? "border-b border-b-[var(--border-strong)] rounded-b-xl"
-                        : "border-b border-b-[var(--border)]",
+                        ? "border-b border-b-(--border-strong) rounded-b-xl"
+                        : "border-b border-b-(--border)",
                     ].join(" ")}
                   >
                     <CellContent text={row.mendly} />
@@ -169,7 +165,7 @@ export function Comparison() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true }}
-          className="mt-8 text-center text-xs font-mono tracking-wider text-[var(--text-dim)] uppercase"
+          className="mt-8 text-center text-xs font-mono tracking-wider text-(--text-dim) uppercase"
         >
           {t("caption")}
         </motion.p>

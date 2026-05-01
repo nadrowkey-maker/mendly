@@ -1,8 +1,6 @@
 "use client";
-import { useRef } from "react"; // AJOUT
-import { motion, useInView } from "framer-motion"; // AJOUT de useInView
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { ShaderCanvas, SHADER_SRC } from "@/components/phosphor-30";
 import { GlowCard } from "@/components/spotlight-card";
 
 const FADE_UP = (delay: number) => ({
@@ -14,48 +12,28 @@ const FADE_UP = (delay: number) => ({
 
 export function ProblemSection() {
   const t = useTranslations("problem");
-  
-  // SÉCURITÉ
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { margin: "0px" });
 
   const cards = [
-    {
-      number: t("stat1Number"),
-      title: t("stat1Title"),
-      desc: t("stat1Desc"),
-      glow: "purple" as const,
-    },
-    {
-      number: t("stat2Number"),
-      title: t("stat2Title"),
-      desc: t("stat2Desc"),
-      glow: "blue" as const,
-    },
-    {
-      number: t("stat3Number"),
-      title: t("stat3Title"),
-      desc: t("stat3Desc"),
-      glow: "red" as const,
-    },
+    { number: t("stat1Number"), title: t("stat1Title"), desc: t("stat1Desc"), glow: "purple" as const },
+    { number: t("stat2Number"), title: t("stat2Title"), desc: t("stat2Desc"), glow: "blue" as const },
+    { number: t("stat3Number"), title: t("stat3Title"), desc: t("stat3Desc"), glow: "red" as const },
   ];
 
   return (
-    // ATTACHE LA RÉFÉRENCE ICI
-    <section ref={sectionRef} className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
-      {/* Phosphor background */}
-      <div className="absolute inset-0 opacity-[0.32] pointer-events-none">
-        {isInView && <ShaderCanvas fragSource={SHADER_SRC} />}
-      </div>
-
-      {/* Radial vignette */}
+    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
+      {/* Static ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 65% 55% at 50% 40%, rgba(139,92,246,0.11) 0%, transparent 70%)",
+        }}
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_10%,var(--bg-primary)_72%)] pointer-events-none" />
-
-      {/* Top edge fade */}
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header */}
         <motion.div {...FADE_UP(0)} className="text-center mb-16 md:mb-24">
           <p className="text-xs tracking-[0.3em] text-(--text-dim) uppercase mb-6">
             {t("eyebrow")}
@@ -71,11 +49,10 @@ export function ProblemSection() {
           </p>
         </motion.div>
 
-        {/* Stat cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {cards.map(({ number, title, desc, glow }, i) => (
             <motion.div key={i} {...FADE_UP(0.1 * (i + 1))}>
-              <GlowCard glowColor={glow} customSize className="w-full min-h-[260px]">
+              <GlowCard glowColor={glow} customSize className="w-full min-h-65">
                 <div className="flex flex-col gap-3">
                   <span className="text-6xl md:text-7xl font-bold text-white leading-none">
                     {number}
@@ -93,7 +70,6 @@ export function ProblemSection() {
         </div>
       </div>
 
-      {/* Bottom edge fade */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
     </section>
   );
