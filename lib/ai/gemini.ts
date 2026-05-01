@@ -23,6 +23,12 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface FileAttachment {
+  data: string;     // base64-encoded file content
+  mimeType: string; // "application/pdf", "image/jpeg", "image/png", etc.
+  name: string;     // original filename for display
+}
+
 /**
  * Convertit notre format de messages en format Gemini.
  * Gemini utilise "user" et "model" (pas "assistant").
@@ -39,16 +45,13 @@ export function toGeminiHistory(
 }
 
 /**
- * Stream une réponse Gemini.
- * @param systemPrompt Le prompt système (instructions de l'agent)
- * @param history L'historique de la conversation
- * @param userMessage Le nouveau message du user
- * @returns Un AsyncGenerator qui yield les chunks de texte
+ * Stream une réponse Gemini, avec support multimodal optionnel (PDF / images).
  */
 export async function* streamGeminiResponse(
   systemPrompt: string,
   history: ChatMessage[],
-  userMessage: string
+  userMessage: string,
+  attachments?: FileAttachment[]
 ): AsyncGenerator<string, void, unknown> {
   const chat = geminiFlash.startChat({
     history: history.map((m) => ({
@@ -61,7 +64,22 @@ export async function* streamGeminiResponse(
     },
   });
 
-  const result = await chat.sendMessageStream(userMessage);
+  type Part =
+    | { text: string }
+    | { inlineData: { data: string; mimeType: string } };
+
+  let messageInput: string | Part[];
+  if (attachments?.length) {
+    const parts: Part[] = attachments.map((att) => ({
+      inlineData: { data: att.data, mimeType: att.mimeType },
+    }));
+    parts.push({ text: userMessage });
+    messageInput = parts;
+  } else {
+    messageInput = userMessage;
+  }
+
+  const result = await chat.sendMessageStream(messageInput);
 
   for await (const chunk of result.stream) {
     const text = chunk.text();

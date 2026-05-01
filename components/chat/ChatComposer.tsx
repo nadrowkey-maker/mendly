@@ -3,7 +3,8 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Zap, ArrowUp, Paperclip, X, Image, FileText } from "lucide-react";
+import { Plus, Zap, ArrowUp, X, Image, FileText } from "lucide-react";
+import type { FileAttachment } from "@/lib/ai/gemini";
 
 interface Props {
   value: string;
@@ -12,9 +13,21 @@ interface Props {
   onDebate?: () => void;
   busy: boolean;
   isDebating: boolean;
-  canDebate: boolean; // true only for CEO
+  canDebate: boolean;
   agentLabel: string;
+  selectedFile?: FileAttachment | null;
+  onFileChange?: (f: FileAttachment | null) => void;
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_MIME = [
+  "application/pdf",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
 
 export function ChatComposer({
   value,
@@ -25,12 +38,16 @@ export function ChatComposer({
   isDebating,
   canDebate,
   agentLabel,
+  selectedFile,
+  onFileChange,
 }: Props) {
   const t = useTranslations("chat");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
   const [attachOpen, setAttachOpen] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
 
-  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -45,9 +62,85 @@ export function ChatComposer({
     }
   };
 
+  const readFile = (file: File) => {
+    setFileError(null);
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError(t("fileTooBig"));
+      return;
+    }
+    if (!ALLOWED_MIME.includes(file.type)) {
+      setFileError(t("fileUnsupported"));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      const base64 = result.split(",")[1];
+      onFileChange?.({ data: base64, mimeType: file.type, name: file.name });
+      setAttachOpen(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const isPdf = selectedFile?.mimeType === "application/pdf";
+
   return (
-    <div className="px-4 md:px-8 pb-6 pt-2 bg-gradient-to-t from-(--bg-primary) via-(--bg-primary) to-transparent">
+    <div className="px-4 md:px-8 pb-6 pt-2 bg-linear-to-t from-(--bg-primary) via-(--bg-primary) to-transparent">
       <div className="max-w-3xl mx-auto">
+        {/* File preview chip */}
+        <AnimatePresence>
+          {selectedFile && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-2 mb-2 px-3 py-2 rounded-2xl bg-(--surface) border border-(--border-strong) w-fit max-w-full"
+            >
+              {isPdf ? (
+                <FileText className="w-4 h-4 text-(--accent-glow) shrink-0" />
+              ) : (
+                <Image className="w-4 h-4 text-(--accent-warm) shrink-0" aria-hidden />
+              )}
+              <span className="text-xs font-mono text-(--text-muted) truncate max-w-52">
+                {selectedFile.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => onFileChange?.(null)}
+                className="shrink-0 p-0.5 rounded-full hover:bg-(--surface-elevated) text-(--text-dim) hover:text-(--text-primary) transition-colors"
+                aria-label={t("removeFile")}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Hidden file inputs */}
+        <input
+          ref={pdfInputRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) readFile(file);
+            e.target.value = "";
+          }}
+        />
+        <input
+          ref={imgInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) readFile(file);
+            e.target.value = "";
+          }}
+        />
+
         {/* Composer wrapper */}
         <div
           className={[
@@ -72,28 +165,28 @@ export function ChatComposer({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden border-b border-(--border)"
               >
-                <div className="px-4 py-3 flex items-center gap-2">
+                <div className="px-4 py-3 flex items-center gap-2 flex-wrap">
                   <button
                     type="button"
-                    disabled
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--surface-elevated) border border-(--border) text-xs text-(--text-muted) opacity-50 cursor-not-allowed"
-                    title={t("comingSoon")}
+                    onClick={() => pdfInputRef.current?.click()}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--surface-elevated) border border-(--border) text-xs text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50 transition-all cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     {t("attachFile")}
                   </button>
                   <button
                     type="button"
-                    disabled
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--surface-elevated) border border-(--border) text-xs text-(--text-muted) opacity-50 cursor-not-allowed"
-                    title={t("comingSoon")}
+                    onClick={() => imgInputRef.current?.click()}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--surface-elevated) border border-(--border) text-xs text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50 transition-all cursor-pointer"
                   >
                     <Image className="w-3.5 h-3.5" aria-hidden />
                     {t("attachImage")}
                   </button>
-                  <span className="text-[10px] font-mono text-(--text-dim) uppercase tracking-wider ml-auto">
-                    {t("comingSoon")}
-                  </span>
+                  {fileError && (
+                    <span className="text-[10px] text-red-400 font-mono ml-auto">
+                      {fileError}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -101,23 +194,28 @@ export function ChatComposer({
 
           {/* Main composer area */}
           <div className="flex items-end gap-2 p-3">
-            {/* Attach button */}
             <button
               type="button"
-              onClick={() => setAttachOpen((v) => !v)}
+              onClick={() => {
+                setAttachOpen((v) => !v);
+                setFileError(null);
+              }}
               disabled={busy}
               className={[
                 "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-                attachOpen
+                attachOpen || selectedFile
                   ? "bg-(--accent-glow) text-(--bg-primary)"
                   : "bg-(--surface-elevated) text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface-hover)",
               ].join(" ")}
               title={t("attach")}
             >
-              {attachOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {attachOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <Plus className="w-4 h-4" />
+              )}
             </button>
 
-            {/* Textarea */}
             <textarea
               ref={textareaRef}
               value={value}
@@ -126,10 +224,9 @@ export function ChatComposer({
               placeholder={t("composerPlaceholder", { agent: agentLabel })}
               rows={1}
               disabled={busy}
-              className="flex-1 px-2 py-2 bg-transparent text-(--text-primary) placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-[280px] text-base leading-relaxed font-medium"
+              className="flex-1 px-2 py-2 bg-transparent text-(--text-primary) placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-70 text-base leading-relaxed font-medium"
             />
 
-            {/* Action buttons cluster */}
             <div className="flex items-center gap-1.5 shrink-0">
               {canDebate && (
                 <button
@@ -144,7 +241,12 @@ export function ChatComposer({
                       : "border border-(--border-strong) text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50",
                   ].join(" ")}
                 >
-                  <Zap className={["w-3.5 h-3.5", isDebating ? "animate-pulse" : ""].join(" ")} />
+                  <Zap
+                    className={[
+                      "w-3.5 h-3.5",
+                      isDebating ? "animate-pulse" : "",
+                    ].join(" ")}
+                  />
                   <span className="hidden md:inline">
                     {isDebating ? t("debating") : t("debate")}
                   </span>
@@ -171,7 +273,6 @@ export function ChatComposer({
           </div>
         </div>
 
-        {/* Hint */}
         <p className="text-[10px] text-(--text-dim) text-center mt-3 font-mono">
           {canDebate ? t("shortcutWithDebate") : t("shortcut")}
         </p>

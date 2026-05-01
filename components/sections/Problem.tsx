@@ -17,7 +17,7 @@ export function ProblemSection() {
   
   // SÉCURITÉ
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { margin: "200px 0px" });
+  const isInView = useInView(sectionRef, { margin: "0px" });
 
   const cards = [
     {

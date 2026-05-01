@@ -1,12 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { CreateProjectInput, Project } from "@/lib/types/project";
+import type {
+  CreateProjectInput,
+  Project,
+  ProjectSector,
+  ProjectStage,
+  ProjectPriority,
+  ProjectTimeCommitment,
+} from "@/lib/types/project";
 
 /**
- * Crée un nouveau projet pour le user authentifié
+ * Create a new project for the authenticated user.
  */
 export async function createProject(input: CreateProjectInput): Promise<{
   success: boolean;
@@ -23,7 +29,6 @@ export async function createProject(input: CreateProjectInput): Promise<{
     return { success: false, error: "Not authenticated" };
   }
 
-  // Validation simple
   if (!input.name || input.name.trim().length < 2) {
     return { success: false, error: "Le nom du projet est trop court" };
   }
@@ -55,7 +60,7 @@ export async function createProject(input: CreateProjectInput): Promise<{
 }
 
 /**
- * Récupère tous les projets du user authentifié
+ * List all projects for the authenticated user.
  */
 export async function listProjects(): Promise<Project[]> {
   const supabase = await createClient();
@@ -80,8 +85,69 @@ export async function listProjects(): Promise<Project[]> {
   return (data ?? []) as Project[];
 }
 
+export interface UpdateProjectInput {
+  name?: string;
+  description?: string | null;
+  sector?: ProjectSector | null;
+  stage?: ProjectStage;
+  priority?: ProjectPriority | null;
+  time_commitment?: ProjectTimeCommitment | null;
+}
+
 /**
- * Supprime un projet du user (RLS empêche déjà de supprimer celui d'un autre)
+ * Update an existing project. RLS ensures user owns it.
+ */
+export async function updateProject(
+  projectId: string,
+  patch: UpdateProjectInput
+): Promise<{ success: boolean; error?: string; project?: Project }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const cleanPatch: Record<string, unknown> = {};
+  if (patch.name !== undefined) {
+    const trimmed = patch.name.trim();
+    if (trimmed.length < 2) return { success: false, error: "Nom trop court" };
+    if (trimmed.length > 100) return { success: false, error: "Nom trop long" };
+    cleanPatch.name = trimmed;
+  }
+  if (patch.description !== undefined) {
+    cleanPatch.description = patch.description?.trim() || null;
+  }
+  if (patch.sector !== undefined) cleanPatch.sector = patch.sector;
+  if (patch.stage !== undefined) cleanPatch.stage = patch.stage;
+  if (patch.priority !== undefined) cleanPatch.priority = patch.priority;
+  if (patch.time_commitment !== undefined) cleanPatch.time_commitment = patch.time_commitment;
+
+  if (Object.keys(cleanPatch).length === 0) {
+    return { success: false, error: "Rien à mettre à jour" };
+  }
+
+  cleanPatch.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("projects")
+    .update(cleanPatch)
+    .eq("id", projectId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("updateProject error:", error);
+    return { success: false, error: "Impossible de mettre à jour le projet" };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/projects/${projectId}`);
+  return { success: true, project: data as Project };
+}
+
+/**
+ * Delete a project. RLS prevents deleting someone else's.
+ * Cascading deletes handled at DB level.
  */
 export async function deleteProject(projectId: string): Promise<{
   success: boolean;
@@ -95,6 +161,19 @@ export async function deleteProject(projectId: string): Promise<{
 
   if (!user) {
     return { success: false, error: "Not authenticated" };
+  }
+
+  try {
+    const prefix = `${user.id}/${projectId}/`;
+    const { data: files } = await supabase.storage
+      .from("deliverables")
+      .list(prefix.replace(/\/$/, ""));
+    if (files && files.length > 0) {
+      const paths = files.map((f) => `${prefix}${f.name}`);
+      await supabase.storage.from("deliverables").remove(paths);
+    }
+  } catch (err) {
+    console.warn("Storage cleanup skipped:", err);
   }
 
   const { error } = await supabase

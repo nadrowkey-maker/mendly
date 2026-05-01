@@ -54,7 +54,7 @@ export function Comparison() {
   const t = useTranslations("comparison");
 
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { margin: "200px 0px" });
+  const isInView = useInView(sectionRef, { margin: "0px" });
 
   const rows: Row[] = [
     { feature: t("row1Feature"), chatgpt: t("row1Chatgpt"), lovable: t("row1Lovable"), mendly: t("row1Mendly") },

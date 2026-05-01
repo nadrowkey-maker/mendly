@@ -167,31 +167,15 @@ export function ActionSection() {
                 viewport={{ once: true }}
                 className="flex items-center gap-2 pt-2 pl-2"
               >
-                <motion.div
-                  animate={{ boxShadow: ["0 0 8px #8B5CF640", "0 0 18px #8B5CF680", "0 0 8px #8B5CF640"] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold shrink-0 bg-[#8B5CF61A] text-[#8B5CF6] border border-[#8B5CF640]"
-                >
+                <div className="ceo-glow-pulse w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold shrink-0 bg-[#8B5CF61A] text-[#8B5CF6] border border-[#8B5CF640]">
                   C
-                </motion.div>
+                </div>
                 <span className="text-xs text-(--text-dim)">CEO</span>
                 <span className="text-[10px] text-(--text-dim) italic">is typing</span>
                 <div className="flex gap-1 ml-0.5">
-                  <motion.span
-                    animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-                    transition={{ duration: 0.9, repeat: Infinity, delay: 0 }}
-                    className="w-1.5 h-1.5 rounded-full bg-(--text-dim) block"
-                  />
-                  <motion.span
-                    animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-                    transition={{ duration: 0.9, repeat: Infinity, delay: 0.15 }}
-                    className="w-1.5 h-1.5 rounded-full bg-(--text-dim) block"
-                  />
-                  <motion.span
-                    animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-                    transition={{ duration: 0.9, repeat: Infinity, delay: 0.3 }}
-                    className="w-1.5 h-1.5 rounded-full bg-(--text-dim) block"
-                  />
+                  <span className="typing-dot-1 w-1.5 h-1.5 rounded-full bg-(--text-dim) block" />
+                  <span className="typing-dot-2 w-1.5 h-1.5 rounded-full bg-(--text-dim) block" />
+                  <span className="typing-dot-3 w-1.5 h-1.5 rounded-full bg-(--text-dim) block" />
                 </div>
               </motion.div>
             </div>

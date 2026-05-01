@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 const DigitalPetalsShader = () => {
@@ -9,16 +9,21 @@ const DigitalPetalsShader = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    // 1) Initialisation du Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     container.appendChild(renderer.domElement);
+
+    // Force canvas to fill its container
+    const cv = renderer.domElement;
+    cv.style.position = "absolute";
+    cv.style.inset = "0";
+    cv.style.width = "100%";
+    cv.style.height = "100%";
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const clock = new THREE.Clock();
 
-    // 2) Shaders
     const vertexShader = `
       void main() {
         gl_Position = vec4(position, 1.0);
@@ -68,38 +73,42 @@ const DigitalPetalsShader = () => {
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // 3) Gestion du Resize ultra-stable avec ResizeObserver
-    const handleResize = (width: number, height: number) => {
-      renderer.setSize(width, height, false);
-      uniforms.iResolution.value.set(width, height);
-    };
-
     const ro = new ResizeObserver((entries) => {
       if (!entries[0]) return;
       const { width, height } = entries[0].contentRect;
-      // On n'exécute que si les dimensions ont RÉELLEMENT changé d'au moins 1px
       if (Math.abs(renderer.domElement.width - width) > 1 || Math.abs(renderer.domElement.height - height) > 1) {
-        handleResize(width, height);
+        renderer.setSize(width, height, false);
+        uniforms.iResolution.value.set(width, height);
       }
     });
-
     ro.observe(container);
 
-    // 4) Mouse handler
     const onMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
       uniforms.iMouse.value.set(e.clientX - rect.left, rect.height - (e.clientY - rect.top));
     };
     window.addEventListener('mousemove', onMouseMove);
 
-    // 5) Loop
-    renderer.setAnimationLoop(() => {
+    // Only run the render loop when the component is in view
+    const loop = () => {
       uniforms.iTime.value = clock.getElapsedTime();
       renderer.render(scene, camera);
-    });
+    };
 
-    // 6) Cleanup
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          renderer.setAnimationLoop(loop);
+        } else {
+          renderer.setAnimationLoop(null);
+        }
+      },
+      { threshold: 0.01 }
+    );
+    io.observe(container);
+
     return () => {
+      io.disconnect();
       ro.disconnect();
       window.removeEventListener('mousemove', onMouseMove);
       renderer.setAnimationLoop(null);

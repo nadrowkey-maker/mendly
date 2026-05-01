@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { geminiFlash } from "@/lib/ai/gemini";
 import { buildCeoMemoPrompt } from "@/lib/ai/prompts/ceo-memo";
+import { withFounderContext } from "@/lib/ai/with-founder-context";
 import { generateMemoPdf } from "@/lib/pdf/memo";
 import type { Project } from "@/lib/types/project";
+import type { UserProfile } from "@/lib/types/profile";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // Allow up to 60s for generation
@@ -25,12 +27,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch project (RLS check)
-    const { data: project, error: projectErr } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", projectId)
-      .single();
+    const [projectRes, profileRes] = await Promise.all([
+      supabase.from("projects").select("*").eq("id", projectId).single(),
+      supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+    const { data: project, error: projectErr } = projectRes;
+    const profile = (profileRes.data as UserProfile | null) ?? null;
 
     if (projectErr || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -64,11 +71,12 @@ export async function POST(req: NextRequest) {
 
     // Generate the memo content
     const targetLocale = locale === "en" ? "en" : "fr";
-    const prompt = buildCeoMemoPrompt(
+    const basePrompt = buildCeoMemoPrompt(
       project as Project,
       conversationContext,
       targetLocale
     );
+    const prompt = withFounderContext(basePrompt, profile, targetLocale);
 
     // Retry up to 3 times if Gemini is overloaded (503)
 let result;

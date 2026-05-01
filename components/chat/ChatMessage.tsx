@@ -1,12 +1,15 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import { FileText, Image } from "lucide-react";
 
 interface Props {
   role: "user" | "assistant";
   content: string;
   agentRole?: string | null;
   isStreaming?: boolean;
+  attachmentName?: string | null;
+  attachmentMime?: string | null;
 }
 
 const AGENT_LABELS: Record<string, string> = {
@@ -20,12 +23,32 @@ const AGENT_LABELS: Record<string, string> = {
   CCO: "CCO",
 };
 
-export function ChatMessage({ role, content, agentRole, isStreaming }: Props) {
+export function ChatMessage({
+  role,
+  content,
+  agentRole,
+  isStreaming,
+  attachmentName,
+  attachmentMime,
+}: Props) {
   if (role === "user") {
+    const isPdf = attachmentMime === "application/pdf";
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] md:max-w-[75%] px-4 py-3 rounded-3xl bg-(--surface-elevated) text-(--text-primary) text-[15px] leading-relaxed">
-          {content}
+        <div className="flex flex-col items-end gap-1.5 max-w-[85%] md:max-w-[75%]">
+          {attachmentName && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-(--surface) border border-(--border-strong) text-xs font-mono text-(--text-muted)">
+              {isPdf ? (
+                <FileText className="w-3.5 h-3.5 text-(--accent-glow) shrink-0" />
+              ) : (
+                <Image className="w-3.5 h-3.5 text-(--accent-warm) shrink-0" aria-hidden />
+              )}
+              <span className="truncate max-w-45">{attachmentName}</span>
+            </div>
+          )}
+          <div className="px-4 py-3 rounded-3xl bg-(--surface-elevated) text-(--text-primary) text-[15px] leading-relaxed">
+            {content}
+          </div>
         </div>
       </div>
     );

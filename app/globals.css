@@ -194,6 +194,80 @@ a:focus-visible {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes hero-pill-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes scroll-dot-bounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
+}
+
+/* Use animation-name + separate props so inline style can override duration/delay */
+.hero-pill-float {
+  animation-name: hero-pill-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 4s;
+}
+
+.scroll-dot-bounce {
+  animation-name: scroll-dot-bounce;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 1.5s;
+}
+
+@keyframes ceo-glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px #8B5CF640; }
+  50% { box-shadow: 0 0 18px #8B5CF680; }
+}
+
+@keyframes typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+.ceo-glow-pulse {
+  animation-name: ceo-glow-pulse;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.typing-dot-1 {
+  animation-name: typing-dot;
+  animation-duration: 0.9s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.typing-dot-2 {
+  animation-name: typing-dot;
+  animation-duration: 0.9s;
+  animation-delay: 0.15s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.typing-dot-3 {
+  animation-name: typing-dot;
+  animation-duration: 0.9s;
+  animation-delay: 0.3s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pill-float,
+  .scroll-dot-bounce,
+  .ceo-glow-pulse,
+  .typing-dot-1,
+  .typing-dot-2,
+  .typing-dot-3 { animation: none !important; }
+}
+
 /* ============================================================
    UTILITY CLASSES — Premium look
    ============================================================ */

@@ -9,9 +9,12 @@ import { buildCdoSystemPrompt } from "@/lib/ai/agents/cdo";
 import { buildDevSystemPrompt } from "@/lib/ai/agents/dev";
 import { buildCcoSystemPrompt } from "@/lib/ai/agents/cco";
 import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
+import type { FileAttachment } from "@/lib/ai/gemini";
+import { withFounderContext } from "@/lib/ai/with-founder-context";
 import type { Project } from "@/lib/types/project";
 import type { Message } from "@/lib/types/conversation";
 import type { AgentRole } from "@/lib/types/conversation";
+import type { UserProfile } from "@/lib/types/profile";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 
 export const runtime = "nodejs";
@@ -49,6 +52,14 @@ export async function POST(req: NextRequest) {
       userMessage,
       locale,
       agentRole = "CEO",
+      attachments,
+    }: {
+      conversationId: string;
+      projectId: string;
+      userMessage: string;
+      locale?: string;
+      agentRole?: string;
+      attachments?: FileAttachment[];
     } = await req.json();
 
     if (!conversationId || !projectId || !userMessage) {
@@ -86,23 +97,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: project, error: projectErr } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", projectId)
-      .single();
+    // Fetch project + history + founder profile in parallel
+    const [projectRes, historyRes, profileRes] = await Promise.all([
+      supabase.from("projects").select("*").eq("id", projectId).single(),
+      supabase
+        .from("messages")
+        .select("role, content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+    const { data: project, error: projectErr } = projectRes;
+    const { data: history } = historyRes;
+    const profile = (profileRes.data as UserProfile | null) ?? null;
 
     if (projectErr || !project) {
       return new Response(JSON.stringify({ error: "Project not found" }), {
         status: 404,
       });
     }
-
-    const { data: history } = await supabase
-      .from("messages")
-      .select("role, content")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
 
     await supabase.from("messages").insert({
       conversation_id: conversationId,
@@ -112,11 +130,12 @@ export async function POST(req: NextRequest) {
     });
 
     const targetLocale = locale === "en" ? "en" : "fr";
-    const systemPrompt = getSystemPrompt(
+    const baseSystemPrompt = getSystemPrompt(
       agentRole as AgentRole,
       project as Project,
       targetLocale
     );
+    const systemPrompt = withFounderContext(baseSystemPrompt, profile, targetLocale);
     const geminiHistory = toGeminiHistory(
       (history ?? []) as Pick<Message, "role" | "content">[]
     );
@@ -130,7 +149,8 @@ export async function POST(req: NextRequest) {
           for await (const chunk of streamGeminiResponse(
             systemPrompt,
             geminiHistory,
-            userMessage
+            userMessage,
+            attachments
           )) {
             fullResponse += chunk;
             controller.enqueue(encoder.encode(chunk));

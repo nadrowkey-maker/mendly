@@ -1,10 +1,13 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { ProjectCardMenu } from "@/components/dashboard/ProjectCardMenu";
+import { EditProjectModal } from "@/components/dashboard/EditProjectModal";
 import type { Project } from "@/lib/types/project";
 
 interface DashboardClientProps {
@@ -13,10 +16,13 @@ interface DashboardClientProps {
 }
 
 export function DashboardClient({
-  projects,
+  projects: initialProjects,
   userEmail,
 }: DashboardClientProps) {
   const t = useTranslations("dashboard");
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [editing, setEditing] = useState<Project | null>(null);
+  const [, startTransition] = useTransition();
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -44,6 +50,18 @@ export function DashboardClient({
     return map[stage] ?? "text-(--text-muted) border-(--border)";
   };
 
+  const handleProjectDeleted = (projectId: string) => {
+    startTransition(() => {
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    });
+  };
+
+  const handleProjectUpdated = (updated: Project) => {
+    startTransition(() => {
+      setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    });
+  };
+
   return (
     <main className="relative min-h-screen px-6 md:px-12 py-12 bg-(--bg-primary)">
       <div
@@ -65,17 +83,24 @@ export function DashboardClient({
               {t("welcome")}
             </h1>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors"
-          >
-            {t("signOut")}
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/settings"
+              className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors"
+            >
+              {t("settings")}
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="text-xs font-mono tracking-widest text-(--text-dim) hover:text-white uppercase transition-colors"
+            >
+              {t("signOut")}
+            </button>
+          </div>
         </div>
 
         {/* Projects section */}
         {projects.length === 0 ? (
-          // Empty state
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -106,7 +131,6 @@ export function DashboardClient({
             </Link>
           </motion.div>
         ) : (
-          // Projects list
           <>
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -133,13 +157,22 @@ export function DashboardClient({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
+                  className="relative group"
                 >
+                  {/* Menu sits above the link */}
+                  <div className="absolute top-4 right-4 z-20">
+                    <ProjectCardMenu
+                      project={project}
+                      onEdit={(p) => setEditing(p)}
+                      onDeleted={handleProjectDeleted}
+                    />
+                  </div>
+
                   <Link
                     href={`/dashboard/projects/${project.id}`}
-                    className="group block rounded-2xl border border-(--border-strong) bg-(--surface)/40 backdrop-blur-xl p-6 hover:border-(--accent-glow)/50 hover:bg-(--surface)/60 transition-all"
+                    className="block rounded-2xl border border-(--border-strong) bg-(--surface)/40 backdrop-blur-xl p-6 hover:border-(--accent-glow)/50 hover:bg-(--surface)/60 transition-all"
                   >
-                    {/* Stage badge */}
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-4 pr-10">
                       <span
                         className={`inline-block px-2.5 py-1 rounded-full border text-[10px] font-mono uppercase tracking-wider ${stageColor(
                           project.stage
@@ -147,30 +180,24 @@ export function DashboardClient({
                       >
                         {stageLabel(project.stage)}
                       </span>
-                      <span className="text-(--text-dim) group-hover:text-(--accent-glow) transition-colors">
-                        →
-                      </span>
                     </div>
 
-                    {/* Name */}
                     <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">
                       {project.name}
                     </h3>
 
-                    {/* Description */}
                     {project.description && (
                       <p className="text-sm text-(--text-muted) line-clamp-2 mb-4">
                         {project.description}
                       </p>
                     )}
 
-                    {/* Footer */}
                     <div className="flex items-center justify-between pt-3 border-t border-(--border)">
                       <span className="text-[10px] font-mono text-(--text-dim) uppercase tracking-wider">
                         {project.sector ?? "—"}
                       </span>
-                      <span className="text-[10px] font-mono text-(--text-dim)">
-                        {new Date(project.created_at).toLocaleDateString()}
+                      <span className="text-[10px] font-mono text-(--text-dim) group-hover:text-(--accent-glow) transition-colors">
+                        {new Date(project.created_at).toLocaleDateString()} →
                       </span>
                     </div>
                   </Link>
@@ -187,6 +214,12 @@ export function DashboardClient({
           </>
         )}
       </div>
+
+      <EditProjectModal
+        project={editing}
+        onClose={() => setEditing(null)}
+        onUpdated={handleProjectUpdated}
+      />
     </main>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from "@/lib/actions/conversations";
 import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
+import type { FileAttachment } from "@/lib/ai/gemini";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -33,6 +34,8 @@ interface DisplayMessage {
   content: string;
   agentRole?: string | null;
   isStreaming?: boolean;
+  attachmentName?: string | null;
+  attachmentMime?: string | null;
 }
 
 interface AgentState {
@@ -89,6 +92,7 @@ export function ChatInterface({
   });
 
   const [input, setInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<FileAttachment | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDebating, setIsDebating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -141,6 +145,8 @@ export function ChatInterface({
 
     setError(null);
     setInput("");
+    const fileToSend = selectedFile;
+    setSelectedFile(null);
     setIsLoading(true);
 
     const userMsgId = `user-${Date.now()}`;
@@ -152,7 +158,13 @@ export function ChatInterface({
         ...prev[activeAgent]!,
         messages: [
           ...(prev[activeAgent]?.messages ?? []),
-          { id: userMsgId, role: "user", content: trimmed },
+          {
+            id: userMsgId,
+            role: "user",
+            content: trimmed,
+            attachmentName: fileToSend?.name ?? null,
+            attachmentMime: fileToSend?.mimeType ?? null,
+          },
           {
             id: assistantMsgId,
             role: "assistant",
@@ -174,6 +186,7 @@ export function ChatInterface({
           userMessage: trimmed,
           locale,
           agentRole: activeAgent,
+          attachments: fileToSend ? [fileToSend] : undefined,
         }),
       });
 
@@ -465,6 +478,8 @@ export function ChatInterface({
                   content={m.content}
                   agentRole={m.agentRole}
                   isStreaming={m.isStreaming}
+                  attachmentName={m.attachmentName}
+                  attachmentMime={m.attachmentMime}
                 />
               ))
             )}
@@ -492,6 +507,8 @@ export function ChatInterface({
           isDebating={isDebating}
           canDebate={activeAgent === "CEO"}
           agentLabel={AGENT_LABELS[activeAgent]}
+          selectedFile={selectedFile}
+          onFileChange={setSelectedFile}
         />
       </main>
     </div>

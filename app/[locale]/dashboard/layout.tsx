@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { hasSeenOnboarding } from "@/lib/actions/profile";
 import type { ReactNode } from "react";
 
 export default async function DashboardLayout({
@@ -14,6 +15,11 @@ export default async function DashboardLayout({
 
   if (!user) {
     redirect("/login");
+  }
+
+  const seen = await hasSeenOnboarding();
+  if (!seen) {
+    redirect("/onboarding");
   }
 
   return <>{children}</>;
