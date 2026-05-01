@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
         .maybeSingle();
 
       const projectName = project?.name ?? "your project";
-      const userName = userData.user.user_metadata?.full_name ?? "";
+      const userName = userData.user?.user_metadata?.full_name ?? "";
 
       const html = buildWeeklyRecapHtml({
         userName,
