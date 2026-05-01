@@ -1,57 +1,116 @@
 "use client";
 
-import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
-interface ChatMessageProps {
+interface Props {
   role: "user" | "assistant";
   content: string;
   agentRole?: string | null;
   isStreaming?: boolean;
 }
 
-export function ChatMessage({
-  role,
-  content,
-  agentRole,
-  isStreaming = false,
-}: ChatMessageProps) {
-  const isUser = role === "user";
+const AGENT_LABELS: Record<string, string> = {
+  CEO: "CEO",
+  CTO: "CTO",
+  CMO: "CMO",
+  CPO: "CPO",
+  CFO: "CFO",
+  CDO: "CDO",
+  DEV: "DEV",
+  CCO: "CCO",
+};
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-    >
-      <div
-        className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 ${
-          isUser
-            ? "bg-(--accent-glow)/10 border border-(--accent-glow)/30 text-white"
-            : "bg-(--surface)/60 border border-(--border-strong) text-white"
-        }`}
-      >
-        {!isUser && agentRole && (
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-(--accent-glow)" />
-            <span className="text-[10px] font-mono tracking-widest text-(--accent-glow) uppercase">
-              {agentRole}
-            </span>
-          </div>
-        )}
-
-        <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-headings:my-3 prose-ul:my-2 prose-li:my-0.5 prose-strong:text-(--accent-glow) prose-strong:font-semibold prose-code:text-(--accent-warm) prose-code:bg-(--bg-primary)/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs">
-          {isUser ? (
-            <p className="m-0 whitespace-pre-wrap">{content}</p>
-          ) : (
-            <ReactMarkdown>{content}</ReactMarkdown>
-          )}
-          {isStreaming && (
-            <span className="inline-block w-1.5 h-4 ml-0.5 bg-(--accent-glow) animate-pulse" />
-          )}
+export function ChatMessage({ role, content, agentRole, isStreaming }: Props) {
+  if (role === "user") {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[85%] md:max-w-[75%] px-4 py-3 rounded-3xl bg-(--surface-elevated) text-(--text-primary) text-[15px] leading-relaxed">
+          {content}
         </div>
       </div>
-    </motion.div>
+    );
+  }
+
+  // Assistant message
+  return (
+    <div className="flex flex-col gap-2">
+      {/* Agent label */}
+      {agentRole && (
+        <div className="flex items-center gap-2 ml-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-(--accent-glow)" />
+          <span className="text-[10px] font-mono font-bold tracking-widest text-(--text-secondary) uppercase">
+            {AGENT_LABELS[agentRole] ?? agentRole}
+          </span>
+        </div>
+      )}
+
+      <div className="text-(--text-primary) text-[15px] leading-relaxed">
+        <div className="prose prose-invert max-w-none">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p className="text-(--text-primary) mb-3 last:mb-0 leading-relaxed">
+                  {children}
+                </p>
+              ),
+              h2: ({ children }) => (
+                <h2 className="text-base font-bold text-(--text-primary) mt-5 mb-2 tracking-tight">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-sm font-bold text-(--text-primary) mt-4 mb-2">
+                  {children}
+                </h3>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-(--text-primary)">
+                  {children}
+                </strong>
+              ),
+              em: ({ children }) => (
+                <em className="italic text-(--text-secondary)">{children}</em>
+              ),
+              ul: ({ children }) => (
+                <ul className="my-2 space-y-1 pl-1">{children}</ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="my-2 space-y-1 pl-1 list-decimal list-inside">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="text-(--text-primary) leading-relaxed pl-2 marker:text-(--accent-glow)">
+                  {children}
+                </li>
+              ),
+              code: ({ children }) => (
+                <code className="px-1.5 py-0.5 rounded-md bg-(--surface-elevated) text-(--accent-warm) font-mono text-[13px] border border-(--border)">
+                  {children}
+                </code>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--accent-glow) underline underline-offset-2 hover:text-(--accent-warm) transition-colors"
+                >
+                  {children}
+                </a>
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
+        {isStreaming && (
+          <span
+            className="inline-block w-2 h-4 ml-1 bg-(--accent-glow) animate-pulse rounded-sm"
+            aria-label="streaming"
+          />
+        )}
+      </div>
+    </div>
   );
 }

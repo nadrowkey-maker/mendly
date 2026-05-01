@@ -112,7 +112,6 @@
     "caption2": "Your CTO is reviewing it against technical constraints",
     "caption3": "Your CEO will arbitrate in the Friday sprint review"
   },
-  
   "comparison": {
     "eyebrow": "WHY NOT JUST CHATGPT?",
     "title": "Because a chatbot",
@@ -486,7 +485,7 @@
     "ctaLoading": "Creating…",
     "errorGeneric": "Something went wrong. Try again."
   },
-   "chat": {
+  "chat": {
     "backToDashboard": "Dashboard",
     "chattingWith": "TALKING WITH",
     "welcomeTitle": "Hey founder.",
@@ -494,25 +493,31 @@
     "welcomeBodyCEO": "I'm your CEO. I already know the basics of {projectName}. Tell me what's on your mind — strategy, priorities, decisions, I'm here to challenge and clarify.",
     "welcomeBodyCTO": "I'm your CTO. For {projectName}, we talk stack, architecture, and technical decisions. No over-engineering, just concrete. What are we looking at?",
     "welcomeBodyCMO": "I'm your CMO. For {projectName}, we talk audience, positioning, channels, conversion. First things first: who exactly is your ideal customer?",
+    "welcomeBodyCPO": "I'm your CPO. For {projectName}, we talk scope, priorities, user experience. My favorite question: what if we don't build it?",
+    "welcomeBodyCFO": "I'm your CFO. For {projectName}, we talk numbers, runway, unit economics. No bullshit on money.",
+    "welcomeBodyCDO": "I'm your CDO. For {projectName}, we talk metrics that actually matter. What's your North Star?",
+    "welcomeBodyDEV": "I'm your DEV. For {projectName}, we talk concrete code. Bug to fix, feature to implement, library to choose?",
+    "welcomeBodyCCO": "I'm your CCO. For {projectName}, we talk copy, taglines, content. One clear sentence beats three clever ones.",
     "startTyping": "Type your message below to start.",
     "inputPlaceholder": "Describe your problem or ask a question…",
     "send": "Send",
     "shortcut": "Enter to send · Shift+Enter for new line",
     "errorGeneric": "Connection error with your agent. Try again.",
+    "errorRateLimited": "You've hit today's 10 message limit. Come back tomorrow or upgrade to a paid plan.",
     "agentSwitching": "Connecting to agent…",
     "debate": "Debate",
-  "debating": "Debating…",
-  "debateTooltip": "Trigger a 3-way debate (CTO + CMO + CEO synthesis)",
-  "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate",
-  "myDeliverables": "My deliverables",
-  "welcomeBodyCPO": "I'm your CPO. For {projectName}, we talk scope, priorities, user experience. My favorite question: what if we don't build it?",
-  "welcomeBodyCFO": "I'm your CFO. For {projectName}, we talk numbers, runway, unit economics. No bullshit on money.",
-  "welcomeBodyCDO": "I'm your CDO. For {projectName}, we talk metrics that actually matter. What's your North Star?",
-  "welcomeBodyDEV": "I'm your DEV. For {projectName}, we talk concrete code. Bug to fix, feature to implement, library to choose?",
-  "welcomeBodyCCO": "I'm your CCO. For {projectName}, we talk copy, taglines, content. One clear sentence beats three clever ones.",
-   "errorRateLimited": "You've hit today's 10 message limit. Come back tomorrow or upgrade to a paid plan."
+    "debating": "Debating…",
+    "debateTooltip": "Trigger a 3-way debate (CTO + CMO + CEO synthesis)",
+    "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate",
+    "myDeliverables": "My deliverables",
+    "composerPlaceholder": "Ask your {agent}…",
+    "attach": "Attach a file",
+    "attachFile": "Document",
+    "attachImage": "Image",
+    "comingSoon": "Soon",
+    "expandSidebar": "Open sidebar"
   },
-   "account": {
+  "account": {
     "ariaLabel": "Account menu",
     "section": "ACCOUNT",
     "loggedInAs": "Logged in as",
@@ -561,7 +566,7 @@
     "errorGeneric": "Could not generate the memo. Try again in a minute.",
     "close": "Close"
   },
-   "deliverablesList": {
+  "deliverablesList": {
     "backToChat": "Back to chat",
     "eyebrow": "YOUR DELIVERABLES",
     "title": "Everything your team has delivered",
@@ -577,38 +582,54 @@
     "tooltip": "{used}/{limit} messages used today"
   },
   "upgrade": {
-  "backToDashboard": "Back to dashboard",
-  "eyebrow": "UPGRADE YOUR PLAN",
-  "title": "Unlock the full team.",
-  "sub": "Free gives you a taste. Paid plans unlock real work sessions with your AI team.",
-  "popular": "Most popular",
-  "perMonth": "mo",
-  "footer": "Secure payment via Stripe. Cancel anytime.",
-  "currentPlan": "You are currently on the {plan} plan.",
-  "activeBadge": "Active",
-  "startCheckout": "Choose this plan",
-  "switchTo": "Switch to {plan}",
-  "manage": "Manage subscription",
-  "loading": "Loading…",
-  "starter": {
-    "f1": "3 projects",
-    "f2": "All 8 agents",
-    "f3": "100 messages / day",
-    "f4": "Unlimited history"
+    "backToDashboard": "Back to dashboard",
+    "eyebrow": "UPGRADE YOUR PLAN",
+    "title": "Unlock the full team.",
+    "sub": "Free gives you a taste. Paid plans unlock real work sessions with your AI team.",
+    "popular": "Most popular",
+    "perMonth": "mo",
+    "footer": "Secure payment via Stripe. Cancel anytime.",
+    "currentPlan": "You are currently on the {plan} plan.",
+    "activeBadge": "Active",
+    "startCheckout": "Choose this plan",
+    "switchTo": "Switch to {plan}",
+    "manage": "Manage subscription",
+    "loading": "Loading…",
+    "starter": {
+      "f1": "3 projects",
+      "f2": "All 8 agents",
+      "f3": "100 messages / day",
+      "f4": "Unlimited history"
+    },
+    "pro": {
+      "f1": "10 projects",
+      "f2": "All 8 agents",
+      "f3": "Unlimited messages",
+      "f4": "Integrations (Notion, Slack)",
+      "f5": "Code generation"
+    },
+    "team": {
+      "f1": "Unlimited projects",
+      "f2": "5 user seats",
+      "f3": "Unlimited messages",
+      "f4": "API access"
+    }
   },
-  "pro": {
-    "f1": "10 projects",
-    "f2": "All 8 agents",
-    "f3": "Unlimited messages",
-    "f4": "Integrations (Notion, Slack)",
-    "f5": "Code generation"
-  },
-  "team": {
-    "f1": "Unlimited projects",
-    "f2": "5 user seats",
-    "f3": "Unlimited messages",
-    "f4": "API access"
+  "sidebar": {
+    "projectsTitle": "PROJECTS",
+    "agentsTitle": "AGENTS",
+    "toolsTitle": "TOOLS",
+    "newProject": "New project",
+    "createFirst": "Create my first project",
+    "deliverables": "Deliverables",
+    "usage": "Usage",
+    "upgrade": "Upgrade",
+    "manage": "Manage",
+    "account": "Account",
+    "dashboard": "Dashboard",
+    "billing": "Billing",
+    "signOut": "Sign out",
+    "collapse": "Collapse",
+    "expand": "Expand"
   }
-}
-
 }

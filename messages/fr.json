@@ -111,7 +111,6 @@
     "caption1": "Ton CMO vient de livrer le plan marketing de la semaine",
     "caption2": "Ton CTO le relit à l'aune des contraintes techniques",
     "caption3": "Ton CEO arbitrera en revue de sprint vendredi"
-  
   },
   "comparison": {
     "eyebrow": "POURQUOI PAS JUSTE CHATGPT ?",
@@ -412,7 +411,7 @@
     "disclaimer": "Pas de spam. Pas de CB. Juste un accès anticipé.",
     "metaTitle": "Rejoindre la liste d'attente Mendly",
     "metaDescription": "Fais partie des premiers fondateurs à accéder à Mendly — ton C-suite IA qui livre."
-},
+  },
   "auth": {
     "loginTitle": "Bon retour.",
     "loginSubtitle": "Connecte-toi pour accéder à ton équipe.",
@@ -436,7 +435,7 @@
     "errorInvalidCredentials": "Email ou mot de passe incorrect.",
     "errorPasswordTooShort": "Le mot de passe doit faire au moins 6 caractères."
   },
-   "dashboard": {
+  "dashboard": {
     "welcome": "Salut chef.",
     "signOut": "Déconnexion",
     "emptyTitle": "Ton équipe est prête.",
@@ -486,7 +485,7 @@
     "ctaLoading": "Création…",
     "errorGeneric": "Une erreur est survenue. Réessaie."
   },
-    "chat": {
+  "chat": {
     "backToDashboard": "Dashboard",
     "chattingWith": "TU PARLES AVEC",
     "welcomeTitle": "Salut chef.",
@@ -494,23 +493,29 @@
     "welcomeBodyCEO": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Balance-moi ce qui t'occupe — stratégie, priorités, décisions, je suis là pour challenger et clarifier.",
     "welcomeBodyCTO": "Je suis ton CTO. Pour {projectName}, on parle stack, architecture, et décisions techniques. Pas de sur-ingénierie, du concret. Qu'est-ce qu'on regarde ?",
     "welcomeBodyCMO": "Je suis ton CMO. Pour {projectName}, on parle audience, positionnement, canaux, conversion. Avant tout : c'est qui exactement ton client idéal ?",
+    "welcomeBodyCPO": "Je suis ton CPO. Pour {projectName}, on parle scope, priorités, expérience user. Ma question favorite : et si on ne le construit pas ?",
+    "welcomeBodyCFO": "Je suis ton CFO. Pour {projectName}, on parle chiffres, runway, unit economics. Pas de bullshit sur l'argent.",
+    "welcomeBodyCDO": "Je suis ton CDO. Pour {projectName}, on parle métriques qui comptent vraiment. Quelle est ta North Star ?",
+    "welcomeBodyDEV": "Je suis ton DEV. Pour {projectName}, on parle code concret. Bug à fixer, feature à implémenter, librairie à choisir ?",
+    "welcomeBodyCCO": "Je suis ton CCO. Pour {projectName}, on parle copy, taglines, contenu. Une phrase claire bat trois phrases brillantes.",
     "startTyping": "Tape ton message ci-dessous pour démarrer.",
     "inputPlaceholder": "Décris ton problème ou pose une question…",
     "send": "Envoyer",
     "shortcut": "Entrée pour envoyer · Shift+Entrée pour aller à la ligne",
     "errorGeneric": "Erreur de connexion avec ton agent. Réessaie.",
+    "errorRateLimited": "Tu as atteint la limite de 10 messages aujourd'hui. Reviens demain ou passe à un plan payant.",
     "agentSwitching": "Connexion à l'agent…",
     "debate": "Débat",
-  "debating": "Débat en cours…",
-  "debateTooltip": "Lancer un débat à 3 (CTO + CMO + synthèse CEO)",
-  "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents",
-  "myDeliverables": "Mes livrables",
-  "welcomeBodyCPO": "Je suis ton CPO. Pour {projectName}, on parle scope, priorités, expérience user. Ma question favorite : et si on ne le construit pas ?",
-  "welcomeBodyCFO": "Je suis ton CFO. Pour {projectName}, on parle chiffres, runway, unit economics. Pas de bullshit sur l'argent.",
-  "welcomeBodyCDO": "Je suis ton CDO. Pour {projectName}, on parle métriques qui comptent vraiment. Quelle est ta North Star ?",
-  "welcomeBodyDEV": "Je suis ton DEV. Pour {projectName}, on parle code concret. Bug à fixer, feature à implémenter, librairie à choisir ?",
-  "welcomeBodyCCO": "Je suis ton CCO. Pour {projectName}, on parle copy, taglines, contenu. Une phrase claire bat trois phrases brillantes.",
-   "errorRateLimited": "Tu as atteint la limite de 10 messages aujourd'hui. Reviens demain ou passe à un plan payant."
+    "debating": "Débat en cours…",
+    "debateTooltip": "Lancer un débat à 3 (CTO + CMO + synthèse CEO)",
+    "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents",
+    "myDeliverables": "Mes livrables",
+    "composerPlaceholder": "Demande à ton {agent}…",
+    "attach": "Joindre un fichier",
+    "attachFile": "Document",
+    "attachImage": "Image",
+    "comingSoon": "Bientôt",
+    "expandSidebar": "Ouvrir la sidebar"
   },
   "account": {
     "ariaLabel": "Menu compte",
@@ -561,7 +566,7 @@
     "errorGeneric": "Impossible de générer le memo. Réessaie dans une minute.",
     "close": "Fermer"
   },
-   "deliverablesList": {
+  "deliverablesList": {
     "backToChat": "Retour au chat",
     "eyebrow": "TES LIVRABLES",
     "title": "Tout ce que ton équipe t'a livré",
@@ -576,40 +581,55 @@
     "limitReachedShort": "Limite · upgrade",
     "tooltip": "{used}/{limit} messages utilisés aujourd'hui"
   },
- "upgrade": {
-  "backToDashboard": "Retour au dashboard",
-  "eyebrow": "PASSER À UN PLAN",
-  "title": "Débloquer toute l'équipe.",
-  "sub": "Free te donne un avant-goût. Les plans payants débloquent les vraies sessions de travail avec ton équipe IA.",
-  "popular": "Le plus pris",
-  "perMonth": "mois",
-  "footer": "Paiement sécurisé via Stripe. Annule à tout moment.",
-  "currentPlan": "Tu es actuellement sur le plan {plan}.",
-  "activeBadge": "Actif",
-  "startCheckout": "Choisir ce plan",
-  "switchTo": "Passer à {plan}",
-  "manage": "Gérer mon abonnement",
-  "loading": "Chargement…",
-  "starter": {
-    "f1": "3 projets",
-    "f2": "8 agents complets",
-    "f3": "100 messages / jour",
-    "f4": "Historique illimité"
+  "upgrade": {
+    "backToDashboard": "Retour au dashboard",
+    "eyebrow": "PASSER À UN PLAN",
+    "title": "Débloquer toute l'équipe.",
+    "sub": "Free te donne un avant-goût. Les plans payants débloquent les vraies sessions de travail avec ton équipe IA.",
+    "popular": "Le plus pris",
+    "perMonth": "mois",
+    "footer": "Paiement sécurisé via Stripe. Annule à tout moment.",
+    "currentPlan": "Tu es actuellement sur le plan {plan}.",
+    "activeBadge": "Actif",
+    "startCheckout": "Choisir ce plan",
+    "switchTo": "Passer à {plan}",
+    "manage": "Gérer mon abonnement",
+    "loading": "Chargement…",
+    "starter": {
+      "f1": "3 projets",
+      "f2": "8 agents complets",
+      "f3": "100 messages / jour",
+      "f4": "Historique illimité"
+    },
+    "pro": {
+      "f1": "10 projets",
+      "f2": "8 agents complets",
+      "f3": "Messages illimités",
+      "f4": "Intégrations (Notion, Slack)",
+      "f5": "Génération de code"
+    },
+    "team": {
+      "f1": "Projets illimités",
+      "f2": "5 sièges utilisateurs",
+      "f3": "Messages illimités",
+      "f4": "Accès API"
+    }
   },
-  "pro": {
-    "f1": "10 projets",
-    "f2": "8 agents complets",
-    "f3": "Messages illimités",
-    "f4": "Intégrations (Notion, Slack)",
-    "f5": "Génération de code"
-  },
-  "team": {
-    "f1": "Projets illimités",
-    "f2": "5 sièges utilisateurs",
-    "f3": "Messages illimités",
-    "f4": "Accès API"
+  "sidebar": {
+    "projectsTitle": "PROJETS",
+    "agentsTitle": "AGENTS",
+    "toolsTitle": "OUTILS",
+    "newProject": "Nouveau projet",
+    "createFirst": "Créer mon premier projet",
+    "deliverables": "Livrables",
+    "usage": "Usage",
+    "upgrade": "Upgrade",
+    "manage": "Gérer",
+    "account": "Compte",
+    "dashboard": "Dashboard",
+    "billing": "Facturation",
+    "signOut": "Déconnexion",
+    "collapse": "Réduire",
+    "expand": "Étendre"
   }
 }
-}
-
-

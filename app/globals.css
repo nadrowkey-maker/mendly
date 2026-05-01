@@ -1,147 +1,233 @@
+
+
+/* ============================================================
+   GEIST FONTS - Premium typography (Vercel/Apple-inspired)
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
 @import "tailwindcss";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-fraunces: var(--font-fraunces);
-  --color-brand: var(----brand);
-  --color-color-5: var(----color-5);
-  --color-color-4: var(----color-4);
-  --color-color-3: var(----color-3);
-  --color-color-2: var(----color-2);
-  --color-color-1: var(----color-1);
-}
-
+/* ============================================================
+   ROOT TOKENS — The new Mendly design system
+   Apple x Vercel premium, no neon, no AI cliche
+   ============================================================ */
 :root {
-  /* Backgrounds */
-  --bg-primary: #05030E;
-  --bg-secondary: #0A0820;
-  --surface: #14102A;
-  --surface-elevated: #1C1736;
+  /* Surfaces - Deep, warm blacks (not pure #000) */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #0f0f0f;
+  --surface: #141414;
+  --surface-elevated: #1a1a1a;
+  --surface-hover: #1f1f1f;
 
-  /* Accents */
-  --accent-primary: #8B5CF6;
-  --accent-glow: #A78BFA;
-  --accent-hot: #06B6D4;
-  --accent-warm: #F0ABFC;
+  /* Borders - Subtle hierarchy */
+  --border: #1f1f1f;
+  --border-strong: #2a2a2a;
+  --border-emphasis: #3a3a3a;
 
-  /* Text */
-  --text-primary: #F5F3FF;
-  --text-muted: #A1A1AA;
-  --text-dim: #71717A;
+  /* Text - Apple-like off-white, never pure */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #52525b;
 
-  /* Borders */
-  --border: rgba(139, 92, 246, 0.15);
-  --border-strong: rgba(139, 92, 246, 0.3);
-  --color-1: hsl(330 100% 40%);
-  --color-2: hsl(140 100% 55%);
-  --color-3: hsl(210 100% 30%);
-  --color-4: hsl(60 100% 70%);
-  --color-5: hsl(295 100% 45%);
-  --brand: hsl(50 100% 50%);
+  /* Accent - One single deep premium violet, used sparingly */
+  --accent-primary: #7c3aed;
+  --accent-glow: #8b5cf6;
+  --accent-warm: #a78bfa;
+  --accent-deep: #5b21b6;
+
+  /* Status colors (kept subtle) */
+  --success: #22c55e;
+  --warning: #eab308;
+  --danger: #ef4444;
+
+  /* Shadows - Clean, no rainbow glows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px 0 rgba(0, 0, 0, 0.6);
+  --shadow-violet: 0 8px 32px 0 rgba(124, 58, 237, 0.25);
 }
 
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 * {
-  border-color: var(--border);
+  box-sizing: border-box;
 }
 
 html {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
 }
 
 body {
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-feature-settings: "ss01", "ss02", "cv01", "cv11";
+  font-weight: 400;
+  letter-spacing: -0.01em;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  margin: 0;
+  min-height: 100vh;
 }
 
-/* Selection */
-::selection {
-  background: var(--accent-primary);
-  color: white;
+/* Headings - Bold, confident, Apple-like */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
 }
 
-/* Scrollbar (optionnel, pour le style) */
+h1 {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+/* Mono for code, eyebrows, technical labels */
+code,
+pre,
+.font-mono,
+[class*="font-mono"] {
+  font-family: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-feature-settings: "ss01", "cv01";
+}
+
+/* Override Tailwind's default font for fraunces (legacy) */
+.font-fraunces {
+  font-family: "Geist", sans-serif !important;
+  font-weight: 700;
+  font-style: normal !important;
+  letter-spacing: -0.03em;
+}
+
+em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ============================================================
+   SCROLLBAR — Subtle premium styling
+   ============================================================ */
 ::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--surface);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--surface-elevated);
+  width: 8px;
+  height: 8px;
 }
 
-/* Réduit les animations pour les utilisateurs qui le demandent */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-emphasis);
+}
+
+/* ============================================================
+   SELECTION — Subtle violet
+   ============================================================ */
+::selection {
+  background: var(--accent-deep);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   FOCUS STATES — Premium ring
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus,
+a:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   ANIMATIONS — Subtle premium motion
+   ============================================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.dark {
-  --color-1: hsl(330 100% 40%);
-  --color-2: hsl(140 100% 55%);
-  --color-3: hsl(210 100% 30%);
-  --color-4: hsl(60 100% 70%);
-  --color-5: hsl(295 100% 45%);
-  --brand: hsl(50 100% 50%);
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-/* GradientText keyframes */
-@keyframes gradient-border {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8%) scale(1.05); }
-}
-@keyframes gradient-1 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(40%, 40%) rotate(200deg); }
-}
-@keyframes gradient-2 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-40%, 40%) rotate(-200deg); }
-}
-@keyframes gradient-3 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(40%, -40%) rotate(200deg); }
-}
-@keyframes gradient-4 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-40%, -40%) rotate(-200deg); }
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Deliverables infinite marquee */
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+/* ============================================================
+   UTILITY CLASSES — Premium look
+   ============================================================ */
+.glass {
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
 }
 
-/* SplineScene suspense fallback */
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.glass-strong {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--border-strong);
 }
-.loader {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--surface);
-  border-top-color: var(--accent-primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+
+/* Subtle text gradient (used very sparingly) */
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--text-primary) 0%,
+    var(--accent-warm) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* No more neon glows. Subtle hover lift instead. */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }

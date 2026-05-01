@@ -4,8 +4,10 @@ import {
   getOrCreateConversation,
   listMessages,
 } from "@/lib/actions/conversations";
- import { checkRateLimit } from "@/lib/rate-limit/check";
+import { listProjects } from "@/lib/actions/projects";
 import { ChatInterface } from "@/components/chat/ChatInterface";
+import { checkRateLimit } from "@/lib/rate-limit/check";
+import { getUserSubscription } from "@/lib/actions/subscription";
 import type { Project } from "@/lib/types/project";
 
 interface PageProps {
@@ -24,7 +26,6 @@ export default async function ProjectChatPage({ params }: PageProps) {
     redirect("/login");
   }
 
-  // Fetch project (RLS ensures user owns it)
   const { data: project, error } = await supabase
     .from("projects")
     .select("*")
@@ -35,15 +36,17 @@ export default async function ProjectChatPage({ params }: PageProps) {
     notFound();
   }
 
-  // Get or create CEO conversation by default
   const conversation = await getOrCreateConversation(id, "CEO");
-
   if (!conversation) {
     throw new Error("Could not create conversation");
   }
 
-  const messages = await listMessages(conversation.id);
-  const usage = await checkRateLimit(user.id);
+  const [messages, allProjects, usage, subscription] = await Promise.all([
+    listMessages(conversation.id),
+    listProjects(),
+    checkRateLimit(user.id),
+    getUserSubscription(),
+  ]);
 
   return (
     <ChatInterface
@@ -53,6 +56,9 @@ export default async function ProjectChatPage({ params }: PageProps) {
       locale={locale}
       initialUsageUsed={usage.used}
       initialUsageLimit={usage.limit}
+      userPlan={subscription.plan}
+      userEmail={user.email ?? null}
+      allProjects={allProjects}
     />
   );
 }
