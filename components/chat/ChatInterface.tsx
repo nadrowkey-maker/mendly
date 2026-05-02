@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, FileText } from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
+import { DebateView } from "./DebateView";
 import { GenerateMemoButton } from "./GenerateMemoButton";
 import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
 import {
@@ -15,6 +16,7 @@ import {
 import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
+import type { DebateState, DebateAgentRole, AgentSelection } from "@/lib/types/debate";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -78,12 +80,9 @@ export function ChatInterface({
   const t = useTranslations("chat");
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
   const [switchingAgent, setSwitchingAgent] = useState(false);
-  const [agentData, setAgentData] = useState<
-    Partial<Record<AgentRole, AgentState>>
-  >({
+  const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
     CEO: {
       conversationId,
       messages: toDisplayMessages(initialMessages),
@@ -95,10 +94,12 @@ export function ChatInterface({
   const [selectedFile, setSelectedFile] = useState<FileAttachment | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDebating, setIsDebating] = useState(false);
+  const [debateState, setDebateState] = useState<DebateState>({ phase: "idle" });
   const [error, setError] = useState<string | null>(null);
   const [usageUsed, setUsageUsed] = useState(initialUsageUsed);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const debateAbortRef = useRef<AbortController | null>(null);
 
   const activeData = agentData[activeAgent];
   const activeMessages = activeData?.messages ?? [];
@@ -106,7 +107,7 @@ export function ChatInterface({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeMessages, activeAgent]);
+  }, [activeMessages, activeAgent, debateState]);
 
   const busy = isLoading || isDebating || switchingAgent;
 
@@ -114,6 +115,7 @@ export function ChatInterface({
     if (agent === activeAgent || busy) return;
     setActiveAgent(agent);
     setError(null);
+    setDebateState({ phase: "idle" });
 
     if (agentData[agent]) return;
 
@@ -241,9 +243,7 @@ export function ChatInterface({
         ...prev,
         [activeAgent]: {
           ...prev[activeAgent]!,
-          messages: prev[activeAgent]!.messages.filter(
-            (m) => m.id !== assistantMsgId
-          ),
+          messages: prev[activeAgent]!.messages.filter((m) => m.id !== assistantMsgId),
         },
       }));
     } finally {
@@ -253,15 +253,14 @@ export function ChatInterface({
 
   const handleDebate = async () => {
     const trimmed = input.trim();
-    if (!trimmed || busy || activeAgent !== "CEO" || !activeConversationId)
-      return;
+    if (!trimmed || busy || activeAgent !== "CEO" || !activeConversationId) return;
 
     setError(null);
     setInput("");
     setIsDebating(true);
+    setDebateState({ phase: "selecting", question: trimmed });
 
     const userMsgId = `user-${Date.now()}`;
-
     setAgentData((prev) => ({
       ...prev,
       CEO: {
@@ -273,8 +272,11 @@ export function ChatInterface({
       },
     }));
 
+    const ac = new AbortController();
+    debateAbortRef.current = ac;
+
     try {
-      const response = await fetch("/api/chat/debate", {
+      const response = await fetch("/api/chat/debate-v2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -283,10 +285,12 @@ export function ChatInterface({
           userMessage: trimmed,
           locale,
         }),
+        signal: ac.signal,
       });
 
       if (response.status === 429) {
         setError(t("errorRateLimited"));
+        setDebateState({ phase: "idle" });
         setAgentData((prev) => ({
           ...prev,
           CEO: {
@@ -296,111 +300,348 @@ export function ChatInterface({
         }));
         return;
       }
-      if (!response.ok || !response.body) throw new Error("Debate failed");
+      if (!response.ok || !response.body) throw new Error("Debate v2 failed");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-      let currentAgent: string | null = null;
-      let currentMsgId: string | null = null;
 
-      const startNewRound = (agent: string) => {
-        const newId = `${agent.toLowerCase()}-debate-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-        currentAgent = agent;
-        currentMsgId = newId;
-        setAgentData((prev) => ({
-          ...prev,
-          CEO: {
-            ...prev.CEO!,
-            messages: [
-              ...prev.CEO!.messages,
-              {
-                id: newId,
-                role: "assistant",
-                content: "",
-                agentRole: agent,
-                isStreaming: true,
-              },
-            ],
-          },
-        }));
+      type Round = 1 | 2;
+      let currentAgent: DebateAgentRole | null = null;
+      let currentRound: Round | null = null;
+      let inSynthesis = false;
+      let messages: import("@/lib/types/debate").DebateMessage[] = [];
+      let synthesis = "";
+      let selection: AgentSelection | null = null;
+
+      const upsertMessage = (
+        agent: DebateAgentRole,
+        round: Round,
+        contentDelta: string,
+        streaming: boolean
+      ) => {
+        messages = [...messages];
+        const idx = messages.findIndex((m) => m.agent === agent && m.round === round);
+        if (idx === -1) {
+          messages.push({
+            id: `${agent}-r${round}-${Date.now()}`,
+            agent,
+            round,
+            content: contentDelta,
+            isStreaming: streaming,
+          });
+        } else {
+          messages[idx] = {
+            ...messages[idx],
+            content: messages[idx].content + contentDelta,
+            isStreaming: streaming,
+          };
+        }
       };
 
-      const appendToCurrent = (text: string) => {
-        if (!currentMsgId) return;
-        const id = currentMsgId;
-        setAgentData((prev) => ({
-          ...prev,
-          CEO: {
-            ...prev.CEO!,
-            messages: prev.CEO!.messages.map((m) =>
-              m.id === id ? { ...m, content: m.content + text } : m
-            ),
-          },
-        }));
+      const finalizeMessage = (agent: DebateAgentRole, round: Round) => {
+        messages = messages.map((m) =>
+          m.agent === agent && m.round === round ? { ...m, isStreaming: false } : m
+        );
       };
 
-      const finalizeCurrent = () => {
-        if (!currentMsgId) return;
-        const id = currentMsgId;
+      const flushState = (
+        phase: "round1" | "round2" | "synthesizing" | "done",
+        sel: AgentSelection,
+        msgs: typeof messages,
+        synth: string | null
+      ) => {
+        if (phase === "synthesizing" || phase === "done") {
+          setDebateState({ phase, question: trimmed, selection: sel, messages: msgs, synthesis: synth ?? "" });
+        } else {
+          setDebateState({ phase, question: trimmed, selection: sel, messages: msgs });
+        }
+      };
+
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        streamDone = done;
+        if (!done && value) buffer += decoder.decode(value, { stream: true });
+
+        // Inner loop: process all complete tokens in buffer before fetching next chunk
+        let madeProgress = true;
+        while (madeProgress) {
+          madeProgress = false;
+
+          // All patterns are anchored with ^ so they only match at the buffer head.
+          // Text is drained last, ensuring markers are only at the front when checked.
+
+          // [[META]]{json}[[/META]]
+          const metaMatch = buffer.match(/^\[\[META\]\]([\s\S]*?)\[\[\/META\]\]/);
+          if (metaMatch) {
+            try {
+              selection = JSON.parse(metaMatch[1]) as AgentSelection;
+              if (selection) setDebateState({ phase: "round1", question: trimmed, selection, messages: [] });
+            } catch { /* ignore bad json */ }
+            buffer = buffer.slice(metaMatch[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[ROUND:1]] / [[ROUND:2]]
+          const roundStart = buffer.match(/^\[\[ROUND:(1|2)\]\]/);
+          if (roundStart) {
+            const roundNum = (roundStart[1] === "1" ? 1 : 2) as Round;
+            currentRound = roundNum;
+            if (selection) flushState(roundNum === 1 ? "round1" : "round2", selection, messages, null);
+            buffer = buffer.slice(roundStart[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[/ROUND:1]] / [[/ROUND:2]]
+          const roundEnd = buffer.match(/^\[\[\/ROUND:(1|2)\]\]/);
+          if (roundEnd) {
+            buffer = buffer.slice(roundEnd[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[AGENT:CFO:1]]
+          const agentStart = buffer.match(/^\[\[AGENT:([A-Z]+):(1|2)\]\]/);
+          if (agentStart) {
+            const agentRole = agentStart[1] as DebateAgentRole;
+            const round = (agentStart[2] === "1" ? 1 : 2) as Round;
+            currentAgent = agentRole;
+            currentRound = round;
+            upsertMessage(agentRole, round, "", true);
+            if (selection) flushState(round === 1 ? "round1" : "round2", selection, messages, null);
+            buffer = buffer.slice(agentStart[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[/AGENT:CFO:1]]
+          const agentEnd = buffer.match(/^\[\[\/AGENT:([A-Z]+):(1|2)\]\]/);
+          if (agentEnd) {
+            const agentRole = agentEnd[1] as DebateAgentRole;
+            const round = (agentEnd[2] === "1" ? 1 : 2) as Round;
+            finalizeMessage(agentRole, round);
+            currentAgent = null;
+            if (selection) flushState(round === 1 ? "round1" : "round2", selection, messages, null);
+            buffer = buffer.slice(agentEnd[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[SYNTHESIS]]
+          const synthStart = buffer.match(/^\[\[SYNTHESIS\]\]/);
+          if (synthStart) {
+            inSynthesis = true;
+            currentAgent = null;
+            if (selection) flushState("synthesizing", selection, messages, synthesis || "");
+            buffer = buffer.slice(synthStart[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[/SYNTHESIS]]
+          const synthEnd = buffer.match(/^\[\[\/SYNTHESIS\]\]/);
+          if (synthEnd) {
+            inSynthesis = false;
+            if (selection) flushState("done", selection, messages, synthesis);
+            buffer = buffer.slice(synthEnd[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[END]]
+          const endMatch = buffer.match(/^\[\[END\]\]/);
+          if (endMatch) {
+            buffer = buffer.slice(endMatch[0].length);
+            streamDone = true;
+            madeProgress = true;
+            continue;
+          }
+
+          // [[ERROR]]msg[[/ERROR]]
+          const errMatch = buffer.match(/^\[\[ERROR\]\]([\s\S]*?)\[\[\/ERROR\]\]/);
+          if (errMatch) {
+            setDebateState({ phase: "error", message: errMatch[1] });
+            buffer = buffer.slice(errMatch[0].length);
+            streamDone = true;
+            madeProgress = true;
+            continue;
+          }
+
+          // Drain plain text (up to the next marker, or all of buffer if no marker).
+          // This must run last so markers are only matched when at the buffer head.
+          if (buffer.length > 0 && !buffer.startsWith("[[")) {
+            const nextMarkerIdx = buffer.indexOf("[[");
+            const drainable = nextMarkerIdx === -1 ? buffer : buffer.slice(0, nextMarkerIdx);
+            if (drainable) {
+              if (inSynthesis) {
+                synthesis += drainable;
+                if (selection) flushState("synthesizing", selection, messages, synthesis);
+              } else if (currentAgent && currentRound !== null) {
+                upsertMessage(currentAgent, currentRound, drainable, true);
+                if (selection) flushState(currentRound === 1 ? "round1" : "round2", selection, messages, null);
+              }
+              buffer = buffer.slice(drainable.length);
+              madeProgress = true;
+            }
+          }
+          // If buffer starts with [[ and no complete marker matched, wait for more data
+        }
+      }
+
+      setUsageUsed((u) => u + 1);
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        setDebateState((prev) => {
+          if (prev.phase === "round1" || prev.phase === "round2" || prev.phase === "synthesizing") {
+            return {
+              phase: "aborted",
+              question: trimmed,
+              messages: "messages" in prev ? prev.messages : [],
+              synthesis: prev.phase === "synthesizing" ? prev.synthesis : null,
+            };
+          }
+          return { phase: "idle" };
+        });
+      } else {
+        console.error("Debate error:", err);
+        setError(t("errorGeneric"));
+        setDebateState({ phase: "idle" });
+      }
+    } finally {
+      setIsDebating(false);
+      debateAbortRef.current = null;
+    }
+  };
+
+  const handleAbortDebate = () => {
+    debateAbortRef.current?.abort();
+  };
+
+  const handleInviteAccept = async (agent: DebateAgentRole, reason: string) => {
+    if (busy || !activeConversationId) return;
+
+    const ceoConversationId = activeConversationId;
+    let targetConversationId: string;
+
+    // Ensure invited agent's conversation is loaded
+    if (agentData[agent as AgentRole]) {
+      targetConversationId = agentData[agent as AgentRole]!.conversationId;
+    } else {
+      setSwitchingAgent(true);
+      try {
+        const convo = await getOrCreateConversation(project.id, agent as AgentRole);
+        if (!convo) throw new Error("Failed to get conversation");
+        const msgs = await listMessages(convo.id);
         setAgentData((prev) => ({
           ...prev,
-          CEO: {
-            ...prev.CEO!,
-            messages: prev.CEO!.messages.map((m) =>
-              m.id === id ? { ...m, isStreaming: false } : m
-            ),
+          [agent]: {
+            conversationId: convo.id,
+            messages: toDisplayMessages(msgs),
+            loaded: true,
           },
         }));
-      };
+        targetConversationId = convo.id;
+      } catch (err) {
+        console.error("Invite agent load error:", err);
+        setError(t("errorGeneric"));
+        setSwitchingAgent(false);
+        return;
+      } finally {
+        setSwitchingAgent(false);
+      }
+    }
+
+    // Switch to the invited agent
+    setActiveAgent(agent as AgentRole);
+    setError(null);
+
+    // Stream their response
+    setIsLoading(true);
+    const assistantMsgId = `assistant-invite-${Date.now()}`;
+
+    setAgentData((prev) => ({
+      ...prev,
+      [agent]: {
+        ...prev[agent as AgentRole]!,
+        messages: [
+          ...(prev[agent as AgentRole]?.messages ?? []),
+          {
+            id: assistantMsgId,
+            role: "assistant" as const,
+            content: "",
+            agentRole: agent,
+            isStreaming: true,
+          },
+        ],
+      },
+    }));
+
+    try {
+      const response = await fetch("/api/chat/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentConversationId: targetConversationId,
+          ceoConversationId,
+          projectId: project.id,
+          invitedAgent: agent,
+          inviteReason: reason,
+          locale,
+        }),
+      });
+
+      if (!response.ok || !response.body) throw new Error("Invite failed");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let markerIdx;
-        while ((markerIdx = buffer.indexOf("[[ROUND:")) !== -1) {
-          if (markerIdx > 0) {
-            const beforeText = buffer.slice(0, markerIdx);
-            if (currentAgent) appendToCurrent(beforeText);
-            buffer = buffer.slice(markerIdx);
-          }
-          const endIdx = buffer.indexOf("]]");
-          if (endIdx === -1) break;
-          const marker = buffer.slice(8, endIdx);
-          buffer = buffer.slice(endIdx + 2);
-
-          if (marker === "END") {
-            finalizeCurrent();
-            currentAgent = null;
-            currentMsgId = null;
-          } else {
-            finalizeCurrent();
-            startNewRound(marker);
-          }
-        }
-
-        if (buffer.length > 0 && currentAgent && !buffer.includes("[[")) {
-          appendToCurrent(buffer);
-          buffer = "";
-        }
+        accumulated += decoder.decode(value, { stream: true });
+        setAgentData((prev) => ({
+          ...prev,
+          [agent]: {
+            ...prev[agent as AgentRole]!,
+            messages: prev[agent as AgentRole]!.messages.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: accumulated } : m
+            ),
+          },
+        }));
       }
 
-      if (buffer.length > 0 && currentAgent) appendToCurrent(buffer);
-      finalizeCurrent();
+      setAgentData((prev) => ({
+        ...prev,
+        [agent]: {
+          ...prev[agent as AgentRole]!,
+          messages: prev[agent as AgentRole]!.messages.map((m) =>
+            m.id === assistantMsgId ? { ...m, isStreaming: false } : m
+          ),
+        },
+      }));
       setUsageUsed((u) => u + 1);
     } catch (err) {
-      console.error("Debate error:", err);
+      console.error("Invite error:", err);
       setError(t("errorGeneric"));
+      setAgentData((prev) => ({
+        ...prev,
+        [agent]: {
+          ...prev[agent as AgentRole]!,
+          messages: prev[agent as AgentRole]!.messages.filter((m) => m.id !== assistantMsgId),
+        },
+      }));
     } finally {
-      setIsDebating(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex h-screen bg-(--bg-primary) overflow-hidden">
-      {/* Left sidebar */}
       <ProjectSidebar
         projects={allProjects}
         activeProjectId={project.id}
@@ -415,9 +656,7 @@ export function ChatInterface({
         userEmail={userEmail}
       />
 
-      {/* Main chat area */}
       <main className="flex-1 flex flex-col min-w-0 relative">
-        {/* Top bar */}
         <header className="h-14 border-b border-(--border) flex items-center justify-between px-4 md:px-6 bg-(--bg-primary)/80 backdrop-blur-xl sticky top-0 z-20">
           <div className="flex items-center gap-3 min-w-0">
             {sidebarCollapsed && (
@@ -439,12 +678,9 @@ export function ChatInterface({
             </div>
           </div>
 
-          {activeAgent === "CEO" && (
-            <GenerateMemoButton projectId={project.id} />
-          )}
+          {activeAgent === "CEO" && <GenerateMemoButton projectId={project.id} />}
         </header>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 py-8">
           <div className="max-w-3xl mx-auto space-y-6">
             {switchingAgent ? (
@@ -454,14 +690,14 @@ export function ChatInterface({
                   {t("agentSwitching")}
                 </div>
               </div>
-            ) : activeMessages.length === 0 ? (
+            ) : activeMessages.length === 0 && debateState.phase === "idle" ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-16 md:py-24"
               >
-                <div className="w-14 h-14 rounded-2xl bg-(--surface-elevated) border border-(--border-strong) flex items-center justify-center mx-auto mb-6 text-base font-bold font-mono text-(--text-primary)">
-                  {activeAgent[0]}
+                <div className="w-14 h-14 rounded-2xl bg-(--surface-elevated) border border-(--border-strong) flex items-center justify-center mx-auto mb-6 text-sm font-bold font-mono text-(--text-primary) tracking-wider">
+                  {activeAgent}
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-(--text-primary) mb-3 tracking-tight">
                   {t("welcomeTitle")}
@@ -480,8 +716,14 @@ export function ChatInterface({
                   isStreaming={m.isStreaming}
                   attachmentName={m.attachmentName}
                   attachmentMime={m.attachmentMime}
+                  onInviteAccept={activeAgent === "CEO" ? handleInviteAccept : undefined}
+                  busy={busy}
                 />
               ))
+            )}
+
+            {debateState.phase !== "idle" && (
+              <DebateView state={debateState} onAbort={handleAbortDebate} />
             )}
 
             {error && (
@@ -497,7 +739,6 @@ export function ChatInterface({
           </div>
         </div>
 
-        {/* Composer */}
         <ChatComposer
           value={input}
           onChange={setInput}

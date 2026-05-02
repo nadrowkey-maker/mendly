@@ -2,6 +2,8 @@
 
 import ReactMarkdown from "react-markdown";
 import { FileText, Image } from "lucide-react";
+import { AgentInvite } from "./AgentInvite";
+import type { DebateAgentRole } from "@/lib/types/debate";
 
 interface Props {
   role: "user" | "assistant";
@@ -10,6 +12,8 @@ interface Props {
   isStreaming?: boolean;
   attachmentName?: string | null;
   attachmentMime?: string | null;
+  onInviteAccept?: (agent: DebateAgentRole, reason: string) => Promise<void>;
+  busy?: boolean;
 }
 
 const AGENT_LABELS: Record<string, string> = {
@@ -23,6 +27,8 @@ const AGENT_LABELS: Record<string, string> = {
   CCO: "CCO",
 };
 
+const VALID_INVITE_AGENTS = new Set<string>(["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"]);
+
 export function ChatMessage({
   role,
   content,
@@ -30,6 +36,8 @@ export function ChatMessage({
   isStreaming,
   attachmentName,
   attachmentMime,
+  onInviteAccept,
+  busy = false,
 }: Props) {
   if (role === "user") {
     const isPdf = attachmentMime === "application/pdf";
@@ -54,10 +62,17 @@ export function ChatMessage({
     );
   }
 
-  // Assistant message
+  // Parse <invite agent="X" reason="Y"/> from content
+  const inviteMatch = content.match(/<invite\s+agent="([^"]+)"\s+reason="([^"]+)"\s*\/>/);
+  const cleanContent = content.replace(/<invite[^/]*\/>/g, "").trim();
+  const inviteAgent =
+    inviteMatch && VALID_INVITE_AGENTS.has(inviteMatch[1].toUpperCase())
+      ? (inviteMatch[1].toUpperCase() as DebateAgentRole)
+      : null;
+  const inviteReason = inviteMatch?.[2] ?? "";
+
   return (
     <div className="flex flex-col gap-2">
-      {/* Agent label */}
       {agentRole && (
         <div className="flex items-center gap-2 ml-1">
           <div className="w-1.5 h-1.5 rounded-full bg-(--accent-glow)" />
@@ -87,20 +102,14 @@ export function ChatMessage({
                 </h3>
               ),
               strong: ({ children }) => (
-                <strong className="font-semibold text-(--text-primary)">
-                  {children}
-                </strong>
+                <strong className="font-semibold text-(--text-primary)">{children}</strong>
               ),
               em: ({ children }) => (
                 <em className="italic text-(--text-secondary)">{children}</em>
               ),
-              ul: ({ children }) => (
-                <ul className="my-2 space-y-1 pl-1">{children}</ul>
-              ),
+              ul: ({ children }) => <ul className="my-2 space-y-1 pl-1">{children}</ul>,
               ol: ({ children }) => (
-                <ol className="my-2 space-y-1 pl-1 list-decimal list-inside">
-                  {children}
-                </ol>
+                <ol className="my-2 space-y-1 pl-1 list-decimal list-inside">{children}</ol>
               ),
               li: ({ children }) => (
                 <li className="text-(--text-primary) leading-relaxed pl-2 marker:text-(--accent-glow)">
@@ -124,7 +133,7 @@ export function ChatMessage({
               ),
             }}
           >
-            {content}
+            {cleanContent}
           </ReactMarkdown>
         </div>
         {isStreaming && (
@@ -134,6 +143,15 @@ export function ChatMessage({
           />
         )}
       </div>
+
+      {inviteAgent && !isStreaming && onInviteAccept && (
+        <AgentInvite
+          agent={inviteAgent}
+          reason={inviteReason}
+          onAccept={onInviteAccept}
+          busy={busy}
+        />
+      )}
     </div>
   );
 }
