@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
@@ -130,7 +130,7 @@ export function Nav() {
             <PremiumButton
               variant="primary"
               size="sm"
-              onClick={() => router.push("/waitlist")}
+              onClick={() => router.push(isLoggedIn ? "/dashboard" : "/signup")}
             >
               {t("cta")}
             </PremiumButton>
@@ -243,7 +243,7 @@ export function Nav() {
                   size="sm"
                   className="w-full justify-center"
                   onClick={() => {
-                    router.push("/waitlist");
+                    router.push(isLoggedIn ? "/dashboard" : "/signup");
                     setOpen(false);
                   }}
                 >

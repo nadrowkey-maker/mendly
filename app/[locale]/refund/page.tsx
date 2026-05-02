@@ -7,21 +7,21 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "cookies" });
+  const t = await getTranslations({ locale, namespace: "refund" });
   return {
     title: `${t("title")} · Mendly`,
-    description: "How Mendly uses cookies.",
+    description: "Mendly refund policy — 14-day satisfaction guarantee.",
     robots: { index: true, follow: true },
   };
 }
 
-export default async function CookiesPage({
+export default async function RefundPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "cookies" });
+  const t = await getTranslations({ locale, namespace: "refund" });
 
   const sections = [
     { title: t("s1Title"), body: t("s1Body") },

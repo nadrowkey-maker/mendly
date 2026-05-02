@@ -98,7 +98,7 @@ export function ContactContent() {
         <p className="text-(--text-muted) mb-10 max-w-md mx-auto leading-relaxed">
           {t("closingBody")}
         </p>
-        <PremiumButton variant="primary" size="lg" onClick={() => router.push("/waitlist")}>
+        <PremiumButton variant="primary" size="lg" onClick={() => router.push("/signup")}>
           {t("cta")}
         </PremiumButton>
       </motion.div>

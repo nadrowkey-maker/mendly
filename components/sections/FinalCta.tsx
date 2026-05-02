@@ -77,7 +77,7 @@ export function FinalCtaSection() {
           viewport={{ once: true }}
           className="flex flex-col items-center gap-5"
         >
-          <LiquidButton size="xxl" className="text-white font-semibold tracking-wide px-10" onClick={() => router.push("/waitlist")}>
+          <LiquidButton size="xxl" className="text-white font-semibold tracking-wide px-10" onClick={() => router.push("/signup")}>
             {t("cta")}
           </LiquidButton>
 

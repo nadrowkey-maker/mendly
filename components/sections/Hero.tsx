@@ -153,11 +153,17 @@ export function Hero() {
           <PremiumButton
             variant="primary"
             size="lg"
-            onClick={() => router.push("/waitlist")}
+            onClick={() => router.push("/signup")}
           >
             {t("ctaPrimary")}
           </PremiumButton>
-          <PremiumButton variant="secondary" size="lg">
+          <PremiumButton
+            variant="secondary"
+            size="lg"
+            onClick={() => {
+              document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
             {t("ctaSecondary")}
           </PremiumButton>
         </motion.div>

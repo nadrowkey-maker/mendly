@@ -41,7 +41,8 @@ export function Footer() {
         { label: t("col4Link1"), href: "/privacy" },
         { label: t("col4Link2"), href: "/terms" },
         { label: t("col4Link3"), href: "/cookies" },
-        { label: t("col4Link4"), href: "/imprint" },
+        { label: t("col4Link4"), href: "/refund" },
+        { label: t("col4Link5"), href: "/legal" },
       ],
     },
   ];

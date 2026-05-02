@@ -1,8 +1,10 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/gradient-text";
@@ -167,27 +169,48 @@ export function PricingSection() {
   const router = useRouter();
   const reduced = useReducedMotion() ?? false;
   const [isYearly, setIsYearly] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setUser(data.user);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (mounted) setUser(session?.user ?? null);
+    });
+    return () => { mounted = false; subscription.unsubscribe(); };
+  }, []);
+
+  const handleCta = (plan: "free" | "starter" | "pro") => {
+    if (user) {
+      router.push(plan === "free" ? "/dashboard" : "/upgrade");
+    } else {
+      router.push(plan === "free" ? "/signup" : `/signup?plan=${plan}`);
+    }
+  };
 
   const tiers: Tier[] = [
     {
       name: t("tier1Name"), price: t("tier1Price"), period: t("tier1Period"),
       tagline: t("tier1Tagline"),
       features: [t("tier1Feature1"), t("tier1Feature2"), t("tier1Feature3"), t("tier1Feature4")],
-      cta: t("tier1Cta"), popular: false, ctaOnClick: () => router.push("/waitlist"),
+      cta: t("tier1Cta"), popular: false, ctaOnClick: () => handleCta("free"),
     },
     {
       name: t("tier2Name"), price: t("tier2Price"), priceYearly: t("tier2PriceYearly"),
       period: t("tier2Period"), periodYearly: t("tier2PeriodYearly"),
       tagline: t("tier2Tagline"),
       features: [t("tier2Feature1"), t("tier2Feature2"), t("tier2Feature3"), t("tier2Feature4"), t("tier2Feature5"), t("tier2Feature6")],
-      cta: t("tier2Cta"), popular: true, badge: t("tier2Badge"),
+      cta: t("tier2Cta"), popular: true, badge: t("tier2Badge"), ctaOnClick: () => handleCta("starter"),
     },
     {
       name: t("tier3Name"), price: t("tier3Price"), priceYearly: t("tier3PriceYearly"),
       period: t("tier3Period"), periodYearly: t("tier3PeriodYearly"),
       tagline: t("tier3Tagline"),
       features: [t("tier3Feature1"), t("tier3Feature2"), t("tier3Feature3"), t("tier3Feature4"), t("tier3Feature5"), t("tier3Feature6")],
-      cta: t("tier3Cta"), popular: false,
+      cta: t("tier3Cta"), popular: false, ctaOnClick: () => handleCta("pro"),
     },
   ];
 
