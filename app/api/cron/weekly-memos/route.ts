@@ -113,7 +113,7 @@ Maintenant écris le memo (200 mots max) :`;
                 "api-key": process.env.BREVO_API_KEY!,
               },
               body: JSON.stringify({
-                sender: { email: "hello@mendly.ai", name: "Mendly" },
+                sender: { email: "nadroleboss@gmail.com", name: "Mendly" },
                 to: [{ email: userData.user.email }],
                 subject: `Ton memo hebdo · ${project.name}`,
                 htmlContent: `
