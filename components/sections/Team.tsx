@@ -15,7 +15,6 @@ interface AgentCardProps {
   tagline: string;
   tags: string;
   deliverables: string;
-  learnMore: string;
   index: number;
   reduced: boolean;
 }
@@ -27,7 +26,6 @@ function AgentCard({
   tagline,
   tags,
   deliverables,
-  learnMore,
   index,
   reduced,
 }: AgentCardProps) {
@@ -86,12 +84,6 @@ function AgentCard({
             {deliverables}
           </p>
 
-          <span
-            className="text-[11px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-0.5 font-medium shrink-0"
-            style={{ color: color }}
-          >
-            {learnMore}
-          </span>
         </div>
       </TiltCard>
     </motion.div>
@@ -101,8 +93,6 @@ function AgentCard({
 export function TeamSection() {
   const t = useTranslations("team");
   const reduced = useReducedMotion() ?? false;
-  const learnMore = t("learnMore");
-
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { margin: "0px", once: true });
 
@@ -114,7 +104,6 @@ export function TeamSection() {
     tagline: t(`${agent.id}Tagline`),
     tags: t(`${agent.id}Tags`),
     deliverables: t(`${agent.id}Deliverables`),
-    learnMore,
     index,
     reduced,
   }));
@@ -154,7 +143,7 @@ export function TeamSection() {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col min-h-screen px-6 md:px-12 py-16 md:py-20">
+      <div className="relative z-10 flex flex-col min-h-screen px-6 md:px-12 py-16 md:py-20 pointer-events-none">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -163,7 +152,7 @@ export function TeamSection() {
           viewport={{ once: true, margin: "-60px" }}
           className="text-center max-w-4xl mx-auto w-full"
         >
-          <p className="text-[10px] md:text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-3 drop-shadow-[0_0_16px_rgba(139,92,246,0.7)]">
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-3 drop-shadow-[0_0_16px_rgba(139,92,246,0.7)]">
             {t("eyebrow")}
           </p>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white drop-shadow-[0_4px_32px_rgba(0,0,0,0.9)]">

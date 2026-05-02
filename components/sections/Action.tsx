@@ -55,10 +55,10 @@ function MessageBubble({
           scale: hovered ? 1.08 : 1,
         }}
         transition={{ duration: 0.2 }}
-        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5 bg-[var(--c-bg)] text-[var(--c)] border border-[var(--c-b)]"
+        className="w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-mono font-bold shrink-0 mt-0.5 bg-(--c-bg) text-(--c) border border-(--c-b)"
         style={{ "--c": msg.color, "--c-bg": `${msg.color}1A`, "--c-b": `${msg.color}40` } as CSSProperties}
       >
-        {msg.agent[0]}
+        {msg.agent}
       </motion.div>
 
       <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -91,7 +91,10 @@ export function ActionSection() {
     <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-primary)">
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-secondary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-secondary) to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_50%,rgba(6,182,212,0.10)_0%,transparent_70%)] pointer-events-none" />
+      {/* Aurora orbs */}
+      <div className="absolute left-[30%] top-[25%] w-[480px] h-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[130px] opacity-25 pointer-events-none" style={{ background: "#8B5CF6" }} />
+      <div className="absolute left-[65%] top-[40%] w-[360px] h-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px] opacity-20 pointer-events-none" style={{ background: "#06B6D4" }} />
+      <div className="absolute left-[50%] top-[70%] w-[300px] h-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px] opacity-18 pointer-events-none" style={{ background: "#F0ABFC" }} />
 
       <div className="relative z-10 max-w-3xl mx-auto">
         {/* Heading */}
@@ -102,7 +105,7 @@ export function ActionSection() {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-12 md:mb-16"
         >
-          <p className="text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-6">{t("eyebrow")}</p>
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-6">{t("eyebrow")}</p>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white mb-6">
             {t("title")}{" "}
             <GradientText as="span" className="bg-transparent dark:bg-transparent">
@@ -136,14 +139,14 @@ export function ActionSection() {
                 {ONLINE_AGENTS.map((a) => (
                   <div
                     key={a.id}
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-mono font-bold border"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[7px] font-mono font-bold border"
                     style={{
                       color: a.color,
                       background: `${a.color}1A`,
                       borderColor: `${a.color}40`,
                     }}
                   >
-                    {a.id[0]}
+                    {a.id.slice(0, 3)}
                   </div>
                 ))}
                 <span className="ml-1.5 flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
@@ -167,8 +170,8 @@ export function ActionSection() {
                 viewport={{ once: true }}
                 className="flex items-center gap-2 pt-2 pl-2"
               >
-                <div className="ceo-glow-pulse w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold shrink-0 bg-[#8B5CF61A] text-[#8B5CF6] border border-[#8B5CF640]">
-                  C
+                <div className="ceo-glow-pulse w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-mono font-bold shrink-0 bg-[#8B5CF61A] text-[#8B5CF6] border border-[#8B5CF640]">
+                  CEO
                 </div>
                 <span className="text-xs text-(--text-dim)">CEO</span>
                 <span className="text-[10px] text-(--text-dim) italic">is typing</span>

@@ -4,13 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { PremiumButton } from "@/components/ui/PremiumButton";
-
-const AGENT_PILLS = [
-  { label: "CEO · Strategy", color: "#8B5CF6", side: "left", top: "18%", delay: 0.8, floatDuration: "4s", floatDelay: "0s" },
-  { label: "CTO · Architecture", color: "#06B6D4", side: "right", top: "22%", delay: 1.1, floatDuration: "4.8s", floatDelay: "0.8s" },
-  { label: "CMO · Growth", color: "#F0ABFC", side: "right", top: "62%", delay: 1.4, floatDuration: "5.2s", floatDelay: "1.6s" },
-  { label: "CFO · Finance", color: "#FBBF24", side: "left", top: "65%", delay: 1.2, floatDuration: "4.5s", floatDelay: "1.2s" },
-] as const;
+import { HeroParticles } from "@/components/hero-particles";
 
 const ease = [0.25, 1, 0.5, 1] as const;
 
@@ -20,6 +14,11 @@ export function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 md:px-12 bg-(--bg-primary)">
+      {/* ─── BG: Particles ─── */}
+      <div className="absolute inset-0 pointer-events-none z-1">
+        <HeroParticles />
+      </div>
+
       {/* ─── BG: Auroras (static — CSS opacity, no JS animation) ─── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
         <svg
@@ -62,40 +61,8 @@ export function Hero() {
         }}
       />
 
-      {/* ─── PILLS FLOTTANTES (Desktop) ─── */}
-      {/* Float = CSS @keyframes (GPU, 0 JS). Entrance only = Framer Motion (plays once). */}
-      <div className="absolute inset-0 pointer-events-none hidden xl:block z-5">
-        {AGENT_PILLS.map(({ label, color, side, top, delay, floatDuration, floatDelay }) => (
-          <div
-            key={label}
-            className="absolute hero-pill-float"
-            style={{
-              [side]: "6%",
-              top,
-              animationDuration: floatDuration,
-              animationDelay: floatDelay,
-            } as React.CSSProperties}
-          >
-            <motion.div
-              className="flex items-center gap-3 px-4 py-2 rounded-full bg-(--surface)/90 border border-(--border-strong) shadow-2xl"
-              initial={{ opacity: 0, x: side === "left" ? -24 : 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay, ease }}
-            >
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ background: color, boxShadow: `0 0 12px ${color}` }}
-              />
-              <span className="text-[11px] font-bold font-mono tracking-wider text-white/80 uppercase">
-                {label}
-              </span>
-            </motion.div>
-          </div>
-        ))}
-      </div>
-
       {/* ─── MAIN CONTENT ─── */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center">
+      <div className="relative z-10 max-w-5xl mx-auto text-center pb-28">
         {/* Eyebrow */}
         <motion.div
           className="inline-flex items-center gap-3 px-5 py-2 mb-8 rounded-full border border-(--border-strong) bg-(--surface)/80"
@@ -104,34 +71,20 @@ export function Hero() {
           transition={{ duration: 0.6, ease }}
         >
           <span className="inline-flex h-2.5 w-2.5 rounded-full bg-(--accent-primary)" />
-          <span className="text-[10px] md:text-xs font-mono font-bold tracking-[0.3em] text-white/60 uppercase">
+          <span className="text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
             {t("eyebrow")}
           </span>
         </motion.div>
 
         {/* Title */}
         <motion.h1
-          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.85] tracking-tighter text-white mb-6"
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.85] tracking-tighter text-white mb-10"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease }}
         >
           {t("title")}
         </motion.h1>
-
-        {/* Subtitle italic */}
-        <motion.p
-          className="font-fraunces italic text-3xl md:text-5xl lg:text-6xl mb-12 bg-clip-text text-transparent"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, #A78BFA 0%, #F0ABFC 50%, #A78BFA 100%)",
-          }}
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.22, ease }}
-        >
-          {t("titleEm")}
-        </motion.p>
 
         {/* Description */}
         <motion.p

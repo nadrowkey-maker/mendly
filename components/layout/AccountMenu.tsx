@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react";
+import { User, LogIn, UserPlus, LayoutDashboard, Settings, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export function AccountMenu() {
@@ -120,6 +120,14 @@ export function AccountMenu() {
                   >
                     <LayoutDashboard className="w-4 h-4 text-[var(--accent-glow)]" />
                     {t("dashboard")}
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--text-muted)] hover:text-white hover:bg-[var(--surface)]/60 transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-[var(--accent-glow)]" />
+                    {t("settings")}
                   </Link>
                   <button
                     onClick={handleSignOut}

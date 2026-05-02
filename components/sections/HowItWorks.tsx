@@ -68,9 +68,13 @@ export function HowItWorksSection() {
 
   return (
     <section id="how-it-works" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-primary)">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_45%,rgba(139,92,246,0.13)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_45%,rgba(139,92,246,0.10)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-secondary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-secondary) to-transparent pointer-events-none" />
+      {/* Aurora orbs */}
+      <div className="absolute left-[20%] top-[55%] w-105 h-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[130px] opacity-20 pointer-events-none" style={{ background: "#8B5CF6" }} />
+      <div className="absolute left-[78%] top-[50%] w-95 h-75 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px] opacity-15 pointer-events-none" style={{ background: "#06B6D4" }} />
+      <div className="absolute left-[50%] top-[65%] w-85 h-70 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px] opacity-15 pointer-events-none" style={{ background: "#A78BFA" }} />
 
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Heading */}
@@ -81,7 +85,7 @@ export function HowItWorksSection() {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-20 md:mb-28"
         >
-          <p className="text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-6">
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-6">
             {t("eyebrow")}
           </p>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white">
@@ -96,6 +100,19 @@ export function HowItWorksSection() {
         <div className="hidden lg:block relative">
           {/* Connecting gradient line */}
           <div className="absolute top-8 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-(--accent-primary) to-transparent opacity-40 pointer-events-none" />
+          {/* Animated data packet traveling the line */}
+          {!reduced && (
+            <motion.div
+              className="absolute top-7.25 w-8 h-0.75 rounded-full pointer-events-none"
+              style={{
+                background: "linear-gradient(to right, transparent, #A78BFA, #06B6D4, transparent)",
+                boxShadow: "0 0 10px #A78BFA, 0 0 20px #06B6D4",
+                filter: "blur(0.5px)",
+              }}
+              animate={{ left: ["12.5%", "87.5%"] }}
+              transition={{ duration: 2.8, ease: "linear", repeat: Infinity, repeatDelay: 1.4 }}
+            />
+          )}
 
           <div className="grid grid-cols-4 gap-8">
             {steps.map((step, i) => (

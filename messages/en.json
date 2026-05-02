@@ -8,9 +8,9 @@
   },
   "hero": {
     "eyebrow": "8 AI EXECUTIVES · 1 FOUNDER · SHIPPED IN 48H",
-    "title": "Launch your business in 48h.",
-    "titleEm": "Not 18 months.",
-    "sub": "While you're still looking for cofounders, others are shipping. Mendly gives you a full C-suite — CEO, CTO, CMO and 5 more — that executes your project like a real team. Not a chatbot. A crew that ships.",
+    "title": "Stop making every decision alone.",
+    "titleEm": "",
+    "sub": "Your CEO, your CTO, your CMO, your CFO... 8 AI agents that debate together to help you make the right calls on your project.",
     "ctaPrimary": "Start for free",
     "ctaSecondary": "See pricing",
     "trust": "Built for founders who ship. Not those who think."
@@ -38,6 +38,19 @@
     "body2": "Mendly fixes that. Today. 8 specialists who remember every decision, challenge every assumption, and ship — for €0 instead of €200K/year.",
     "body3": "Not a tool. A team.",
     "support": "Powered by the most advanced AI models. Structured like a real company."
+  },
+  "whatYouGet": {
+    "eyebrow": "WHAT YOU GET",
+    "title": "Everything a funded startup has.",
+    "titleEm": "On day one.",
+    "card1Title": "A full C-suite",
+    "card1Desc": "CEO, CTO, CMO, CFO, CPO, CDO, a developer, and a CCO — 8 specialists assembled around your specific project.",
+    "card2Title": "Agents that debate",
+    "card2Desc": "They challenge each other before you see the output. No groupthink. No yes-men. Real decisions.",
+    "card3Title": "Weekly memos",
+    "card3Desc": "Every Monday: key decisions, open risks, and next week's priorities — written by your team, not a template.",
+    "card4Title": "As many projects as you need",
+    "card4Desc": "Each project has its own team, context, and memory. Switch without losing a thread."
   },
   "howItWorks": {
     "eyebrow": "FROM IDEA TO EXECUTION",
@@ -213,13 +226,9 @@
     "cta": "Read our security pledge →"
   },
   "finalCta": {
-    "manifesto1": "There'll be founders with an AI team.",
-    "manifesto2": "And founders replaced",
-    "manifesto3": "by the ones who had one.",
-    "transition": "Pick a side.",
-    "cta": "Start for free →",
-    "sub": "No credit card required. Cancel anytime.",
-    "counter": "{count} founders are already on board"
+    "title": "Ready to hire your team?",
+    "sub": "Start free. No credit card required.",
+    "cta": "Create my account"
   },
   "footer": {
     "tagline": "The team you couldn't afford.",
@@ -283,11 +292,11 @@
     "card1Note": "We reply within 48h on average, 24h for Pro.",
     "card2Icon": "🤝",
     "card2Title": "For partnerships & investors",
-    "card2Email": "glodi@mendly.ai",
+    "card2Email": "mendlyai01@gmail.com",
     "card2Note": "Or directly on LinkedIn",
     "card3Icon": "🛡️",
     "card3Title": "For security concerns",
-    "card3Email": "security@mendly.ai",
+    "card3Email": "mendlyai01@gmail.com",
     "card3Note": "If you've found a vulnerability, we take it very seriously.",
     "closingTitle": "No form.",
     "closingBody": "We'd rather you write us directly. We read everything. We answer everything.",
@@ -317,7 +326,7 @@
     "p6Title": "6. Regular security audits",
     "p6Body": "We commission independent security audits every 6 months. Reports are available on request for Pro and Team customers.",
     "vulnTitle": "If you find a vulnerability",
-    "vulnBody": "Email us at security@mendly.ai. We respond within 48h. We value responsible security researchers — a bug bounty program will launch with the product.",
+    "vulnBody": "Email us at mendlyai01@gmail.com. We respond within 48h. We value responsible security researchers — a bug bounty program will launch with the product.",
     "closingTitle": "Got a question?",
     "cta": "Contact us →"
   },
@@ -357,7 +366,7 @@
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: May 2, 2026",
     "s1Title": "1. Who is the data controller?",
-    "s1Body": "Mendly (hereinafter \"Mendly\", \"we\") is a SaaS service for solo founders. The data controllers are Flavien Gaude and Glodi Bandzouzi, reachable at: privacy@mendly.ai.",
+    "s1Body": "Mendly (hereinafter \"Mendly\", \"we\") is a SaaS service for solo founders. The data controllers are Flavien Gaude and Glodi Bandzouzi, reachable at: mendlyai01@gmail.com.",
     "s2Title": "2. What data we collect",
     "s2Body": "For browsing: anonymized analytics (Vercel Analytics), browser type and operating system. For the service: email and password (hashed) for your account, content of your projects and conversations with AI agents, billing information processed by Stripe, preferences and settings.",
     "s3Title": "3. Why we collect this data",
@@ -365,7 +374,7 @@
     "s4Title": "4. How long we keep your data",
     "s4Body": "Account data: retained while your account is active + 30 days after deletion. Free plan conversation history: 30 days. Paid plan conversation history: unlimited. Analytics data: 12 months maximum.",
     "s5Title": "5. Your rights (GDPR)",
-    "s5Body": "Under GDPR, you have the right to access your personal data, rectify it, delete it (\"right to be forgotten\"), export your data, object to processing, withdraw consent at any time. To exercise these rights: privacy@mendly.ai. Response within 30 days.",
+    "s5Body": "Under GDPR, you have the right to access your personal data, rectify it, delete it (\"right to be forgotten\"), export your data, object to processing, withdraw consent at any time. To exercise these rights: mendlyai01@gmail.com. Response within 30 days.",
     "s6Title": "6. Third-party processors",
     "s6Body": "We use the following services (all GDPR-compliant): Vercel (hosting), Supabase (database and authentication), Stripe (payments), Brevo (transactional emails), Google (AI models — Gemini).",
     "s7Title": "7. Security",
@@ -375,7 +384,7 @@
     "s9Title": "9. Changes",
     "s9Body": "We may update this policy. Significant changes will be notified by email to subscribed users.",
     "s10Title": "10. Contact",
-    "s10Body": "For any question: privacy@mendly.ai"
+    "s10Body": "For any question: mendlyai01@gmail.com"
   },
   "terms": {
     "title": "Terms of Service",
@@ -401,7 +410,7 @@
     "s10Title": "10. Suspension and termination",
     "s10Body": "We reserve the right to suspend or terminate your access in case of serious violation of these terms. You can delete your account at any time from your settings.",
     "s11Title": "11. Governing law & contact",
-    "s11Body": "These terms are governed by French law. Any disputes shall be submitted to the competent courts of France, unless mandatory legal provisions provide otherwise. For any question about the terms: legal@mendly.ai"
+    "s11Body": "These terms are governed by French law. Any disputes shall be submitted to the competent courts of France, unless mandatory legal provisions provide otherwise. For any question about the terms: mendlyai01@gmail.com"
   },
   "imprint": {
     "title": "Imprint",
@@ -416,7 +425,7 @@
     "ipTitle": "Intellectual property",
     "ipBody": "The entire site (text, images, logos, Mendly brand) is protected by copyright. Any reproduction, in whole or in part, without written authorization is prohibited.",
     "contactTitle": "Contact",
-    "contactBody": "For any legal question: legal@mendly.ai"
+    "contactBody": "For any legal question: mendlyai01@gmail.com"
   },
   "waitlist": {
     "title": "Get early access.",
@@ -565,6 +574,7 @@
     "section": "ACCOUNT",
     "loggedInAs": "Logged in as",
     "dashboard": "My dashboard",
+    "settings": "Settings",
     "signIn": "Sign in",
     "signUp": "Create account",
     "signOut": "Sign out"

@@ -44,6 +44,10 @@ export function DeliverablesSection() {
       <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-(--bg-secondary) to-transparent pointer-events-none" />
       {/* Ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(139,92,246,0.08)_0%,transparent_70%)] pointer-events-none" />
+      {/* Aurora orbs */}
+      <div className="absolute left-[25%] top-[50%] w-125 h-75 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[130px] opacity-20 pointer-events-none" style={{ background: "#8B5CF6" }} />
+      <div className="absolute left-[75%] top-[50%] w-110 h-70 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px] opacity-15 pointer-events-none" style={{ background: "#06B6D4" }} />
+      <div className="absolute left-[50%] top-[30%] w-90 h-60 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px] opacity-15 pointer-events-none" style={{ background: "#F0ABFC" }} />
 
       {/* Heading */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-12 text-center mb-16 md:mb-20">
@@ -53,7 +57,7 @@ export function DeliverablesSection() {
           transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <p className="text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-6">
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-6">
             {t("eyebrow")}
           </p>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white mb-6">

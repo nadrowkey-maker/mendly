@@ -15,7 +15,7 @@ function CellContent({ text }: { text: string }) {
   if (text.includes("✅")) {
     const label = text.replace("✅", "").trim();
     return (
-      <span className="inline-flex items-center gap-1.5 justify-center">
+      <span className="inline-flex items-center gap-1.5 justify-start">
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 shrink-0">
           <Check className="w-3 h-3 text-emerald-400" />
         </span>
@@ -26,7 +26,7 @@ function CellContent({ text }: { text: string }) {
   if (text.includes("❌")) {
     const label = text.replace("❌", "").trim();
     return (
-      <span className="inline-flex items-center gap-1.5 justify-center">
+      <span className="inline-flex items-center gap-1.5 justify-start">
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15 shrink-0">
           <X className="w-3 h-3 text-red-400" />
         </span>
@@ -37,7 +37,7 @@ function CellContent({ text }: { text: string }) {
   if (text.includes("⚠")) {
     const label = text.replace(/⚠️|⚠/g, "").trim();
     return (
-      <span className="inline-flex items-center gap-1.5 justify-center">
+      <span className="inline-flex items-center gap-1.5 justify-start">
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/15 shrink-0">
           <AlertTriangle className="w-3 h-3 text-amber-400" />
         </span>
@@ -91,7 +91,7 @@ export function Comparison() {
           viewport={{ once: true, margin: "-80px" }}
           className="text-center mb-16"
         >
-          <p className="text-[10px] font-mono tracking-[0.3em] text-(--accent-glow) mb-4 uppercase">
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) mb-4 uppercase">
             {t("eyebrow")}
           </p>
           <h2 className="text-4xl md:text-6xl font-semibold text-(--text-primary) leading-[0.95] tracking-[-0.03em] mb-4">
@@ -136,15 +136,15 @@ export function Comparison() {
                   <td className="py-4 px-6 text-sm text-(--text-primary) border-b border-(--border)">
                     {row.feature}
                   </td>
-                  <td className="py-4 px-4 text-center border-b border-(--border)">
+                  <td className="py-4 px-4 text-left border-b border-(--border)">
                     <CellContent text={row.chatgpt} />
                   </td>
-                  <td className="py-4 px-4 text-center border-b border-(--border)">
+                  <td className="py-4 px-4 text-left border-b border-(--border)">
                     <CellContent text={row.lovable} />
                   </td>
                   <td
                     className={[
-                      "py-4 px-6 text-center",
+                      "py-4 px-6 text-left",
                       "bg-(--accent-primary)/10 border-l border-r border-(--border-strong)",
                       i === rows.length - 1
                         ? "border-b border-b-(--border-strong) rounded-b-xl"

@@ -32,6 +32,20 @@ export function ProblemSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_10%,var(--bg-primary)_72%)] pointer-events-none" />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
+      {/* Scanline sweep */}
+      <motion.div
+        className="absolute inset-x-0 h-px pointer-events-none z-0"
+        style={{ background: "linear-gradient(to right, transparent 5%, rgba(139,92,246,0.35) 50%, transparent 95%)" }}
+        animate={{ top: ["0%", "100%"] }}
+        transition={{ duration: 7, ease: "linear", repeat: Infinity, repeatDelay: 4 }}
+      />
+      {/* Second scanline offset */}
+      <motion.div
+        className="absolute inset-x-0 h-px pointer-events-none z-0"
+        style={{ background: "linear-gradient(to right, transparent 5%, rgba(6,182,212,0.2) 50%, transparent 95%)" }}
+        animate={{ top: ["0%", "100%"] }}
+        transition={{ duration: 7, ease: "linear", repeat: Infinity, repeatDelay: 4, delay: 3.5 }}
+      />
 
       <div className="relative z-10 max-w-6xl mx-auto">
         <motion.div {...FADE_UP(0)} className="text-center mb-16 md:mb-24">

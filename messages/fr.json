@@ -8,9 +8,9 @@
   },
   "hero": {
     "eyebrow": "8 EXPERTS IA · 1 FONDATEUR · LANCÉ EN 48H",
-    "title": "Lance ton business en 48h.",
-    "titleEm": "Pas en 18 mois.",
-    "sub": "Pendant que tu cherches encore tes cofondateurs, les autres livrent. Mendly te donne une C-suite complète — CEO, CTO, CMO et 5 autres — qui exécute ton projet comme une vraie équipe. Pas un chatbot. Une équipe qui ship.",
+    "title": "Arrête de prendre toutes tes décisions seul.",
+    "titleEm": "",
+    "sub": "Ton CEO, ton CTO, ton CMO, ton CFO... 8 agents IA qui débattent ensemble pour t'aider à prendre les bonnes décisions sur ton projet.",
     "ctaPrimary": "Commencer gratuitement",
     "ctaSecondary": "Voir les tarifs",
     "trust": "Pour les fondateurs qui livrent. Pas ceux qui réfléchissent."
@@ -38,6 +38,19 @@
     "body2": "Mendly change ça. Aujourd'hui. 8 spécialistes qui retiennent chaque décision, challengent chaque hypothèse, et livrent — pour 0 € au lieu de 200 K€/an.",
     "body3": "Pas un outil. Une équipe.",
     "support": "Propulsé par les modèles IA les plus avancés. Structuré comme une vraie entreprise."
+  },
+  "whatYouGet": {
+    "eyebrow": "CE QUE TU OBTIENS",
+    "title": "Tout ce qu'une startup financée a.",
+    "titleEm": "Dès le premier jour.",
+    "card1Title": "Une C-suite complète",
+    "card1Desc": "CEO, CTO, CMO, CFO, CPO, CDO, un développeur et un CCO — 8 spécialistes assemblés autour de ton projet.",
+    "card2Title": "Des agents qui débattent",
+    "card2Desc": "Ils se challengent mutuellement avant de te présenter une réponse. Pas de pensée unique. Des vraies décisions.",
+    "card3Title": "Des memos hebdomadaires",
+    "card3Desc": "Chaque lundi : décisions clés, risques ouverts et priorités de la semaine — rédigés par ton équipe, pas un template.",
+    "card4Title": "Autant de projets que tu veux",
+    "card4Desc": "Chaque projet a sa propre équipe, son propre contexte, sa propre mémoire. Change de projet sans perdre le fil."
   },
   "howItWorks": {
     "eyebrow": "DE L'IDÉE À L'EXÉCUTION",
@@ -213,13 +226,9 @@
     "cta": "Lire notre engagement sécurité →"
   },
   "finalCta": {
-    "manifesto1": "Y aura ceux qui ont une équipe IA.",
-    "manifesto2": "Et ceux qui se sont fait remplacer",
-    "manifesto3": "par ceux qui en avaient une.",
-    "transition": "Choisis ton camp.",
-    "cta": "Commencer gratuitement →",
-    "sub": "Sans carte bancaire. Sans engagement. Résiliation à tout moment.",
-    "counter": "{count} fondateurs ont déjà rejoint l'aventure"
+    "title": "Prêt à embaucher ton équipe ?",
+    "sub": "Commence gratuitement. Aucune carte bancaire requise.",
+    "cta": "Créer mon compte"
   },
   "footer": {
     "tagline": "L'équipe que tu ne pouvais pas te payer.",
@@ -283,11 +292,11 @@
     "card1Note": "On répond en moyenne sous 48h, sous 24h pour les Pro.",
     "card2Icon": "🤝",
     "card2Title": "Pour les partenariats & investisseurs",
-    "card2Email": "glodi@mendly.ai",
+    "card2Email": "mendlyai01@gmail.com",
     "card2Note": "Ou directement sur LinkedIn",
     "card3Icon": "🛡️",
     "card3Title": "Pour les questions de sécurité",
-    "card3Email": "security@mendly.ai",
+    "card3Email": "mendlyai01@gmail.com",
     "card3Note": "Si tu as identifié une vulnérabilité, on prend ça très au sérieux.",
     "closingTitle": "Pas de formulaire.",
     "closingBody": "On préfère que tu nous écrives directement. On lit tout. On répond à tout.",
@@ -317,7 +326,7 @@
     "p6Title": "6. Audits de sécurité réguliers",
     "p6Body": "On commande des audits de sécurité indépendants tous les 6 mois. Les rapports sont disponibles sur demande pour les clients Pro et Team.",
     "vulnTitle": "Si tu trouves une faille",
-    "vulnBody": "Écris-nous à security@mendly.ai. On répond sous 48h. On valorise les chercheurs en sécurité responsables — un programme de récompenses (bug bounty) sera lancé avec le produit.",
+    "vulnBody": "Écris-nous à mendlyai01@gmail.com. On répond sous 48h. On valorise les chercheurs en sécurité responsables — un programme de récompenses (bug bounty) sera lancé avec le produit.",
     "closingTitle": "Une question ?",
     "cta": "Contacte-nous →"
   },
@@ -357,7 +366,7 @@
     "title": "Politique de confidentialité",
     "lastUpdated": "Dernière mise à jour : 2 mai 2026",
     "s1Title": "1. Qui est responsable du traitement ?",
-    "s1Body": "Mendly (ci-après « Mendly », « nous ») est un service SaaS pour fondateurs solos. Les responsables du traitement sont Flavien Gaude et Glodi Bandzouzi, joignables à : privacy@mendly.ai.",
+    "s1Body": "Mendly (ci-après « Mendly », « nous ») est un service SaaS pour fondateurs solos. Les responsables du traitement sont Flavien Gaude et Glodi Bandzouzi, joignables à : mendlyai01@gmail.com.",
     "s2Title": "2. Quelles données on collecte",
     "s2Body": "Pour la navigation : données analytiques anonymisées (Vercel Analytics), type de navigateur et système d'exploitation. Pour le service : email et mot de passe hashé (compte), contenu de tes projets et conversations avec les agents IA, informations de facturation traitées par Stripe, préférences et réglages.",
     "s3Title": "3. Pourquoi on collecte ces données",
@@ -365,7 +374,7 @@
     "s4Title": "4. Combien de temps on garde tes données",
     "s4Body": "Données du compte : conservées tant que ton compte est actif + 30 jours après suppression. Historique des conversations (plan Free) : 30 jours. Historique des conversations (plans payants) : illimité. Données analytiques : 12 mois maximum.",
     "s5Title": "5. Tes droits (RGPD)",
-    "s5Body": "Conformément au RGPD, tu as le droit d'accéder à tes données personnelles, les rectifier, les supprimer (« droit à l'oubli »), exporter tes données, t'opposer au traitement, retirer ton consentement à tout moment. Pour exercer ces droits : privacy@mendly.ai. Réponse sous 30 jours.",
+    "s5Body": "Conformément au RGPD, tu as le droit d'accéder à tes données personnelles, les rectifier, les supprimer (« droit à l'oubli »), exporter tes données, t'opposer au traitement, retirer ton consentement à tout moment. Pour exercer ces droits : mendlyai01@gmail.com. Réponse sous 30 jours.",
     "s6Title": "6. Sous-traitants",
     "s6Body": "On utilise les services suivants (tous conformes RGPD) : Vercel (hébergement), Supabase (base de données et authentification), Stripe (paiements), Brevo (emails transactionnels), Google (modèles IA — Gemini).",
     "s7Title": "7. Sécurité",
@@ -375,7 +384,7 @@
     "s9Title": "9. Modifications",
     "s9Body": "On peut modifier cette politique. Les changements importants seront notifiés par email aux personnes inscrites.",
     "s10Title": "10. Contact",
-    "s10Body": "Pour toute question : privacy@mendly.ai"
+    "s10Body": "Pour toute question : mendlyai01@gmail.com"
   },
   "terms": {
     "title": "Conditions Générales d'Utilisation",
@@ -401,7 +410,7 @@
     "s10Title": "10. Suspension et résiliation",
     "s10Body": "On se réserve le droit de suspendre ou résilier ton accès en cas de violation grave de ces conditions. Tu peux supprimer ton compte à tout moment depuis tes paramètres.",
     "s11Title": "11. Droit applicable & contact",
-    "s11Body": "Ces conditions sont régies par le droit français. Tout litige sera soumis aux juridictions compétentes françaises, sauf disposition légale impérative contraire. Pour toute question : legal@mendly.ai"
+    "s11Body": "Ces conditions sont régies par le droit français. Tout litige sera soumis aux juridictions compétentes françaises, sauf disposition légale impérative contraire. Pour toute question : mendlyai01@gmail.com"
   },
   "imprint": {
     "title": "Mentions légales",
@@ -416,7 +425,7 @@
     "ipTitle": "Propriété intellectuelle",
     "ipBody": "L'ensemble du site (textes, images, logos, marque Mendly) est protégé par le droit d'auteur. Toute reproduction, totale ou partielle, sans autorisation écrite est interdite.",
     "contactTitle": "Contact",
-    "contactBody": "Pour toute question légale : legal@mendly.ai"
+    "contactBody": "Pour toute question légale : mendlyai01@gmail.com"
   },
   "waitlist": {
     "title": "Accès anticipé.",
@@ -565,6 +574,7 @@
     "section": "COMPTE",
     "loggedInAs": "Connecté en tant que",
     "dashboard": "Mon dashboard",
+    "settings": "Réglages",
     "signIn": "Se connecter",
     "signUp": "Créer un compte",
     "signOut": "Déconnexion"

@@ -226,6 +226,28 @@ export function PricingSection() {
       />
       <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
+      {/* Shooting stars */}
+      {!reduced && ([
+        { top: "12%", left: "8%",  delay: 0,   dur: 0.7 },
+        { top: "28%", left: "55%", delay: 2.4, dur: 0.6 },
+        { top: "55%", left: "20%", delay: 5.1, dur: 0.8 },
+        { top: "70%", left: "72%", delay: 1.8, dur: 0.65 },
+        { top: "40%", left: "88%", delay: 7.2, dur: 0.55 },
+      ].map((s, i) => (
+        <motion.div
+          key={i}
+          className="absolute pointer-events-none w-20 h-px rounded-full"
+          style={{
+            top: s.top, left: s.left, rotate: "35deg",
+            background: "linear-gradient(to right, transparent, rgba(167,139,250,0.9), rgba(240,171,252,0.6), transparent)",
+            boxShadow: "0 0 6px rgba(167,139,250,0.6)",
+          }}
+          initial={{ scaleX: 0, opacity: 0, x: 0 }}
+          animate={{ scaleX: [0, 1, 1, 0], opacity: [0, 1, 0.8, 0], x: [0, 120, 160] }}
+          transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, repeatDelay: 9 + i * 1.3, ease: "easeOut" }}
+        />
+      )))}
+
 
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Heading */}
@@ -236,7 +258,7 @@ export function PricingSection() {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-10 md:mb-12"
         >
-          <p className="text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-6">{t("eyebrow")}</p>
+          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-6">{t("eyebrow")}</p>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white mb-6">
             {t("title")}{" "}
             <GradientText as="span" className="bg-transparent dark:bg-transparent">
