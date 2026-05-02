@@ -25,23 +25,11 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
     .eq("user_id", userId)
     .maybeSingle();
 
-  const plan = (subData?.plan as PlanTier) ?? "free";
+  const rawPlan = subData?.plan as string;
+  const plan: PlanTier = (rawPlan in PLANS) ? (rawPlan as PlanTier) : "free";
   const limit = PLANS[plan].dailyMessageLimit;
   const tomorrow = new Date();
   tomorrow.setHours(24, 0, 0, 0);
-
-  // Unlimited plans (Pro, Team)
-  if (limit === -1) {
-    return {
-      allowed: true,
-      used: 0,
-      remaining: -1,
-      limit: -1,
-      resetsAt: tomorrow,
-      plan,
-      unlimited: true,
-    };
-  }
 
   // Count user messages in last 24h
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

@@ -1,59 +1,35 @@
-export type PlanTier = "free" | "starter" | "pro" | "team";
+export type PlanTier = "free" | "starter" | "pro";
 
-export interface PlanConfig {
-  tier: PlanTier;
-  name: string;
-  priceId: string | null;
-  monthlyPrice: number; // EUR
-  dailyMessageLimit: number; // -1 = unlimited
-  maxProjects: number; // -1 = unlimited
-}
-
-export const PLANS: Record<PlanTier, PlanConfig> = {
+export const PLANS = {
   free: {
-    tier: "free",
     name: "Free",
     priceId: null,
-    monthlyPrice: 0,
     dailyMessageLimit: 10,
-    maxProjects: 1,
+    projectLimit: 1,
+    agentsAvailable: ["CEO", "CTO", "CMO"] as const,
+    debateEnabled: false,
   },
   starter: {
-    tier: "starter",
     name: "Starter",
     priceId: process.env.STRIPE_PRICE_STARTER ?? null,
-    monthlyPrice: 19,
     dailyMessageLimit: 100,
-    maxProjects: 3,
+    projectLimit: 3,
+    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"] as const,
+    debateEnabled: true,
   },
   pro: {
-    tier: "pro",
     name: "Pro",
     priceId: process.env.STRIPE_PRICE_PRO ?? null,
-    monthlyPrice: 49,
-    dailyMessageLimit: -1, // unlimited
-    maxProjects: 10,
+    dailyMessageLimit: 500,
+    projectLimit: 10,
+    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"] as const,
+    debateEnabled: true,
+    weeklyMemos: true,
   },
-  team: {
-    tier: "team",
-    name: "Team",
-    priceId: process.env.STRIPE_PRICE_TEAM ?? null,
-    monthlyPrice: 149,
-    dailyMessageLimit: -1,
-    maxProjects: -1,
-  },
-};
+} as const;
 
-/**
- * Returns the plan tier from a Stripe Price ID.
- */
 export function getPlanFromPriceId(priceId: string): PlanTier | null {
-  for (const [tier, plan] of Object.entries(PLANS)) {
-    if (plan.priceId === priceId) return tier as PlanTier;
-  }
+  if (priceId === PLANS.starter.priceId) return "starter";
+  if (priceId === PLANS.pro.priceId) return "pro";
   return null;
-}
-
-export function getPlanLimit(tier: PlanTier): number {
-  return PLANS[tier].dailyMessageLimit;
 }

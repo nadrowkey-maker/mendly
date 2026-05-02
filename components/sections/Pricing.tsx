@@ -179,7 +179,7 @@ export function PricingSection() {
       name: t("tier2Name"), price: t("tier2Price"), priceYearly: t("tier2PriceYearly"),
       period: t("tier2Period"), periodYearly: t("tier2PeriodYearly"),
       tagline: t("tier2Tagline"),
-      features: [t("tier2Feature1"), t("tier2Feature2"), t("tier2Feature3"), t("tier2Feature4"), t("tier2Feature5")],
+      features: [t("tier2Feature1"), t("tier2Feature2"), t("tier2Feature3"), t("tier2Feature4"), t("tier2Feature5"), t("tier2Feature6")],
       cta: t("tier2Cta"), popular: true, badge: t("tier2Badge"),
     },
     {
@@ -188,13 +188,6 @@ export function PricingSection() {
       tagline: t("tier3Tagline"),
       features: [t("tier3Feature1"), t("tier3Feature2"), t("tier3Feature3"), t("tier3Feature4"), t("tier3Feature5"), t("tier3Feature6")],
       cta: t("tier3Cta"), popular: false,
-    },
-    {
-      name: t("tier4Name"), price: t("tier4Price"), priceYearly: t("tier4PriceYearly"),
-      period: t("tier4Period"), periodYearly: t("tier4PeriodYearly"),
-      tagline: t("tier4Tagline"),
-      features: [t("tier4Feature1"), t("tier4Feature2"), t("tier4Feature3"), t("tier4Feature4"), t("tier4Feature5"), t("tier4Feature6")],
-      cta: t("tier4Cta"), popular: false,
     },
   ];
 
@@ -296,7 +289,7 @@ export function PricingSection() {
         </motion.div>
 
         {/* Cards — py-6 leaves room for the badge to float above */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start py-6">
           {tiers.map((tier, i) => (
             <PricingCard key={tier.name} tier={tier} index={i} reduced={reduced} isYearly={isYearly} />
           ))}

@@ -21,37 +21,26 @@ export default async function UpgradePage() {
       tier: "starter",
       name: "Starter",
       price: "19",
-      featured: false,
+      featured: true,
       features: [
         t("starter.f1"),
         t("starter.f2"),
         t("starter.f3"),
         t("starter.f4"),
+        t("starter.f5"),
       ],
     },
     {
       tier: "pro",
       name: "Pro",
       price: "49",
-      featured: true,
+      featured: false,
       features: [
         t("pro.f1"),
         t("pro.f2"),
         t("pro.f3"),
         t("pro.f4"),
         t("pro.f5"),
-      ],
-    },
-    {
-      tier: "team",
-      name: "Team",
-      price: "149",
-      featured: false,
-      features: [
-        t("team.f1"),
-        t("team.f2"),
-        t("team.f3"),
-        t("team.f4"),
       ],
     },
   ];
@@ -94,7 +83,7 @@ export default async function UpgradePage() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto w-full">
           {plans.map((plan) => {
             const isCurrent = currentPlan === plan.tier;
             const buttonLabel = isCurrent
