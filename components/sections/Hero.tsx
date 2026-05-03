@@ -62,7 +62,7 @@ export function Hero() {
       />
 
       {/* ─── MAIN CONTENT ─── */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center pb-28">
+      <div className="relative z-10 max-w-5xl mx-auto text-center pb-28 mt-20">
         {/* Eyebrow */}
         <motion.div
           className="inline-flex items-center gap-3 px-5 py-2 mb-8 rounded-full border border-(--border-strong) bg-(--surface)/80"

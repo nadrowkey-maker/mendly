@@ -11,7 +11,7 @@ interface DeliverableItem {
 
 function DeliverableCard({ icon, title, meta }: DeliverableItem) {
   return (
-    <div className="shrink-0 w-52 md:w-60 rounded-3xl bg-(--surface)/80 backdrop-blur-sm border border-(--border) p-5 flex flex-col gap-3 hover:border-(--border-strong) hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] transition-all duration-300 select-none">
+    <div className="shrink-0 w-52 md:w-60 rounded-3xl bg-(--surface)/80 backdrop-blur-sm border border-(--border) p-5 flex flex-col gap-3 hover:border-(--border-strong) hover:shadow-[0_0_24px_rgba(139,92,246,0.35)] hover:scale-110 hover:z-10 transition-all duration-300 select-none cursor-pointer relative">
       <span className="text-3xl leading-none">{icon}</span>
       <p className="font-semibold text-white text-sm leading-snug">{title}</p>
       <p className="font-mono text-[11px] text-(--text-dim) leading-relaxed">{meta}</p>
@@ -75,11 +75,11 @@ export function DeliverablesSection() {
         <div className="[perspective:1400px]">
           <div className="[transform:rotateX(-5deg)] space-y-3 py-2">
 
-            {/* Row 1 — scrolls left */}
-            <div className="group/r1 overflow-hidden">
+            {/* Row 1 — scrolls right */}
+            <div className="group/r1 overflow-visible">
               <div
                 className={`flex gap-3 w-max ${
-                  reduced ? "" : "[animation:marquee-left_34s_linear_infinite]"
+                  reduced ? "" : "animate-[marquee-right_34s_linear_infinite]"
                 } group-hover/r1:[animation-play-state:paused]`}
               >
                 {row1.map((item, i) => (
@@ -88,11 +88,11 @@ export function DeliverablesSection() {
               </div>
             </div>
 
-            {/* Row 2 — scrolls right */}
-            <div className="group/r2 overflow-hidden">
+            {/* Row 2 — scrolls left */}
+            <div className="group/r2 overflow-visible">
               <div
                 className={`flex gap-3 w-max ${
-                  reduced ? "" : "[animation:marquee-right_28s_linear_infinite]"
+                  reduced ? "" : "animate-[marquee-left_28s_linear_infinite]"
                 } group-hover/r2:[animation-play-state:paused]`}
               >
                 {row2.map((item, i) => (

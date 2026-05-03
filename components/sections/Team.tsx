@@ -1,11 +1,11 @@
 "use client";
-import { motion, useReducedMotion, useInView } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useRef, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { AGENTS } from "@/lib/agents";
-import { SplineScene } from "@/components/ui/splite";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { GradientText } from "@/components/ui/gradient-text";
+import { TeamConstellation } from "@/components/team-constellation";
 
 interface AgentCardProps {
   id: string;
@@ -33,19 +33,20 @@ function AgentCard({
     <motion.div
       initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 16 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.1, zIndex: 30 }}
       transition={{
         duration: 0.5,
         delay: reduced ? 0 : index * 0.05,
         ease: [0.25, 1, 0.5, 1],
       }}
       viewport={{ once: true, margin: "-20px" }}
-      className="group pointer-events-auto h-full"
-      style={{ "--glow": color } as CSSProperties}
+      className="group h-full cursor-pointer"
+      style={{ "--glow": color, position: "relative" } as CSSProperties}
     >
       <TiltCard
         spotlight
         tiltLimit={8}
-        scale={1.02}
+        scale={1.0}
         className="rounded-2xl border bg-(--surface)/90 p-4 transition-all duration-300 h-full flex flex-col justify-between"
         style={{
           borderColor: `${color}55`,
@@ -93,8 +94,6 @@ function AgentCard({
 export function TeamSection() {
   const t = useTranslations("team");
   const reduced = useReducedMotion() ?? false;
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { margin: "0px", once: true });
 
   const cards = AGENTS.map((agent, index) => ({
     id: agent.id,
@@ -111,46 +110,45 @@ export function TeamSection() {
   return (
     <section
       id="team"
-      ref={sectionRef}
       className="relative scroll-mt-20 bg-(--bg-primary) min-h-screen overflow-hidden flex flex-col"
     >
-      {/* SplineScene — full background */}
+      {/* Constellation background */}
       <div className="absolute inset-0 z-0">
-        {isInView && (
-          <SplineScene
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="w-full h-full"
-          />
-        )}
+        <TeamConstellation />
       </div>
 
-      {/* Ambient violet glow */}
+      {/* Aurora orbs */}
+      <div className="absolute left-[20%] top-[30%] w-120 h-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px] opacity-25 pointer-events-none z-1" style={{ background: "#8B5CF6" }} />
+      <div className="absolute left-[80%] top-[60%] w-100 h-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[130px] opacity-20 pointer-events-none z-1" style={{ background: "#06B6D4" }} />
+      <div className="absolute left-[50%] top-[75%] w-90 h-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px] opacity-15 pointer-events-none z-1" style={{ background: "#F0ABFC" }} />
+
+      {/* Ambient violet glow center */}
       <div
         className="absolute inset-0 z-1 pointer-events-none"
         style={{
           background:
-            "radial-gradient(70% 60% at 50% 45%, rgba(139,92,246,0.18) 0%, transparent 70%)",
+            "radial-gradient(70% 60% at 50% 45%, rgba(139,92,246,0.14) 0%, transparent 70%)",
         }}
       />
 
-      {/* Bottom gradient so cards are readable over the 3D scene */}
+      {/* Bottom gradient so cards are readable */}
       <div
         className="absolute inset-x-0 bottom-0 h-3/5 z-2 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, var(--bg-primary) 0%, rgba(17,17,19,0.92) 45%, transparent 100%)",
+            "linear-gradient(to top, var(--bg-primary) 0%, rgba(17,17,19,0.88) 45%, transparent 100%)",
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col min-h-screen px-6 md:px-12 py-16 md:py-20 pointer-events-none">
+      <div className="relative z-10 flex flex-col min-h-screen px-6 md:px-12 py-16 md:py-20">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
           viewport={{ once: true, margin: "-60px" }}
-          className="text-center max-w-4xl mx-auto w-full"
+          className="text-center max-w-4xl mx-auto w-full pointer-events-none"
         >
           <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-3 drop-shadow-[0_0_16px_rgba(139,92,246,0.7)]">
             {t("eyebrow")}
@@ -163,13 +161,13 @@ export function TeamSection() {
           </h2>
         </motion.div>
 
-        {/* Sub-text — always visible, never scroll-gated */}
+        {/* Sub-text */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
           viewport={{ once: true, margin: "-60px" }}
-          className="text-center mt-4 mb-auto"
+          className="text-center mt-4 mb-auto pointer-events-none"
         >
           <p className="text-sm md:text-base text-white/70 max-w-2xl mx-auto drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)]">
             {t("sub")}
