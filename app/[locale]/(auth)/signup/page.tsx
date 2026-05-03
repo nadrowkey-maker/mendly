@@ -3,19 +3,19 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
+  const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
-    "idle"
-  );
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +43,7 @@ export default function SignupPage() {
       return;
     }
 
-    setStatus("success");
+    router.push("/dashboard");
   };
 
   return (
@@ -62,26 +62,7 @@ export default function SignupPage() {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 w-full max-w-md"
       >
-        {status === "success" ? (
-          <div className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-8 text-center space-y-4">
-            <div className="text-5xl mb-2" role="img" aria-label="Success">
-              ✉️
-            </div>
-            <h2 className="text-2xl font-bold text-white">
-              {t("signupSuccessTitle")}
-            </h2>
-            <p className="text-(--text-muted) text-sm">
-              {t("signupSuccessBody")}
-            </p>
-            <Link
-              href="/login"
-              className="inline-block mt-2 text-(--accent-glow) hover:text-(--accent-warm) transition-colors text-sm font-semibold"
-            >
-              {t("loginLink")} →
-            </Link>
-          </div>
-        ) : (
-          <>
+        <>
             <div className="text-center mb-10">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
                 {t("signupTitle")}
@@ -176,8 +157,7 @@ export default function SignupPage() {
                 {t("backHome")}
               </Link>
             </div>
-          </>
-        )}
+        </>
       </motion.div>
     </main>
   );
