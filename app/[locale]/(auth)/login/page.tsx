@@ -123,6 +123,15 @@ export default function LoginPage() {
           >
             {status === "loading" ? t("loginLoading") : t("loginCta")}
           </PremiumButton>
+
+          <div className="text-center">
+            <Link
+              href="/forgot-password"
+              className="text-xs text-(--text-dim) hover:text-(--text-muted) transition-colors"
+            >
+              {t("forgotPassword")}
+            </Link>
+          </div>
         </form>
 
         <p className="mt-6 text-center text-sm text-(--text-muted)">

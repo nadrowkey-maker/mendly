@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 
-export default function SignupPage() {
+export default function ForgotPasswordPage() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -21,18 +21,8 @@ export default function SignupPage() {
     setStatus("loading");
     setErrorMsg("");
 
-    if (password.length < 6) {
-      setStatus("error");
-      setErrorMsg(t("errorPasswordTooShort"));
-      return;
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/${locale}/reset-password`,
     });
 
     if (error) {
@@ -62,9 +52,9 @@ export default function SignupPage() {
       >
         {status === "success" ? (
           <div className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-8 text-center space-y-4">
-            <div className="text-5xl mb-2" role="img" aria-label="Success">✉️</div>
-            <h2 className="text-2xl font-bold text-white">{t("signupSuccessTitle")}</h2>
-            <p className="text-(--text-muted) text-sm">{t("signupSuccessBody")}</p>
+            <div className="text-5xl mb-2" role="img" aria-label="Email sent">✉️</div>
+            <h2 className="text-2xl font-bold text-white">{t("forgotPasswordSuccessTitle")}</h2>
+            <p className="text-(--text-muted) text-sm">{t("forgotPasswordSuccessBody")}</p>
             <Link
               href="/login"
               className="inline-block mt-2 text-(--accent-glow) hover:text-(--accent-warm) transition-colors text-sm font-semibold"
@@ -76,17 +66,14 @@ export default function SignupPage() {
           <>
             <div className="text-center mb-10">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                {t("signupTitle")}
+                {t("forgotPasswordTitle")}
               </h1>
-              <p className="text-(--text-muted) text-sm">
-                {t("signupSubtitle")}
-              </p>
+              <p className="text-(--text-muted) text-sm">{t("forgotPasswordSubtitle")}</p>
             </div>
 
             <form
               onSubmit={handleSubmit}
               className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-6 md:p-8 space-y-5"
-              aria-label={t("signupTitle")}
             >
               {status === "error" && errorMsg && (
                 <div
@@ -116,29 +103,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
-                >
-                  {t("passwordLabel")}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  disabled={status === "loading"}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
-                />
-                <p className="text-[10px] text-(--text-dim)">
-                  {t("passwordHint")}
-                </p>
-              </div>
-
               <PremiumButton
                 variant="primary"
                 size="lg"
@@ -146,28 +110,18 @@ export default function SignupPage() {
                 disabled={status === "loading"}
                 className="w-full"
               >
-                {status === "loading" ? t("signupLoading") : t("signupCta")}
+                {status === "loading" ? t("forgotPasswordLoading") : t("forgotPasswordCta")}
               </PremiumButton>
             </form>
 
             <p className="mt-6 text-center text-sm text-(--text-muted)">
-              {t("haveAccount")}{" "}
               <Link
                 href="/login"
                 className="text-(--accent-glow) hover:text-(--accent-warm) transition-colors font-semibold"
               >
-                {t("loginLink")}
+                ← {t("loginLink")}
               </Link>
             </p>
-
-            <div className="mt-4 text-center">
-              <Link
-                href="/"
-                className="text-xs text-(--text-dim) hover:text-(--text-muted) transition-colors"
-              >
-                {t("backHome")}
-              </Link>
-            </div>
           </>
         )}
       </motion.div>

@@ -1,24 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 
-export default function SignupPage() {
+export default function ResetPasswordPage() {
   const t = useTranslations("auth");
+  const router = useRouter();
   const supabase = createClient();
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    // Supabase fires PASSWORD_RECOVERY once the URL token is consumed
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setReady(true);
+    });
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("loading");
     setErrorMsg("");
 
     if (password.length < 6) {
@@ -26,14 +35,15 @@ export default function SignupPage() {
       setErrorMsg(t("errorPasswordTooShort"));
       return;
     }
+    if (password !== confirm) {
+      setStatus("error");
+      setErrorMsg(t("errorPasswordMismatch"));
+      return;
+    }
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
+    setStatus("loading");
+
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
       setStatus("error");
@@ -42,6 +52,7 @@ export default function SignupPage() {
     }
 
     setStatus("success");
+    setTimeout(() => router.push("/dashboard"), 2000);
   };
 
   return (
@@ -62,31 +73,24 @@ export default function SignupPage() {
       >
         {status === "success" ? (
           <div className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-8 text-center space-y-4">
-            <div className="text-5xl mb-2" role="img" aria-label="Success">✉️</div>
-            <h2 className="text-2xl font-bold text-white">{t("signupSuccessTitle")}</h2>
-            <p className="text-(--text-muted) text-sm">{t("signupSuccessBody")}</p>
-            <Link
-              href="/login"
-              className="inline-block mt-2 text-(--accent-glow) hover:text-(--accent-warm) transition-colors text-sm font-semibold"
-            >
-              {t("loginLink")} →
-            </Link>
+            <div className="text-5xl mb-2" role="img" aria-label="Success">✅</div>
+            <h2 className="text-2xl font-bold text-white">{t("resetPasswordSuccessTitle")}</h2>
+            <p className="text-(--text-muted) text-sm">{t("resetPasswordSuccessBody")}</p>
           </div>
+        ) : !ready ? (
+          <div className="text-center text-(--text-muted) text-sm">{t("resetPasswordWaiting")}</div>
         ) : (
           <>
             <div className="text-center mb-10">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                {t("signupTitle")}
+                {t("resetPasswordTitle")}
               </h1>
-              <p className="text-(--text-muted) text-sm">
-                {t("signupSubtitle")}
-              </p>
+              <p className="text-(--text-muted) text-sm">{t("resetPasswordSubtitle")}</p>
             </div>
 
             <form
               onSubmit={handleSubmit}
               className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-6 md:p-8 space-y-5"
-              aria-label={t("signupTitle")}
             >
               {status === "error" && errorMsg && (
                 <div
@@ -99,29 +103,10 @@ export default function SignupPage() {
 
               <div className="space-y-2">
                 <label
-                  htmlFor="email"
-                  className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
-                >
-                  {t("emailLabel")}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={status === "loading"}
-                  placeholder={t("emailPlaceholder")}
-                  className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
                   htmlFor="password"
                   className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
                 >
-                  {t("passwordLabel")}
+                  {t("resetPasswordNewLabel")}
                 </label>
                 <input
                   id="password"
@@ -134,9 +119,26 @@ export default function SignupPage() {
                   placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
                 />
-                <p className="text-[10px] text-(--text-dim)">
-                  {t("passwordHint")}
-                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="confirm"
+                  className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
+                >
+                  {t("resetPasswordConfirmLabel")}
+                </label>
+                <input
+                  id="confirm"
+                  type="password"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  required
+                  minLength={6}
+                  disabled={status === "loading"}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
+                />
               </div>
 
               <PremiumButton
@@ -146,28 +148,18 @@ export default function SignupPage() {
                 disabled={status === "loading"}
                 className="w-full"
               >
-                {status === "loading" ? t("signupLoading") : t("signupCta")}
+                {status === "loading" ? t("resetPasswordLoading") : t("resetPasswordCta")}
               </PremiumButton>
             </form>
 
-            <p className="mt-6 text-center text-sm text-(--text-muted)">
-              {t("haveAccount")}{" "}
+            <p className="mt-6 text-center">
               <Link
                 href="/login"
-                className="text-(--accent-glow) hover:text-(--accent-warm) transition-colors font-semibold"
-              >
-                {t("loginLink")}
-              </Link>
-            </p>
-
-            <div className="mt-4 text-center">
-              <Link
-                href="/"
                 className="text-xs text-(--text-dim) hover:text-(--text-muted) transition-colors"
               >
-                {t("backHome")}
+                ← {t("loginLink")}
               </Link>
-            </div>
+            </p>
           </>
         )}
       </motion.div>
