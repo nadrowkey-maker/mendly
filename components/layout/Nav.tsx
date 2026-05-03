@@ -9,6 +9,7 @@ import { MenuToggle } from "@/components/menu-toggle";
 import { PremiumButton } from "@/components/ui/PremiumButton";
 import { AccountMenu } from "@/components/layout/AccountMenu";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/supabase/auth-context";
 import { LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react";
 
 export function Nav() {
@@ -17,35 +18,15 @@ export function Nav() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
+  const email = user?.email ?? null;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Track auth state for mobile drawer
-  useEffect(() => {
-    const supabase = createClient();
-    let mounted = true;
-
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (mounted) setEmail(user?.email ?? null);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setEmail(session?.user?.email ?? null);
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
   }, []);
 
   const links = [

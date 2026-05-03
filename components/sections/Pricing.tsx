@@ -1,10 +1,9 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { createClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import { useAuth } from "@/lib/supabase/auth-context";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/gradient-text";
@@ -169,19 +168,7 @@ export function PricingSection() {
   const router = useRouter();
   const reduced = useReducedMotion() ?? false;
   const [isYearly, setIsYearly] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-    let mounted = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (mounted) setUser(data.user);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (mounted) setUser(session?.user ?? null);
-    });
-    return () => { mounted = false; subscription.unsubscribe(); };
-  }, []);
+  const { user } = useAuth();
 
   const handleCta = (plan: "free" | "starter" | "pro") => {
     if (user) {
@@ -340,16 +327,6 @@ export function PricingSection() {
           ))}
         </div>
 
-        {/* Compare link */}
-        <motion.p
-          initial={{ opacity: reduced ? 1 : 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          viewport={{ once: true }}
-          className="text-center mt-10 text-sm text-(--accent-glow) hover:text-(--accent-primary) transition-colors cursor-pointer"
-        >
-          {t("compareCta")}
-        </motion.p>
       </div>
     </section>
   );

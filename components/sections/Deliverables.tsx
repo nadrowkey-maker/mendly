@@ -75,11 +75,11 @@ export function DeliverablesSection() {
         <div className="[perspective:1400px]">
           <div className="[transform:rotateX(-5deg)] space-y-3 py-2">
 
-            {/* Row 1 — scrolls right */}
+            {/* Row 1 — scrolls left */}
             <div className="group/r1 overflow-visible">
               <div
                 className={`flex gap-3 w-max ${
-                  reduced ? "" : "animate-[marquee-right_34s_linear_infinite]"
+                  reduced ? "" : "animate-[marquee-left_34s_linear_infinite]"
                 } group-hover/r1:[animation-play-state:paused]`}
               >
                 {row1.map((item, i) => (
@@ -88,11 +88,11 @@ export function DeliverablesSection() {
               </div>
             </div>
 
-            {/* Row 2 — scrolls left */}
+            {/* Row 2 — scrolls right */}
             <div className="group/r2 overflow-visible">
               <div
                 className={`flex gap-3 w-max ${
-                  reduced ? "" : "animate-[marquee-left_28s_linear_infinite]"
+                  reduced ? "" : "animate-[marquee-right_28s_linear_infinite]"
                 } group-hover/r2:[animation-play-state:paused]`}
               >
                 {row2.map((item, i) => (

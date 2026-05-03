@@ -4,6 +4,7 @@ import { routing } from '@/i18n/routing';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Cormorant_Garamond } from 'next/font/google';
+import { AuthProvider } from '@/lib/supabase/auth-context';
 // import { TubeCursor } from '@/components/ui/TubeCursor'; // disabled: causes Three.js double-import + global freeze on Hero
 // import { TransitionPortal } from '@/components/ui/TransitionPortal'; // disabled: GPU saturation
 import '../globals.css';
@@ -37,7 +38,9 @@ export default async function LocaleLayout({
       className={`dark ${GeistSans.variable} ${GeistMono.variable} ${cormorant.variable}`}
     >
       <body className="antialiased bg-(--bg-primary) text-(--text-primary) font-sans">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </NextIntlClientProvider>
         {/* <TubeCursor /> — disabled: causes Three.js double-import + global freeze on Hero */}
         {/* <TransitionPortal /> — disabled: WebGL shader running globally was saturating GPU */}
       </body>
