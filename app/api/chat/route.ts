@@ -16,6 +16,7 @@ import type { Message } from "@/lib/types/conversation";
 import type { AgentRole } from "@/lib/types/conversation";
 import type { UserProfile } from "@/lib/types/profile";
 import { checkRateLimit } from "@/lib/rate-limit/check";
+import { PLANS } from "@/lib/stripe/plans";
 
 export const runtime = "nodejs";
 
@@ -94,6 +95,15 @@ export async function POST(req: NextRequest) {
           status: 429,
           headers: { "Content-Type": "application/json" },
         }
+      );
+    }
+
+    // ============= AGENT PLAN CHECK =============
+    const allowedAgents: readonly string[] = PLANS[rateLimit.plan].agentsAvailable;
+    if (!allowedAgents.includes(agentRole)) {
+      return new Response(
+        JSON.stringify({ error: "agent_not_available", message: "This agent is not available on your plan" }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
       );
     }
 

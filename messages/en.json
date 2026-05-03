@@ -611,6 +611,7 @@
   },
   "memoButton": {
     "generateMemo": "Generate memo",
+    "lockedTooltip": "Available from Starter plan — upgrade to export PDF memos",
     "loadingTitle": "Your CEO is working…",
     "loadingBody": "Analyzing your project and writing your strategic memo. Takes 20-40 seconds.",
     "successTitle": "Your memo is ready.",
@@ -678,7 +679,8 @@
     "billing": "Billing",
     "signOut": "Sign out",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "agentLocked": "Upgrade your plan to unlock this agent"
   },
   "projectMenu": {
     "ariaLabel": "Project options",

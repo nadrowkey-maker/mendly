@@ -611,6 +611,7 @@
   },
   "memoButton": {
     "generateMemo": "Générer le memo",
+    "lockedTooltip": "Disponible à partir du plan Starter — passe à un plan supérieur pour exporter des mémos PDF",
     "loadingTitle": "Le CEO travaille…",
     "loadingBody": "Il analyse ton projet et rédige ton memo stratégique. Ça prend 20-40 secondes.",
     "successTitle": "Ton memo est prêt.",
@@ -678,7 +679,8 @@
     "billing": "Facturation",
     "signOut": "Déconnexion",
     "collapse": "Réduire",
-    "expand": "Étendre"
+    "expand": "Étendre",
+    "agentLocked": "Passe à un plan supérieur pour débloquer cet agent"
   },
   "projectMenu": {
     "ariaLabel": "Options du projet",

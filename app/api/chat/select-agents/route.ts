@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { selectAgents } from "@/lib/ai/debate/selector";
+import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,17 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // ============= DEBATE PLAN CHECK =============
+    const { data: subData } = await supabase
+      .from("subscriptions")
+      .select("plan")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const plan = ((subData?.plan as string) in PLANS ? subData?.plan : "free") as PlanTier;
+    if (!PLANS[plan].debateEnabled) {
+      return NextResponse.json({ error: "plan_required", message: "Debate is not available on your plan" }, { status: 403 });
+    }
 
     const { data: project, error: projectErr } = await supabase
       .from("projects")

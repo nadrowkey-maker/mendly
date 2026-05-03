@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/prompts/debate";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
 import { checkRateLimit } from "@/lib/rate-limit/check";
+import { PLANS } from "@/lib/stripe/plans";
 import type { Project } from "@/lib/types/project";
 import type { UserProfile } from "@/lib/types/profile";
 
@@ -71,6 +72,14 @@ export async function POST(req: NextRequest) {
           status: 429,
           headers: { "Content-Type": "application/json" },
         }
+      );
+    }
+
+    // ============= DEBATE PLAN CHECK =============
+    if (!PLANS[rateLimit.plan].debateEnabled) {
+      return new Response(
+        JSON.stringify({ error: "plan_required", message: "Debate is not available on your plan" }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
       );
     }
 

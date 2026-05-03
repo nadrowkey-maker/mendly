@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import type {
   CreateProjectInput,
   Project,
@@ -27,6 +28,22 @@ export async function createProject(input: CreateProjectInput): Promise<{
 
   if (!user) {
     return { success: false, error: "Not authenticated" };
+  }
+
+  // ============= PROJECT LIMIT CHECK =============
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("plan")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const plan = ((subData?.plan as string) in PLANS ? subData?.plan : "free") as PlanTier;
+  const projectLimit = PLANS[plan].projectLimit;
+  const { count } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+  if ((count ?? 0) >= projectLimit) {
+    return { success: false, error: `plan_limit:${projectLimit}` };
   }
 
   if (!input.name || input.name.trim().length < 2) {

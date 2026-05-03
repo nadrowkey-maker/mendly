@@ -13,8 +13,10 @@ import {
   CreditCard,
   FileStack,
   Settings,
+  Lock,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import type { Project } from "@/lib/types/project";
 import type { AgentRole } from "@/lib/types/conversation";
 
@@ -162,17 +164,23 @@ export function ProjectSidebar({
             </p>
             <div className="space-y-0.5">
               {AGENTS.map((a) => {
+                const safePlan = (userPlan in PLANS ? userPlan : "free") as PlanTier;
+                const allowed = (PLANS[safePlan].agentsAvailable as readonly string[]).includes(a.role);
                 const active = a.role === activeAgent;
                 return (
                   <button
                     key={a.role}
-                    onClick={() => onAgentChange(a.role)}
-                    disabled={agentBusy}
+                    onClick={() => allowed && onAgentChange(a.role)}
+                    disabled={agentBusy || !allowed}
+                    title={!allowed ? t("agentLocked") : undefined}
                     className={[
-                      "w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
-                      active
-                        ? "bg-(--surface) text-(--text-primary)"
-                        : "text-(--text-secondary) hover:bg-(--surface)/60 hover:text-(--text-primary)",
+                      "w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-colors cursor-pointer",
+                      !allowed
+                        ? "opacity-40 cursor-not-allowed"
+                        : active
+                          ? "bg-(--surface) text-(--text-primary)"
+                          : "text-(--text-secondary) hover:bg-(--surface)/60 hover:text-(--text-primary)",
+                      agentBusy ? "disabled:opacity-50 disabled:cursor-not-allowed" : "",
                     ].join(" ")}
                   >
                     <span className="flex items-center gap-2.5">
@@ -186,9 +194,13 @@ export function ProjectSidebar({
                         {a.label}
                       </span>
                     </span>
-                    <span className="text-[10px] text-(--text-dim) font-mono uppercase tracking-wider">
-                      {a.description}
-                    </span>
+                    {allowed ? (
+                      <span className="text-[10px] text-(--text-dim) font-mono uppercase tracking-wider">
+                        {a.description}
+                      </span>
+                    ) : (
+                      <Lock className="w-3 h-3 text-(--text-dim)" />
+                    )}
                   </button>
                 );
               })}

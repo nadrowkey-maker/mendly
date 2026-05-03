@@ -678,7 +678,7 @@ export function ChatInterface({
             </div>
           </div>
 
-          {activeAgent === "CEO" && <GenerateMemoButton projectId={project.id} />}
+          {activeAgent === "CEO" && <GenerateMemoButton projectId={project.id} userPlan={userPlan} />}
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 md:px-8 py-8">

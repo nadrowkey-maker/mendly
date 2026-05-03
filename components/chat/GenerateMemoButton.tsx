@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Download, Loader2, X } from "lucide-react";
+import { FileText, Download, Loader2, X, Lock } from "lucide-react";
 
 interface GenerateMemoButtonProps {
   projectId: string;
+  userPlan: string;
 }
 
 interface GeneratedDeliverable {
@@ -14,9 +16,11 @@ interface GeneratedDeliverable {
   downloadUrl: string;
 }
 
-export function GenerateMemoButton({ projectId }: GenerateMemoButtonProps) {
+export function GenerateMemoButton({ projectId, userPlan }: GenerateMemoButtonProps) {
   const t = useTranslations("memoButton");
   const locale = useLocale();
+  const router = useRouter();
+  const isFree = userPlan === "free";
 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle"
@@ -58,6 +62,19 @@ export function GenerateMemoButton({ projectId }: GenerateMemoButtonProps) {
     setResult(null);
     setError(null);
   };
+
+  if (isFree) {
+    return (
+      <button
+        onClick={() => router.push("/upgrade")}
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-(--border) bg-(--surface)/20 text-xs font-mono uppercase tracking-wider text-(--text-dim) hover:text-(--accent-glow) hover:border-(--accent-glow)/40 transition-all"
+        title={t("lockedTooltip")}
+      >
+        <Lock className="w-3.5 h-3.5" />
+        {t("generateMemo")}
+      </button>
+    );
+  }
 
   return (
     <>

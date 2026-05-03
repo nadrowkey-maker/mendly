@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import { geminiFlash } from "@/lib/ai/gemini";
 import { buildCeoMemoPrompt } from "@/lib/ai/prompts/ceo-memo";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
@@ -25,6 +26,17 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // ============= PLAN CHECK — starter+ only =============
+    const { data: subData } = await supabase
+      .from("subscriptions")
+      .select("plan")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const plan = ((subData?.plan as string) in PLANS ? subData?.plan : "free") as PlanTier;
+    if (plan === "free") {
+      return NextResponse.json({ error: "plan_required", message: "PDF export requires a paid plan" }, { status: 403 });
     }
 
     const [projectRes, profileRes] = await Promise.all([
