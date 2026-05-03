@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
 
     if (!sub?.stripe_customer_id) {
       return NextResponse.json(
-        { error: "No active subscription" },
-        { status: 404 }
+        { error: "No active subscription to manage" },
+        { status: 403 }
       );
     }
 

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { geminiFlash } from "@/lib/ai/gemini";
 import { checkRateLimit } from "@/lib/rate-limit/check";
+import { PLANS } from "@/lib/stripe/plans";
 import { selectAgents } from "@/lib/ai/debate/selector";
 import { buildRound1Prompt, buildRound2Prompt } from "@/lib/ai/debate/orchestrator";
 import { buildSynthesisPrompt } from "@/lib/ai/debate/synthesizer";
@@ -67,6 +68,13 @@ export async function POST(req: NextRequest) {
       return new Response(
         JSON.stringify({ error: "rate_limited", used: rateLimit.used, limit: rateLimit.limit }),
         { status: 429 }
+      );
+    }
+
+    if (!PLANS[rateLimit.plan].debateEnabled) {
+      return new Response(
+        JSON.stringify({ error: "plan_required", message: "Debate is not available on your plan" }),
+        { status: 403 }
       );
     }
 

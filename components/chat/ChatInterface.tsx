@@ -17,6 +17,8 @@ import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import type { DebateState, DebateAgentRole, AgentSelection } from "@/lib/types/debate";
+import { PLANS } from "@/lib/stripe/plans";
+import type { PlanTier } from "@/lib/stripe/plans";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -205,6 +207,19 @@ export function ChatInterface({
         }));
         return;
       }
+      if (response.status === 403) {
+        setError(t("errorPlanRequired"));
+        setAgentData((prev) => ({
+          ...prev,
+          [activeAgent]: {
+            ...prev[activeAgent]!,
+            messages: prev[activeAgent]!.messages.filter(
+              (m) => m.id !== assistantMsgId && m.id !== userMsgId
+            ),
+          },
+        }));
+        return;
+      }
       if (!response.ok || !response.body) throw new Error("Failed");
 
       const reader = response.body.getReader();
@@ -290,6 +305,18 @@ export function ChatInterface({
 
       if (response.status === 429) {
         setError(t("errorRateLimited"));
+        setDebateState({ phase: "idle" });
+        setAgentData((prev) => ({
+          ...prev,
+          CEO: {
+            ...prev.CEO!,
+            messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId),
+          },
+        }));
+        return;
+      }
+      if (response.status === 403) {
+        setError(t("errorPlanRequired"));
         setDebateState({ phase: "idle" });
         setAgentData((prev) => ({
           ...prev,
@@ -594,6 +621,10 @@ export function ChatInterface({
         }),
       });
 
+      if (response.status === 403) {
+        setError(t("errorPlanRequired"));
+        return;
+      }
       if (!response.ok || !response.body) throw new Error("Invite failed");
 
       const reader = response.body.getReader();
@@ -746,7 +777,7 @@ export function ChatInterface({
           onDebate={handleDebate}
           busy={busy}
           isDebating={isDebating}
-          canDebate={activeAgent === "CEO"}
+          canDebate={activeAgent === "CEO" && PLANS[userPlan as PlanTier]?.debateEnabled === true}
           agentLabel={AGENT_LABELS[activeAgent]}
           selectedFile={selectedFile}
           onFileChange={setSelectedFile}

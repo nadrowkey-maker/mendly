@@ -51,7 +51,12 @@ export async function POST(req: NextRequest) {
         // Fetch the full subscription to get price + period
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const priceId = subscription.items.data[0]?.price.id;
-        const plan = (priceId ? getPlanFromPriceId(priceId) : null) ?? "free";
+        const resolvedPlan = priceId ? getPlanFromPriceId(priceId) : null;
+        if (!resolvedPlan) {
+          console.error(`[webhook] checkout.session.completed: unknown priceId "${priceId}" for user ${userId} — skipping plan update`);
+          break;
+        }
+        const plan: PlanTier = resolvedPlan;
 
         await supabase
           .from("subscriptions")
@@ -84,7 +89,12 @@ export async function POST(req: NextRequest) {
           (sub.metadata?.supabase_user_id as string | undefined) ?? null;
         const customerId = sub.customer as string;
         const priceId = sub.items.data[0]?.price.id;
-        const plan = (priceId ? getPlanFromPriceId(priceId) : null) ?? "free";
+        const resolvedPlan2 = priceId ? getPlanFromPriceId(priceId) : null;
+        if (!resolvedPlan2) {
+          console.error(`[webhook] subscription.updated/created: unknown priceId "${priceId}" — skipping plan update`);
+          break;
+        }
+        const plan: PlanTier = resolvedPlan2;
 
         // If we don't have the userId in metadata, look it up by customer
         let resolvedUserId = userId;

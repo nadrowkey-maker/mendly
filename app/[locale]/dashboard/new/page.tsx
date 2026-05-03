@@ -44,7 +44,12 @@ export default function NewProjectPage() {
 
     if (!result.success) {
       setStatus("error");
-      setErrorMsg(result.error || t("errorGeneric"));
+      if (result.error?.startsWith("plan_limit:")) {
+        const limit = result.error.split(":")[1];
+        setErrorMsg(t("errorProjectLimit", { limit }));
+      } else {
+        setErrorMsg(result.error || t("errorGeneric"));
+      }
       return;
     }
 

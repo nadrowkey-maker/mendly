@@ -514,7 +514,8 @@
     "time_fulltime": "Full-time",
     "cta": "Create project",
     "ctaLoading": "Creating…",
-    "errorGeneric": "Something went wrong. Try again."
+    "errorGeneric": "Something went wrong. Try again.",
+    "errorProjectLimit": "You've reached the {limit}-project limit for your plan. Upgrade to add more."
   },
   "chat": {
     "backToDashboard": "Dashboard",
@@ -535,6 +536,7 @@
     "shortcut": "Enter to send · Shift+Enter for new line",
     "errorGeneric": "Connection error with your agent. Try again.",
     "errorRateLimited": "You've hit today's 10 message limit. Come back tomorrow or upgrade to a paid plan.",
+    "errorPlanRequired": "This feature requires a paid plan. Upgrade to unlock it.",
     "agentSwitching": "Connecting to agent…",
     "debate": "Debate",
     "debating": "Debating…",

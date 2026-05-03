@@ -514,7 +514,8 @@
     "time_fulltime": "Plein-temps",
     "cta": "Créer le projet",
     "ctaLoading": "Création…",
-    "errorGeneric": "Une erreur est survenue. Réessaie."
+    "errorGeneric": "Une erreur est survenue. Réessaie.",
+    "errorProjectLimit": "Tu as atteint la limite de {limit} projet(s) pour ton plan. Passe à un plan supérieur pour en ajouter."
   },
   "chat": {
     "backToDashboard": "Dashboard",
@@ -535,6 +536,7 @@
     "shortcut": "Entrée pour envoyer · Shift+Entrée pour aller à la ligne",
     "errorGeneric": "Erreur de connexion avec ton agent. Réessaie.",
     "errorRateLimited": "Tu as atteint la limite de 10 messages aujourd'hui. Reviens demain ou passe à un plan payant.",
+    "errorPlanRequired": "Cette fonctionnalité nécessite un plan payant. Passe à un plan supérieur pour la débloquer.",
     "agentSwitching": "Connexion à l'agent…",
     "debate": "Débat",
     "debating": "Débat en cours…",
