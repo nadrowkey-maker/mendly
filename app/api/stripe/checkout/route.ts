@@ -29,34 +29,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get or create the customer in Stripe
+    const origin = req.headers.get("origin") ?? "http://localhost:3000";
+    const returnUrl = `${origin}/${locale}/dashboard`;
+
+    // Fetch existing subscription info
     const { data: existing } = await supabase
       .from("subscriptions")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, stripe_subscription_id")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    let customerId = existing?.stripe_customer_id;
+    const customerId = existing?.stripe_customer_id;
+    const existingSubId = existing?.stripe_subscription_id;
 
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: {
-          supabase_user_id: user.id,
-        },
+    // If the user already has an active subscription, redirect to billing portal
+    // so Stripe handles the plan change with proper confirmation + proration UI
+    if (existingSubId && customerId) {
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
       });
-      customerId = customer.id;
+      return NextResponse.json({ url: portalSession.url });
     }
 
-    // Build URLs
-    const origin = req.headers.get("origin") ?? "http://localhost:3000";
+    // No existing subscription — create a new customer if needed, then checkout
+    let newCustomerId = customerId;
+    if (!newCustomerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { supabase_user_id: user.id },
+      });
+      newCustomerId = customer.id;
+    }
+
     const successUrl = `${origin}/${locale}/dashboard?upgrade=success`;
     const cancelUrl = `${origin}/${locale}/upgrade?canceled=true`;
 
-    // Create the checkout session
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      customer: customerId,
+      customer: newCustomerId,
       line_items: [
         {
           price: planConfig.priceId,
