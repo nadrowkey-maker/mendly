@@ -10,7 +10,7 @@ import { PremiumButton } from "@/components/ui/PremiumButton";
 import { AccountMenu } from "@/components/layout/AccountMenu";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
-import { LogIn, UserPlus, LayoutDashboard, LogOut, Sun, Moon } from "lucide-react";
+import { LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react";
 
 export function Nav() {
   const t = useTranslations("nav");
@@ -22,27 +22,6 @@ export function Nav() {
   const email = user?.email ?? null;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isLight, setIsLight] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "light") {
-      document.documentElement.classList.add("light");
-      setIsLight(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !isLight;
-    setIsLight(next);
-    if (next) {
-      document.documentElement.classList.add("light");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-    }
-  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -126,14 +105,6 @@ export function Nav() {
                 </button>
               ))}
             </div>
-
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="w-8 h-8 rounded-full flex items-center justify-center border border-(--border) bg-(--surface)/30 text-(--text-muted) hover:text-(--text-primary) transition-colors"
-            >
-              {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </button>
 
             <AccountMenu />
 
@@ -248,14 +219,6 @@ export function Nav() {
                     </button>
                   ))}
                 </div>
-                <button
-                  onClick={toggleTheme}
-                  aria-label="Toggle theme"
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-full border border-(--border) text-(--text-muted) hover:text-(--text-primary) transition-colors text-xs font-mono tracking-widest uppercase"
-                >
-                  {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-                  {isLight ? "Dark mode" : "Light mode"}
-                </button>
                 <PremiumButton
                   variant="primary"
                   size="sm"

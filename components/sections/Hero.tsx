@@ -83,7 +83,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease }}
         >
-          {t("title")}
+          <span className="block">{t("titleLine1")}</span>
+          <span className="block">{t("titleLine2")}</span>
         </motion.h1>
 
         {/* Description */}
