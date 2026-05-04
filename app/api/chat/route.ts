@@ -19,6 +19,13 @@ import { checkRateLimit } from "@/lib/rate-limit/check";
 import { PLANS } from "@/lib/stripe/plans";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
+
+export const dynamic = "force-dynamic";
+
+export const config = {
+  api: { bodyParser: { sizeLimit: "10mb" } },
+};
 
 function getSystemPrompt(
   agentRole: string,

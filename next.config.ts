@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
   trailingSlash: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
 };
 
 export default withNextIntl(nextConfig);
