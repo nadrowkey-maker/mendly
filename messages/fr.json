@@ -463,6 +463,7 @@
     "haveAccount": "Tu as déjà un compte ?",
     "backHome": "← Retour à l'accueil",
     "errorInvalidCredentials": "Email ou mot de passe incorrect.",
+    "errorEmailNotConfirmed": "Vérifie ta boîte mail et clique sur le lien de confirmation avant de te connecter.",
     "errorPasswordTooShort": "Le mot de passe doit faire au moins 6 caractères.",
     "errorPasswordMismatch": "Les mots de passe ne correspondent pas.",
     "forgotPassword": "Mot de passe oublié ?",

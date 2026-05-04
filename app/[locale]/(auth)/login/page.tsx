@@ -29,7 +29,11 @@ export default function LoginPage() {
 
     if (error) {
       setStatus("error");
-      setErrorMsg(t("errorInvalidCredentials"));
+      if (error.message === "Email not confirmed") {
+        setErrorMsg(t("errorEmailNotConfirmed"));
+      } else {
+        setErrorMsg(t("errorInvalidCredentials"));
+      }
       return;
     }
 
