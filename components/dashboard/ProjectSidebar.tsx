@@ -86,7 +86,7 @@ export function ProjectSidebar({
   }
 
   return (
-    <aside className="flex flex-col w-72 shrink-0 border-r border-(--border) bg-(--bg-secondary)">
+    <aside className="flex flex-col w-72 h-full shrink-0 border-r border-(--border) bg-(--bg-secondary)">
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-(--border)">
         <Link

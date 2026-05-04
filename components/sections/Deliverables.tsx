@@ -70,8 +70,19 @@ export function DeliverablesSection() {
         </motion.div>
       </div>
 
-      {/* Perspective marquee */}
-      <div className="relative z-10 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      {/* Mobile: 2-col grid of all 8 items */}
+      <div className="md:hidden relative z-10 px-4 grid grid-cols-2 gap-3">
+        {items.map(({ icon, title, meta }, i) => (
+          <div key={i} className="rounded-2xl bg-(--surface)/80 backdrop-blur-sm border border-(--border) p-4 flex flex-col gap-2 cursor-pointer hover:border-(--border-strong) transition-all duration-300">
+            <span className="text-2xl leading-none">{icon}</span>
+            <p className="font-semibold text-white text-xs leading-snug">{title}</p>
+            <p className="font-mono text-[10px] text-(--text-dim) leading-relaxed">{meta}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Perspective marquee */}
+      <div className="hidden md:block relative z-10 mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
         <div className="[perspective:1400px]">
           <div className="[transform:rotateX(-5deg)] space-y-3 py-2">
 

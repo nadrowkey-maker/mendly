@@ -51,39 +51,47 @@ export function WhatYouGetSection() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+        {/* Mobile: horizontal swipe */}
+        <div className="md:hidden -mx-6 overflow-x-auto pb-4 [scrollbar-width:none] [scroll-snap-type:x_mandatory]">
+          <div className="flex gap-4 px-6 w-max">
+            {cards.map(({ icon: Icon, colorVar, glow, title, desc }, i) => (
+              <div key={i} className="w-[80vw] shrink-0 snap-start">
+                <GlowCard glowColor={glow} customSize className="w-full p-6">
+                  <div className="flex flex-col gap-3">
+                    <div
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-xl"
+                      style={{ background: `color-mix(in srgb, var(${colorVar}) 15%, transparent)` }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: `var(${colorVar})` }} strokeWidth={1.75} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-(--text-primary) tracking-tight">{title}</h3>
+                    <p className="text-sm text-(--text-muted) leading-relaxed">{desc}</p>
+                  </div>
+                </GlowCard>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Desktop: 2-col grid */}
+        <div className="hidden md:grid md:grid-cols-2 gap-6">
           {cards.map(({ icon: Icon, colorVar, glow, title, desc }, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.7,
-                delay: i * 0.08,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
               viewport={{ once: true, margin: "-60px" }}
             >
               <GlowCard glowColor={glow} customSize className="w-full p-7">
                 <div className="flex flex-col gap-3">
                   <div
                     className="inline-flex items-center justify-center w-10 h-10 rounded-xl"
-                    style={{
-                      background: `color-mix(in srgb, var(${colorVar}) 15%, transparent)`,
-                    }}
+                    style={{ background: `color-mix(in srgb, var(${colorVar}) 15%, transparent)` }}
                   >
-                    <Icon
-                      className="w-5 h-5"
-                      style={{ color: `var(${colorVar})` }}
-                      strokeWidth={1.75}
-                    />
+                    <Icon className="w-5 h-5" style={{ color: `var(${colorVar})` }} strokeWidth={1.75} />
                   </div>
-                  <h3 className="text-lg font-semibold text-(--text-primary) tracking-tight">
-                    {title}
-                  </h3>
-                  <p className="text-sm text-(--text-muted) leading-relaxed">
-                    {desc}
-                  </p>
+                  <h3 className="text-lg font-semibold text-(--text-primary) tracking-tight">{title}</h3>
+                  <p className="text-sm text-(--text-muted) leading-relaxed">{desc}</p>
                 </div>
               </GlowCard>
             </motion.div>

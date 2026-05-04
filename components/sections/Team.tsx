@@ -177,10 +177,10 @@ export function TeamSection() {
         {/* 8 agent cards */}
         <div className="mt-auto pt-8 w-full">
           {/* Mobile: horizontal scroll */}
-          <div className="md:hidden overflow-x-auto pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
-            <div className="flex gap-2.5 w-max px-2">
+          <div className="md:hidden overflow-x-auto pb-4 [scrollbar-width:none] [scroll-snap-type:x_mandatory] [-webkit-overflow-scrolling:touch] overscroll-x-contain">
+            <div className="flex gap-3 w-max px-4">
               {cards.map((card) => (
-                <div key={card.id} className="w-44 shrink-0">
+                <div key={card.id} className="w-[72vw] shrink-0 snap-start">
                   <AgentCard {...card} />
                 </div>
               ))}

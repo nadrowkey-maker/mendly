@@ -52,7 +52,8 @@ export function ChatComposer({
     const ta = textareaRef.current;
     if (!ta) return;
     ta.style.height = "auto";
-    ta.style.height = `${Math.min(ta.scrollHeight, 280)}px`;
+    const maxH = window.innerWidth < 768 ? 120 : 280;
+    ta.style.height = `${Math.min(ta.scrollHeight, maxH)}px`;
   }, [value]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -85,7 +86,7 @@ export function ChatComposer({
   const isPdf = selectedFile?.mimeType === "application/pdf";
 
   return (
-    <div className="px-4 md:px-8 pb-6 pt-2 bg-linear-to-t from-(--bg-primary) via-(--bg-primary) to-transparent">
+    <div className="px-3 md:px-8 pb-3 md:pb-6 pt-2 bg-linear-to-t from-(--bg-primary) via-(--bg-primary) to-transparent">
       <div className="max-w-3xl mx-auto">
         {/* File preview chip */}
         <AnimatePresence>
@@ -224,7 +225,7 @@ export function ChatComposer({
               placeholder={t("composerPlaceholder", { agent: agentLabel })}
               rows={1}
               disabled={busy}
-              className="flex-1 px-2 py-2 bg-transparent text-(--text-primary) placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-70 text-base leading-relaxed font-medium"
+              className="flex-1 px-2 py-2 bg-transparent text-(--text-primary) placeholder-(--text-dim) focus:outline-none resize-none disabled:opacity-50 max-h-30 md:max-h-70 text-base leading-relaxed font-medium"
             />
 
             <div className="flex items-center gap-1.5 shrink-0">

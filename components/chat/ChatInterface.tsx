@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, PanelLeft } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
@@ -82,6 +82,7 @@ export function ChatInterface({
   const t = useTranslations("chat");
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
   const [switchingAgent, setSwitchingAgent] = useState(false);
   const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
@@ -673,27 +674,67 @@ export function ChatInterface({
 
   return (
     <div className="flex h-screen bg-(--bg-primary) overflow-hidden">
-      <ProjectSidebar
-        projects={allProjects}
-        activeProjectId={project.id}
-        activeAgent={activeAgent}
-        onAgentChange={handleAgentSwitch}
-        agentBusy={busy}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
-        usageUsed={usageUsed}
-        usageLimit={initialUsageLimit}
-        userPlan={userPlan}
-        userEmail={userEmail}
-      />
+      {/* Desktop sidebar */}
+      <div className="hidden md:flex">
+        <ProjectSidebar
+          projects={allProjects}
+          activeProjectId={project.id}
+          activeAgent={activeAgent}
+          onAgentChange={handleAgentSwitch}
+          agentBusy={busy}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+          usageUsed={usageUsed}
+          usageLimit={initialUsageLimit}
+          userPlan={userPlan}
+          userEmail={userEmail}
+        />
+      </div>
+
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="relative z-10 h-full">
+            <ProjectSidebar
+              projects={allProjects}
+              activeProjectId={project.id}
+              activeAgent={activeAgent}
+              onAgentChange={(agent) => {
+                handleAgentSwitch(agent);
+                setMobileSidebarOpen(false);
+              }}
+              agentBusy={busy}
+              collapsed={false}
+              onToggleCollapse={() => setMobileSidebarOpen(false)}
+              usageUsed={usageUsed}
+              usageLimit={initialUsageLimit}
+              userPlan={userPlan}
+              userEmail={userEmail}
+            />
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 flex flex-col min-w-0 relative">
         <header className="h-14 border-b border-(--border) flex items-center justify-between px-4 md:px-6 bg-(--bg-primary)/80 backdrop-blur-xl sticky top-0 z-20">
           <div className="flex items-center gap-3 min-w-0">
+            {/* Mobile: open sidebar */}
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface) transition-colors cursor-pointer"
+              aria-label={t("expandSidebar")}
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+            {/* Desktop: expand when collapsed */}
             {sidebarCollapsed && (
               <button
                 onClick={() => setSidebarCollapsed(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface) transition-colors cursor-pointer"
+                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface) transition-colors cursor-pointer"
                 title={t("expandSidebar")}
               >
                 <ChevronRight className="w-4 h-4" />

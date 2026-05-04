@@ -47,6 +47,43 @@
 }
 
 /* ============================================================
+   LIGHT MODE
+   ============================================================ */
+html.light {
+  --bg-primary: #F8F7FF;
+  --bg-secondary: #F1EFFE;
+  --surface: #FFFFFF;
+  --surface-elevated: #F5F3FF;
+  --surface-hover: #EDE9FE;
+  --border: rgba(124, 58, 237, 0.12);
+  --border-strong: rgba(124, 58, 237, 0.20);
+  --border-emphasis: rgba(124, 58, 237, 0.32);
+  --text-primary: #1C1033;
+  --text-secondary: #3B2A6E;
+  --text-muted: #6B5FA0;
+  --text-dim: #9E95C5;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px 0 rgba(0, 0, 0, 0.10);
+  --shadow-violet: 0 8px 32px 0 rgba(124, 58, 237, 0.15);
+}
+
+html.light body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+html.light .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--border);
+}
+
+html.light .glass-strong {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border-strong);
+}
+
+/* ============================================================
    BASE STYLES
    ============================================================ */
 * {

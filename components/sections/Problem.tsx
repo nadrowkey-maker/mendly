@@ -63,7 +63,24 @@ export function ProblemSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        {/* Mobile: horizontal swipe */}
+        <div className="md:hidden -mx-6 overflow-x-auto pb-4 [scrollbar-width:none] [scroll-snap-type:x_mandatory]">
+          <div className="flex gap-4 px-6 w-max">
+            {cards.map(({ number, title, desc, glow }, i) => (
+              <div key={i} className="w-[80vw] shrink-0 snap-start">
+                <GlowCard glowColor={glow} customSize className="w-full min-h-52">
+                  <div className="flex flex-col gap-3">
+                    <span className="text-6xl font-bold text-white leading-none">{number}</span>
+                    <p className="text-sm font-semibold text-(--text-primary)">{title}</p>
+                    <p className="text-xs text-(--text-muted) leading-relaxed">{desc}</p>
+                  </div>
+                </GlowCard>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Desktop: 3-col grid */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8">
           {cards.map(({ number, title, desc, glow }, i) => (
             <motion.div key={i} {...FADE_UP(0.1 * (i + 1))}>
               <GlowCard glowColor={glow} customSize className="w-full min-h-65">
@@ -71,12 +88,8 @@ export function ProblemSection() {
                   <span className="text-6xl md:text-7xl font-bold text-white leading-none">
                     {number}
                   </span>
-                  <p className="text-sm font-semibold text-(--text-primary)">
-                    {title}
-                  </p>
-                  <p className="text-xs text-(--text-muted) leading-relaxed">
-                    {desc}
-                  </p>
+                  <p className="text-sm font-semibold text-(--text-primary)">{title}</p>
+                  <p className="text-xs text-(--text-muted) leading-relaxed">{desc}</p>
                 </div>
               </GlowCard>
             </motion.div>
