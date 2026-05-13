@@ -8,7 +8,6 @@ import { buildThreadTurnPrompt } from "@/lib/ai/debate/orchestrator";
 import { buildCeoCallPrompt } from "@/lib/ai/debate/synthesizer";
 import { generateWhisper } from "@/lib/ai/debate/whisper";
 import { generateConsensusVote } from "@/lib/ai/debate/consensus";
-import { analyzeTension } from "@/lib/ai/debate/tension";
 import type { Project } from "@/lib/types/project";
 import type { DebateAgentRole } from "@/lib/types/debate";
 
@@ -338,18 +337,6 @@ export async function POST(req: NextRequest) {
             }
 
             write("[[CONSENSUS_END]]");
-
-            // Tension map
-            if (!cancelled && activeAgents.length >= 2) {
-              try {
-                const tensions = await analyzeTension(thread, activeAgents, targetLocale);
-                if (tensions.length > 0) {
-                  write(`[[TENSION_MAP]]${JSON.stringify(tensions)}[[/TENSION_MAP]]`);
-                }
-              } catch {
-                // non-fatal
-              }
-            }
           }
 
           write("[[END]]");

@@ -16,7 +16,7 @@ import {
 import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
-import type { DebateState, DebateAgentRole, AgentSelection, ConsensusVote, TensionLink, VoteVerdict } from "@/lib/types/debate";
+import type { DebateState, DebateAgentRole, AgentSelection, ConsensusVote, VoteVerdict } from "@/lib/types/debate";
 import { PLANS } from "@/lib/stripe/plans";
 import type { PlanTier } from "@/lib/stripe/plans";
 
@@ -342,7 +342,6 @@ export function ChatInterface({
       let selection: AgentSelection | null = null;
       const lateJoinAgents = new Set<DebateAgentRole>();
       let consensusVotes: ConsensusVote[] = [];
-      let tensionMap: TensionLink[] | null = null;
 
       const upsertTurn = (
         agent: DebateAgentRole,
@@ -510,7 +509,7 @@ export function ChatInterface({
             const voteVerdict = voteMatch[2] as VoteVerdict;
             const voteNote = voteMatch[3].trim();
             consensusVotes = [...consensusVotes, { agent: voteAgent, verdict: voteVerdict, note: voteNote }];
-            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
+            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap: null });
             buffer = buffer.slice(voteMatch[0].length);
             madeProgress = true;
             continue;
@@ -524,23 +523,10 @@ export function ChatInterface({
             continue;
           }
 
-          // [[TENSION_MAP]][json][[/TENSION_MAP]]
-          const tensionMatch = buffer.match(/^\[\[TENSION_MAP\]\]([\s\S]*?)\[\[\/TENSION_MAP\]\]/);
-          if (tensionMatch) {
-            try {
-              tensionMap = JSON.parse(tensionMatch[1]) as TensionLink[];
-            } catch { tensionMap = []; }
-            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
-            buffer = buffer.slice(tensionMatch[0].length);
-            madeProgress = true;
-            continue;
-          }
-
           // [[END]]
           const endMatch = buffer.match(/^\[\[END\]\]/);
           if (endMatch) {
-            // Final transition to "done" with all accumulated data
-            if (selection) setDebateState({ phase: "done", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
+            if (selection) setDebateState({ phase: "done", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap: null });
             buffer = buffer.slice(endMatch[0].length);
             streamDone = true;
             madeProgress = true;

@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Zap, UserPlus, Lock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { TensionMapSVG } from "./TensionMapSVG";
 import type {
   AgentSelection,
   DebateMessage,
@@ -348,8 +347,6 @@ export function DebateView({ state, onAbort }: Props) {
   const ceoCall = "ceoCall" in stateAny ? (stateAny.ceoCall as string | null) : null;
   const consensus =
     state.phase === "revealing" || state.phase === "done" ? state.consensus : null;
-  const tensionMap =
-    state.phase === "revealing" || state.phase === "done" ? state.tensionMap : null;
 
   return (
     <div className="space-y-4">
@@ -384,11 +381,6 @@ export function DebateView({ state, onAbort }: Props) {
       {/* Consensus votes */}
       {consensus !== null && consensus.length > 0 && (
         <ConsensusPanel votes={consensus} />
-      )}
-
-      {/* Tension map */}
-      {tensionMap !== null && tensionMap.length > 0 && selection && (
-        <TensionMapSVG agents={selection.agents} links={tensionMap} />
       )}
 
       {state.phase === "aborted" && (
