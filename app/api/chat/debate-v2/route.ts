@@ -12,6 +12,57 @@ import type { DebateAgentRole } from "@/lib/types/debate";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const ALL_DEBATE_AGENTS: DebateAgentRole[] = ["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"];
+
+async function detectSurpriseExpert(
+  thread: { agent: DebateAgentRole; content: string }[],
+  existingAgents: DebateAgentRole[],
+  question: string,
+  project: Project,
+  locale: "fr" | "en"
+): Promise<DebateAgentRole | null> {
+  const available = ALL_DEBATE_AGENTS.filter((a) => !existingAgents.includes(a));
+  if (available.length === 0) return null;
+
+  const threadStr = thread.map((t) => `${t.agent}: ${t.content.slice(0, 120)}`).join("\n");
+
+  const prompt = locale === "en"
+    ? `Debate on "${question}" for project "${project.name}":
+${threadStr}
+
+Current debaters: ${existingAgents.join(", ")}
+Available specialists: ${available.join(", ")}
+
+Is there a CRITICAL expert perspective completely absent from this debate that would significantly change the decision?
+Answer with ONLY the agent role (e.g. "CFO") or "NONE". One word only. No explanation.`
+    : `Débat sur "${question}" pour le projet "${project.name}" :
+${threadStr}
+
+Participants actuels : ${existingAgents.join(", ")}
+Spécialistes disponibles : ${available.join(", ")}
+
+Y a-t-il une perspective d'expert CRITIQUE complètement absente de ce débat qui changerait significativement la décision ?
+Réponds avec UNIQUEMENT le rôle (ex : "CFO") ou "NONE". Un seul mot, aucune explication.`;
+
+  try {
+    const result = await geminiFlash.generateContent(prompt);
+    const text = result.response.text().trim().toUpperCase().replace(/[^A-Z]/g, "") as DebateAgentRole;
+    if (available.includes(text)) return text;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function parseRetryDelay(err: unknown): number | null {
   const details = (err as { errorDetails?: { "@type"?: string; retryDelay?: string }[] })?.errorDetails;
   if (!Array.isArray(details)) return null;
@@ -127,11 +178,16 @@ export async function POST(req: NextRequest) {
           const thread: { agent: DebateAgentRole; content: string }[] = [];
           // 2 agents → 3 passes each (6 messages); 3-4 agents → 2 passes each
           const numPasses = selection.agents.length <= 2 ? 3 : 2;
+          // Mutable agents list — surprise expert may be added after pass 1
+          let activeAgents = [...selection.agents];
 
           write("[[THREAD]]");
 
           for (let pass = 1; pass <= numPasses; pass++) {
-            for (const agent of selection.agents) {
+            // Randomize speaking order each pass
+            const passOrder = shuffleArray(activeAgents);
+
+            for (const agent of passOrder) {
               if (cancelled) break;
 
               write(`[[TURN:${agent}]]`);
@@ -172,6 +228,18 @@ export async function POST(req: NextRequest) {
                 });
               }
             }
+
+            // After pass 1: detect if a critical expert perspective is missing
+            if (pass === 1 && !cancelled && numPasses > 1) {
+              const surprise = await detectSurpriseExpert(
+                thread, activeAgents, userMessage, project, targetLocale
+              );
+              if (surprise) {
+                activeAgents = [...activeAgents, surprise];
+                write(`[[SURPRISE_JOIN:${surprise}]]`);
+              }
+            }
+
             if (cancelled) break;
           }
 

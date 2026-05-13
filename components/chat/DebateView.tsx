@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { Zap, UserPlus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import type { AgentSelection, DebateMessage, DebateState } from "@/lib/types/debate";
 
@@ -34,15 +34,19 @@ function SelectionCard({ selection, onAbort }: { selection: AgentSelection; onAb
       <div className="flex items-center gap-2.5">
         <Zap className="w-3.5 h-3.5 text-[#BF5AF2] animate-pulse shrink-0" />
         <div className="flex items-center gap-1.5">
-          {selection.agents.map((a) => (
-            <span
-              key={a}
-              className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full"
-              style={{ color: AGENT_COLORS[a] ?? "#fff", background: `${AGENT_COLORS[a] ?? "#fff"}18` }}
-            >
-              {a}
-            </span>
-          ))}
+          {selection.agents.map((a) => {
+            const isLate = selection.lateJoins?.includes(a);
+            const color = isLate ? "#FF9F0A" : (AGENT_COLORS[a] ?? "#fff");
+            return (
+              <span
+                key={a}
+                className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full"
+                style={{ color, background: `${color}18` }}
+              >
+                {isLate ? `+${a}` : a}
+              </span>
+            );
+          })}
         </div>
         <span className="text-[11px] text-[#6E6E73] italic hidden sm:block">"{selection.rationale}"</span>
       </div>
@@ -56,10 +60,36 @@ function SelectionCard({ selection, onAbort }: { selection: AgentSelection; onAb
   );
 }
 
+function SurpriseJoinBanner({ agent }: { agent: string }) {
+  const t = useTranslations("chat");
+  const color = AGENT_COLORS[agent] ?? "#FF9F0A";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+      className="flex items-center gap-2.5 px-3 py-2 rounded-xl border mb-1"
+      style={{
+        borderColor: `${color}30`,
+        background: `${color}0A`,
+      }}
+    >
+      <UserPlus className="w-3.5 h-3.5 shrink-0" style={{ color }} />
+      <span className="text-[11px] font-mono font-semibold" style={{ color }}>
+        {agent}
+      </span>
+      <span className="text-[11px] text-[#6E6E73]">{t("surpriseJoinLabel")}</span>
+      <div className="h-px flex-1" style={{ background: `${color}20` }} />
+    </motion.div>
+  );
+}
+
 function TurnBubble({ message, index }: { message: DebateMessage; index: number }) {
   const color = AGENT_COLORS[message.agent] ?? "#fff";
 
   return (
+    <div>
+      {message.isLateJoin && <SurpriseJoinBanner agent={message.agent} />}
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -102,6 +132,7 @@ function TurnBubble({ message, index }: { message: DebateMessage; index: number 
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }
 

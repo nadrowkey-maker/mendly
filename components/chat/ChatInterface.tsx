@@ -340,12 +340,14 @@ export function ChatInterface({
       let messages: import("@/lib/types/debate").DebateMessage[] = [];
       let ceoCall = "";
       let selection: AgentSelection | null = null;
+      const lateJoinAgents = new Set<DebateAgentRole>();
 
       const upsertTurn = (
         agent: DebateAgentRole,
         idx: number,
         contentDelta: string,
-        streaming: boolean
+        streaming: boolean,
+        isLateJoin?: boolean
       ) => {
         messages = [...messages];
         const pos = messages.findIndex((m) => m.agent === agent && m.turnIndex === idx);
@@ -356,6 +358,7 @@ export function ChatInterface({
             turnIndex: idx,
             content: contentDelta,
             isStreaming: streaming,
+            isLateJoin,
           });
         } else {
           messages[pos] = {
@@ -403,12 +406,32 @@ export function ChatInterface({
             continue;
           }
 
+          // [[SURPRISE_JOIN:CFO]]
+          const surpriseMatch = buffer.match(/^\[\[SURPRISE_JOIN:([A-Z]+)\]\]/);
+          if (surpriseMatch) {
+            const surpriseAgent = surpriseMatch[1] as DebateAgentRole;
+            lateJoinAgents.add(surpriseAgent);
+            if (selection && !selection.agents.includes(surpriseAgent)) {
+              selection = {
+                ...selection,
+                agents: [...selection.agents, surpriseAgent],
+                lateJoins: [...(selection.lateJoins ?? []), surpriseAgent],
+              };
+              setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
+            }
+            buffer = buffer.slice(surpriseMatch[0].length);
+            madeProgress = true;
+            continue;
+          }
+
           // [[TURN:CFO]]
           const turnStart = buffer.match(/^\[\[TURN:([A-Z]+)\]\]/);
           if (turnStart) {
             const agentRole = turnStart[1] as DebateAgentRole;
             currentAgent = agentRole;
-            upsertTurn(agentRole, turnIndex, "", true);
+            const isFirstTurnForAgent = !messages.some((m) => m.agent === agentRole);
+            const isLateJoin = lateJoinAgents.has(agentRole) && isFirstTurnForAgent;
+            upsertTurn(agentRole, turnIndex, "", true, isLateJoin);
             if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
             buffer = buffer.slice(turnStart[0].length);
             madeProgress = true;

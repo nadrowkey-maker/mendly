@@ -5,6 +5,7 @@ export type DebateAgentRole = Exclude<AgentRole, "CEO">;
 export interface AgentSelection {
   agents: DebateAgentRole[];
   rationale: string;
+  lateJoins?: DebateAgentRole[];
 }
 
 export interface DebateMessage {
@@ -13,6 +14,7 @@ export interface DebateMessage {
   turnIndex: number;
   content: string;
   isStreaming: boolean;
+  isLateJoin?: boolean;
 }
 
 export type DebateState =
