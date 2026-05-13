@@ -123,49 +123,56 @@ export async function POST(req: NextRequest) {
 
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);
 
-          // Thread: each agent speaks in sequence, sees all previous turns
+          // Thread: interleaved passes — each agent speaks 2-3 times, short messages
           const thread: { agent: DebateAgentRole; content: string }[] = [];
+          // 2 agents → 3 passes each (6 messages); 3-4 agents → 2 passes each
+          const numPasses = selection.agents.length <= 2 ? 3 : 2;
 
           write("[[THREAD]]");
 
-          for (const agent of selection.agents) {
-            if (cancelled) break;
+          for (let pass = 1; pass <= numPasses; pass++) {
+            for (const agent of selection.agents) {
+              if (cancelled) break;
 
-            write(`[[TURN:${agent}]]`);
+              write(`[[TURN:${agent}]]`);
 
-            const prompt = buildThreadTurnPrompt({
-              agent,
-              question: userMessage,
-              previousTurns: [...thread],
-              project,
-              locale: targetLocale,
-            });
-
-            let content = "";
-            try {
-              const result = await streamAgent(prompt);
-              for await (const chunk of result.stream) {
-                if (cancelled) break;
-                const text = chunk.text();
-                if (text) { content += text; write(text); }
-              }
-            } catch (err) {
-              console.error(`[debate-v2] ${agent} turn error:`, err);
-              write(targetLocale === "en" ? "[Error generating response]" : "[Erreur lors de la génération]");
-            }
-
-            thread.push({ agent, content });
-            write(`[[/TURN:${agent}]]`);
-
-            if (!cancelled && content) {
-              await supabase.from("messages").insert({
-                conversation_id: conversationId,
-                user_id: user.id,
-                role: "assistant",
-                agent_role: agent,
-                content,
+              const prompt = buildThreadTurnPrompt({
+                agent,
+                question: userMessage,
+                previousTurns: [...thread],
+                project,
+                locale: targetLocale,
+                pass,
+                totalPasses: numPasses,
               });
+
+              let content = "";
+              try {
+                const result = await streamAgent(prompt);
+                for await (const chunk of result.stream) {
+                  if (cancelled) break;
+                  const text = chunk.text();
+                  if (text) { content += text; write(text); }
+                }
+              } catch (err) {
+                console.error(`[debate-v2] ${agent} pass${pass} error:`, err);
+                write(targetLocale === "en" ? "[Error generating response]" : "[Erreur lors de la génération]");
+              }
+
+              thread.push({ agent, content });
+              write(`[[/TURN:${agent}]]`);
+
+              if (!cancelled && content) {
+                await supabase.from("messages").insert({
+                  conversation_id: conversationId,
+                  user_id: user.id,
+                  role: "assistant",
+                  agent_role: agent,
+                  content,
+                });
+              }
             }
+            if (cancelled) break;
           }
 
           write("[[/THREAD]]");
