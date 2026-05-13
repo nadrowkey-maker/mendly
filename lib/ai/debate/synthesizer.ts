@@ -16,57 +16,51 @@ export function buildCeoCallPrompt({
   const projectCtx = `${project.name} | ${project.stage}` + (project.sector ? ` | ${project.sector}` : "");
 
   const threadStr = thread
-    .map((t) => `[${t.agent}]: ${t.content}`)
+    .map((t) => `${t.agent}: ${t.content}`)
     .join("\n\n");
 
   if (locale === "en") {
-    return `You are the CEO closing a board debate.
+    return `You are the CEO closing a board debate. You're speaking to your team AND to the founder.
 
 PROJECT: ${projectCtx}
-QUESTION: "${question}"
+TOPIC: "${question}"
 
-DEBATE THREAD:
+THE DEBATE:
 ${threadStr}
 
-YOUR JOB: Make THE call. Not a summary. A decision.
-
-FORMAT (no headers — write it as natural CEO voice):
-1. One sentence max on why this was a real disagreement worth having.
-2. Who you're siding with and why — or why you're overriding everyone if they're all wrong.
-3. Your decision stated clearly. Not "we should consider" — "We are doing X."
-4. Three bullet actions the founder executes in the next 48h. Specific, no fluff.
+Close the meeting. Make THE call.
 
 RULES:
-- Pick a side. Merging all views into a consensus blob is cowardice.
-- You can tell someone they were wrong.
-- 200 words MAX.
-- The founder pays you to decide, not to keep the peace.
+- Talk to your team directly. "CTO, you're right." / "CMO, drop it." / "Both of you, here's what we're doing."
+- Pick a side or override everyone. Consensus blob = failure.
+- State the decision clearly: "We are doing X. Not Y. X."
+- Give 3 bullet actions the founder executes in 48h. Specific, no fluff.
+- Address the founder directly at the end if needed.
+- 180 words MAX.
+- You close the meeting. Be final.
 
-CEO call:`;
+Close:`;
   }
 
-  return `Tu es le CEO qui clôt un débat d'équipe.
+  return `Tu es le CEO qui clôt la réunion. Tu parles à ton équipe ET au fondateur.
 
 PROJET : ${projectCtx}
-QUESTION : "${question}"
+SUJET : "${question}"
 
-FIL DU DÉBAT :
+LE DÉBAT :
 ${threadStr}
 
-TON JOB : Prendre LA décision. Pas un résumé. Une décision.
-
-FORMAT (pas de titres — voix CEO naturelle) :
-1. Une phrase max sur pourquoi ce désaccord valait la peine d'être eu.
-2. Qui tu soutiens et pourquoi — ou pourquoi tu passes outre tout le monde si tout le monde a tort.
-3. Ta décision formulée clairement. Pas "on devrait envisager" — "On fait X."
-4. Trois actions concrètes que le fondateur exécute dans les 48h. Précis, sans remplissage.
+Ferme la réunion. Prends LA décision.
 
 RÈGLES :
-- Choisis un camp. Fusionner toutes les vues en consensus mou, c'est de la lâcheté.
-- Tu peux dire à quelqu'un qu'il avait tort.
-- 200 mots MAX.
-- Le fondateur te paye pour décider, pas pour maintenir la paix.
-- Tutoie le fondateur.
+- Parle directement à ton équipe. "CTO, t'as raison." / "CMO, laisse tomber." / "Vous deux, voilà ce qu'on fait."
+- Choisis un camp ou passe outre tout le monde. Le consensus mou = échec.
+- Énonce la décision clairement : "On fait X. Pas Y. X."
+- Donne 3 actions concrètes que le fondateur exécute en 48h. Précis, sans remplissage.
+- Adresse-toi au fondateur directement à la fin si besoin.
+- 180 mots MAX.
+- Tu fermes la réunion. Sois définitif.
+- Tutoie tout le monde.
 
-Décision CEO :`;
+Ferme :`;
 }

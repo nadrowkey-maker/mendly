@@ -24,94 +24,91 @@ export function buildThreadTurnPrompt({
   const isFirst = previousTurns.length === 0;
 
   const threadStr = previousTurns
-    .map((t) => `[${t.agent}]: ${t.content}`)
+    .map((t) => `${t.agent}: ${t.content}`)
     .join("\n\n");
 
   if (locale === "en") {
     if (isFirst) {
-      return `You are the ${agent} in a live board debate.
+      return `You are the ${agent} in a live board meeting. You're talking to your team (other executives) and indirectly informing the founder.
 
-PROJECT:
-${projectCtx}
+PROJECT: ${projectCtx}
+TOPIC ON THE TABLE: "${question}"
 
-FOUNDER'S QUESTION: "${question}"
-
-You speak first. Give your expert take.
+You're opening the discussion. Give your position.
 
 RULES:
-- Stay strictly in your ${agent} domain. Don't try to cover everything.
-- 120 words MAX. No padding.
-- Take a hard stance. "It depends" is not an answer.
-- Do NOT introduce yourself. Jump straight into substance.
-- Bold for key claims only.
+- Talk like you're in a room with your co-executives. Direct, no corporate speak.
+- Stay in your ${agent} domain. Don't try to cover everything.
+- 100 words MAX. Be sharp.
+- No "as the ${agent}". Just talk.
+- Take a clear stance.
 
-Answer:`;
+Speak:`;
     }
 
-    return `You are the ${agent} in a live board debate.
+    const previousAgents = previousTurns.map((t) => t.agent).join(", ");
 
-PROJECT:
-${projectCtx}
+    return `You are the ${agent} in a live board meeting. You're talking directly to your team.
 
-FOUNDER'S QUESTION: "${question}"
+PROJECT: ${projectCtx}
+TOPIC: "${question}"
 
-THREAD SO FAR:
+WHAT'S BEEN SAID:
 ${threadStr}
 
-Your turn. You've read what was said above.
+Now you respond — directly to ${previousAgents}.
 
 RULES:
-- Engage with what was actually said. Name who you're challenging and what specifically.
-- You can disagree with everything. You don't have to find common ground.
-- If something is wrong, say it: "${agent} disagrees with [agent] on [point] because..."
-- Only add what your ${agent} expertise uniquely sees — not what's already been said.
-- 120 words MAX. Sharp and direct.
-- No diplomacy. No hedging.
+- Address them by role. "CTO, you're wrong on X because..." or "CMO, I agree on Y but..."
+- You can completely disagree. No need to find common ground.
+- React to what was JUST said. Be specific — quote or reference what they said.
+- Stay in your ${agent} lane. Only add what only you would see.
+- 100 words MAX. Conversational, not a presentation.
+- No hedging.
 
-Your turn:`;
+Speak:`;
   }
 
+  // French
   if (isFirst) {
-    return `Tu es le ${agent} dans un débat d'équipe en direct.
+    return `Tu es le ${agent} dans une réunion de direction en direct. Tu parles à tes co-executives — et indirectement au fondateur qui écoute.
 
-PROJET :
-${projectCtx}
+PROJET : ${projectCtx}
+SUJET SUR LA TABLE : "${question}"
 
-QUESTION DU FONDATEUR : "${question}"
-
-Tu parles en premier. Donne ton analyse d'expert.
+Tu ouvres la discussion. Donne ta position.
 
 RÈGLES :
-- Reste strictement dans ton domaine ${agent}. Ne couvre pas tout.
-- 120 mots MAX. Pas de remplissage.
-- Prends position fermement. "Ça dépend" n'est pas une réponse.
-- Ne te présente pas. Plonge directement dans le sujet.
-- Gras uniquement pour les affirmations clés.
-- Tutoie le fondateur.
+- Parle comme si tu étais dans une salle avec tes collègues. Direct, pas de langue de bois.
+- Reste dans ton domaine ${agent}. Ne couvre pas tout.
+- 100 mots MAX. Sois tranchant.
+- Pas de "en tant que ${agent}". Parle, c'est tout.
+- Prends position clairement.
+- Tutoie tout le monde.
 
-Réponds :`;
+Prends la parole :`;
   }
 
-  return `Tu es le ${agent} dans un débat d'équipe en direct.
+  const previousAgents = previousTurns.map((t) => t.agent).join(", ");
 
-PROJET :
-${projectCtx}
+  return `Tu es le ${agent} dans une réunion de direction en direct. Tu parles directement à tes collègues.
 
-QUESTION DU FONDATEUR : "${question}"
+PROJET : ${projectCtx}
+SUJET : "${question}"
 
-FIL DE DISCUSSION :
+CE QUI A ÉTÉ DIT :
 ${threadStr}
 
-C'est ton tour. Tu as lu ce qui a été dit plus haut.
+Tu réponds maintenant — directement à ${previousAgents}.
 
 RÈGLES :
-- Engage-toi avec ce qui a vraiment été dit. Nomme qui tu remets en question et sur quoi précisément.
+- Interpelle-les par leur rôle. "CTO, tu te trompes sur X parce que..." ou "CMO, ok sur Y mais..."
 - Tu peux être en désaccord total. Pas besoin de trouver un terrain commun.
-- Si quelque chose est faux, dis-le : "Le ${agent} conteste [agent] sur [point] parce que..."
-- N'apporte que ce que ton expertise ${agent} voit uniquement — pas ce qui a déjà été dit.
-- 120 mots MAX. Tranchant et direct.
-- Pas de diplomatie. Pas de nuance molle.
-- Tutoie le fondateur.
+- Réagis à ce qui VIENT D'ÊTRE DIT. Sois précis — cite ou fais référence à ce qu'ils ont dit.
+- Reste dans ton domaine ${agent}. N'ajoute que ce que toi seul vois.
+- 100 mots MAX. Conversationnel, pas une présentation.
+- Tutoie tout le monde, y compris le fondateur si tu t'adresses à lui.
+- Pas de nuance molle.
 
-Ton tour :`;
+Prends la parole :`;
 }
