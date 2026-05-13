@@ -6,6 +6,9 @@ import { PLANS } from "@/lib/stripe/plans";
 import { selectAgents } from "@/lib/ai/debate/selector";
 import { buildThreadTurnPrompt } from "@/lib/ai/debate/orchestrator";
 import { buildCeoCallPrompt } from "@/lib/ai/debate/synthesizer";
+import { generateWhisper } from "@/lib/ai/debate/whisper";
+import { generateConsensusVote } from "@/lib/ai/debate/consensus";
+import { analyzeTension } from "@/lib/ai/debate/tension";
 import type { Project } from "@/lib/types/project";
 import type { DebateAgentRole } from "@/lib/types/debate";
 
@@ -35,8 +38,9 @@ async function detectSurpriseExpert(
 
   const threadStr = thread.map((t) => `${t.agent}: ${t.content.slice(0, 120)}`).join("\n");
 
-  const prompt = locale === "en"
-    ? `Debate on "${question}":
+  const prompt =
+    locale === "en"
+      ? `Debate on "${question}":
 ${threadStr}
 
 ALREADY IN THE DEBATE (do NOT suggest these): ${existingAgents.join(", ")}
@@ -44,7 +48,7 @@ CAN join: ${available.join(", ")}
 
 Is a CRITICAL perspective completely missing that would change the outcome?
 Reply with EXACTLY one word from this list: ${available.join(", ")} — or reply NONE.`
-    : `Débat sur "${question}" :
+      : `Débat sur "${question}" :
 ${threadStr}
 
 DÉJÀ DANS LE DÉBAT (ne pas suggérer) : ${existingAgents.join(", ")}
@@ -56,7 +60,6 @@ Réponds avec EXACTEMENT un mot parmi : ${available.join(", ")} — ou réponds 
   try {
     const result = await geminiFlash.generateContent(prompt);
     const raw = result.response.text().trim().toUpperCase();
-    // Match any of the available agents as a whole word in the response
     for (const agent of available) {
       if (new RegExp(`\\b${agent}\\b`).test(raw)) return agent;
     }
@@ -177,17 +180,14 @@ export async function POST(req: NextRequest) {
 
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);
 
-          // Thread: interleaved passes — each agent speaks 2-3 times, short messages
           const thread: { agent: DebateAgentRole; content: string }[] = [];
-          // 2 agents → 3 passes each (6 messages); 3-4 agents → 2 passes each
           const numPasses = selection.agents.length <= 2 ? 3 : 2;
-          // Mutable agents list — surprise expert may be added after pass 1
           let activeAgents = [...selection.agents];
+          let whisperCount = 0;
 
           write("[[THREAD]]");
 
           for (let pass = 1; pass <= numPasses; pass++) {
-            // Randomize speaking order each pass
             const passOrder = shuffleArray(activeAgents);
 
             for (const agent of passOrder) {
@@ -221,6 +221,26 @@ export async function POST(req: NextRequest) {
               thread.push({ agent, content });
               write(`[[/TURN:${agent}]]`);
 
+              // Whisper: pass 1 only, 60% chance, max 2 per debate
+              if (pass === 1 && !cancelled && content && whisperCount < 2 && Math.random() < 0.60) {
+                try {
+                  const whisperText = await generateWhisper({
+                    agent,
+                    question: userMessage,
+                    agentTurnContent: content,
+                    previousTurns: [...thread],
+                    project,
+                    locale: targetLocale,
+                  });
+                  if (whisperText) {
+                    write(`[[WHISPER:${agent}]]${whisperText}[[/WHISPER:${agent}]]`);
+                    whisperCount++;
+                  }
+                } catch {
+                  // non-fatal
+                }
+              }
+
               if (!cancelled && content) {
                 await supabase.from("messages").insert({
                   conversation_id: conversationId,
@@ -232,7 +252,7 @@ export async function POST(req: NextRequest) {
               }
             }
 
-            // After pass 1: detect if a critical expert perspective is missing
+            // After pass 1: detect surprise expert
             if (pass === 1 && !cancelled && numPasses > 1) {
               const surprise = await detectSurpriseExpert(
                 thread, activeAgents, userMessage, project, targetLocale
@@ -292,6 +312,45 @@ export async function POST(req: NextRequest) {
             .from("conversations")
             .update({ updated_at: new Date().toISOString() })
             .eq("id", conversationId);
+
+          // Consensus votes (parallel generation, sequential reveal)
+          if (!cancelled && ceoContent) {
+            write("[[CONSENSUS_START]]");
+
+            const voteResults = await Promise.all(
+              activeAgents.map((agent) =>
+                generateConsensusVote({
+                  agent,
+                  question: userMessage,
+                  ceoCall: ceoContent,
+                  thread,
+                  project,
+                  locale: targetLocale,
+                })
+              )
+            );
+
+            for (const [i, vote] of voteResults.entries()) {
+              if (cancelled) break;
+              const agent = activeAgents[i];
+              write(`[[VOTE:${agent}:${vote.verdict}]]${vote.note}[[/VOTE:${agent}]]`);
+              if (!cancelled) await new Promise((r) => setTimeout(r, 380));
+            }
+
+            write("[[CONSENSUS_END]]");
+
+            // Tension map
+            if (!cancelled && activeAgents.length >= 2) {
+              try {
+                const tensions = await analyzeTension(thread, activeAgents, targetLocale);
+                if (tensions.length > 0) {
+                  write(`[[TENSION_MAP]]${JSON.stringify(tensions)}[[/TENSION_MAP]]`);
+                }
+              } catch {
+                // non-fatal
+              }
+            }
+          }
 
           write("[[END]]");
         } catch (err) {

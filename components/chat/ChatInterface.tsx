@@ -16,7 +16,7 @@ import {
 import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
-import type { DebateState, DebateAgentRole, AgentSelection } from "@/lib/types/debate";
+import type { DebateState, DebateAgentRole, AgentSelection, ConsensusVote, TensionLink, VoteVerdict } from "@/lib/types/debate";
 import { PLANS } from "@/lib/stripe/plans";
 import type { PlanTier } from "@/lib/stripe/plans";
 
@@ -341,6 +341,8 @@ export function ChatInterface({
       let ceoCall = "";
       let selection: AgentSelection | null = null;
       const lateJoinAgents = new Set<DebateAgentRole>();
+      let consensusVotes: ConsensusVote[] = [];
+      let tensionMap: TensionLink[] | null = null;
 
       const upsertTurn = (
         agent: DebateAgentRole,
@@ -466,8 +468,70 @@ export function ChatInterface({
           const ceoEnd = buffer.match(/^\[\[\/CEO_CALL\]\]/);
           if (ceoEnd) {
             inCeoCall = false;
-            if (selection) setDebateState({ phase: "done", question: trimmed, selection, messages: [...messages], ceoCall });
+            // Transition to "revealing" — consensus arrives next
+            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [], tensionMap: null });
             buffer = buffer.slice(ceoEnd[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[WHISPER:CMO]]text[[/WHISPER:CMO]] — complete block
+          const whisperMatch = buffer.match(/^\[\[WHISPER:([A-Z]+)\]\]([\s\S]*?)\[\[\/WHISPER:\1\]\]/);
+          if (whisperMatch) {
+            const whisperAgent = whisperMatch[1] as DebateAgentRole;
+            const whisperText = whisperMatch[2].trim();
+            if (whisperText) {
+              // Patch the last message by this agent with the whisper text
+              let lastIdx = -1;
+              messages.forEach((m, i) => { if (m.agent === whisperAgent) lastIdx = i; });
+              if (lastIdx >= 0) {
+                messages = messages.map((m, i) => i === lastIdx ? { ...m, whisper: whisperText } : m);
+                if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
+              }
+            }
+            buffer = buffer.slice(whisperMatch[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[CONSENSUS_START]]
+          const consensusStart = buffer.match(/^\[\[CONSENSUS_START\]\]/);
+          if (consensusStart) {
+            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [], tensionMap: null });
+            buffer = buffer.slice(consensusStart[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[VOTE:CTO:reluctant]]note[[/VOTE:CTO]]
+          const voteMatch = buffer.match(/^\[\[VOTE:([A-Z]+):([a-z]+)\]\]([\s\S]*?)\[\[\/VOTE:\1\]\]/);
+          if (voteMatch) {
+            const voteAgent = voteMatch[1] as DebateAgentRole;
+            const voteVerdict = voteMatch[2] as VoteVerdict;
+            const voteNote = voteMatch[3].trim();
+            consensusVotes = [...consensusVotes, { agent: voteAgent, verdict: voteVerdict, note: voteNote }];
+            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
+            buffer = buffer.slice(voteMatch[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[CONSENSUS_END]]
+          const consensusEnd = buffer.match(/^\[\[CONSENSUS_END\]\]/);
+          if (consensusEnd) {
+            buffer = buffer.slice(consensusEnd[0].length);
+            madeProgress = true;
+            continue;
+          }
+
+          // [[TENSION_MAP]][json][[/TENSION_MAP]]
+          const tensionMatch = buffer.match(/^\[\[TENSION_MAP\]\]([\s\S]*?)\[\[\/TENSION_MAP\]\]/);
+          if (tensionMatch) {
+            try {
+              tensionMap = JSON.parse(tensionMatch[1]) as TensionLink[];
+            } catch { tensionMap = []; }
+            if (selection) setDebateState({ phase: "revealing", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
+            buffer = buffer.slice(tensionMatch[0].length);
             madeProgress = true;
             continue;
           }
@@ -475,6 +539,8 @@ export function ChatInterface({
           // [[END]]
           const endMatch = buffer.match(/^\[\[END\]\]/);
           if (endMatch) {
+            // Final transition to "done" with all accumulated data
+            if (selection) setDebateState({ phase: "done", question: trimmed, selection, messages: [...messages], ceoCall, consensus: [...consensusVotes], tensionMap });
             buffer = buffer.slice(endMatch[0].length);
             streamDone = true;
             madeProgress = true;
@@ -514,12 +580,12 @@ export function ChatInterface({
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         setDebateState((prev) => {
-          if (prev.phase === "threading" || prev.phase === "deciding") {
+          if (prev.phase === "threading" || prev.phase === "deciding" || prev.phase === "revealing") {
             return {
               phase: "aborted",
               question: trimmed,
               messages: "messages" in prev ? prev.messages : [],
-              ceoCall: prev.phase === "deciding" ? prev.ceoCall : null,
+              ceoCall: "ceoCall" in prev ? (prev.ceoCall as string) : null,
             };
           }
           return { phase: "idle" };

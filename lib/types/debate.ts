@@ -2,6 +2,20 @@ import type { AgentRole } from "./conversation";
 
 export type DebateAgentRole = Exclude<AgentRole, "CEO">;
 
+export type VoteVerdict = "agree" | "reluctant" | "disagree";
+
+export interface ConsensusVote {
+  agent: DebateAgentRole;
+  verdict: VoteVerdict;
+  note: string;
+}
+
+export interface TensionLink {
+  a: DebateAgentRole;
+  b: DebateAgentRole;
+  intensity: 1 | 2 | 3;
+}
+
 export interface AgentSelection {
   agents: DebateAgentRole[];
   rationale: string;
@@ -15,6 +29,7 @@ export interface DebateMessage {
   content: string;
   isStreaming: boolean;
   isLateJoin?: boolean;
+  whisper?: string;
 }
 
 export type DebateState =
@@ -34,11 +49,22 @@ export type DebateState =
       ceoCall: string;
     }
   | {
+      phase: "revealing";
+      question: string;
+      selection: AgentSelection;
+      messages: DebateMessage[];
+      ceoCall: string;
+      consensus: ConsensusVote[];
+      tensionMap: TensionLink[] | null;
+    }
+  | {
       phase: "done";
       question: string;
       selection: AgentSelection;
       messages: DebateMessage[];
       ceoCall: string;
+      consensus: ConsensusVote[];
+      tensionMap: TensionLink[] | null;
     }
   | {
       phase: "aborted";
