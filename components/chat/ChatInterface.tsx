@@ -410,8 +410,8 @@ export function ChatInterface({
           const surpriseMatch = buffer.match(/^\[\[SURPRISE_JOIN:([A-Z]+)\]\]/);
           if (surpriseMatch) {
             const surpriseAgent = surpriseMatch[1] as DebateAgentRole;
-            lateJoinAgents.add(surpriseAgent);
             if (selection && !selection.agents.includes(surpriseAgent)) {
+              lateJoinAgents.add(surpriseAgent);
               selection = {
                 ...selection,
                 agents: [...selection.agents, surpriseAgent],

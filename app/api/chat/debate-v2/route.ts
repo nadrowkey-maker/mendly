@@ -36,27 +36,30 @@ async function detectSurpriseExpert(
   const threadStr = thread.map((t) => `${t.agent}: ${t.content.slice(0, 120)}`).join("\n");
 
   const prompt = locale === "en"
-    ? `Debate on "${question}" for project "${project.name}":
+    ? `Debate on "${question}":
 ${threadStr}
 
-Current debaters: ${existingAgents.join(", ")}
-Available specialists: ${available.join(", ")}
+ALREADY IN THE DEBATE (do NOT suggest these): ${existingAgents.join(", ")}
+CAN join: ${available.join(", ")}
 
-Is there a CRITICAL expert perspective completely absent from this debate that would significantly change the decision?
-Answer with ONLY the agent role (e.g. "CFO") or "NONE". One word only. No explanation.`
-    : `Débat sur "${question}" pour le projet "${project.name}" :
+Is a CRITICAL perspective completely missing that would change the outcome?
+Reply with EXACTLY one word from this list: ${available.join(", ")} — or reply NONE.`
+    : `Débat sur "${question}" :
 ${threadStr}
 
-Participants actuels : ${existingAgents.join(", ")}
-Spécialistes disponibles : ${available.join(", ")}
+DÉJÀ DANS LE DÉBAT (ne pas suggérer) : ${existingAgents.join(", ")}
+PEUVENT rejoindre : ${available.join(", ")}
 
-Y a-t-il une perspective d'expert CRITIQUE complètement absente de ce débat qui changerait significativement la décision ?
-Réponds avec UNIQUEMENT le rôle (ex : "CFO") ou "NONE". Un seul mot, aucune explication.`;
+Une perspective CRITIQUE est-elle complètement absente et changerait la décision ?
+Réponds avec EXACTEMENT un mot parmi : ${available.join(", ")} — ou réponds NONE.`;
 
   try {
     const result = await geminiFlash.generateContent(prompt);
-    const text = result.response.text().trim().toUpperCase().replace(/[^A-Z]/g, "") as DebateAgentRole;
-    if (available.includes(text)) return text;
+    const raw = result.response.text().trim().toUpperCase();
+    // Match any of the available agents as a whole word in the response
+    for (const agent of available) {
+      if (new RegExp(`\\b${agent}\\b`).test(raw)) return agent;
+    }
     return null;
   } catch {
     return null;
@@ -234,7 +237,7 @@ export async function POST(req: NextRequest) {
               const surprise = await detectSurpriseExpert(
                 thread, activeAgents, userMessage, project, targetLocale
               );
-              if (surprise) {
+              if (surprise && !activeAgents.includes(surprise)) {
                 activeAgents = [...activeAgents, surprise];
                 write(`[[SURPRISE_JOIN:${surprise}]]`);
               }
