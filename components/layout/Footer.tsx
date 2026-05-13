@@ -48,22 +48,20 @@ export function Footer() {
   ];
 
   return (
-    <footer className="relative border-t border-(--border) bg-(--bg-secondary) overflow-hidden">
-      {/* Top glow line */}
+    <footer className="relative border-t border-[rgba(255,255,255,0.06)] bg-black overflow-hidden">
+      {/* Hairline AI gradient at top */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 h-px pointer-events-none"
         style={{
-          width: "600px",
-          background:
-            "linear-gradient(to right, transparent, var(--accent-primary), transparent)",
-          opacity: 0.5,
+          width: "480px",
+          background: "linear-gradient(to right, transparent, rgba(191,90,242,0.4), rgba(10,132,255,0.4), transparent)",
         }}
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true, margin: "-60px" }}
         className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-20"
       >
@@ -72,11 +70,11 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link
               href="/"
-              className="font-mono text-base font-bold tracking-[0.18em] text-(--text-primary) hover:text-(--accent-glow) transition-colors duration-200 block"
+              className="text-sm font-semibold tracking-[0.15em] text-white/80 hover:text-white transition-colors duration-200 block"
             >
               MENDLY
             </Link>
-            <p className="text-sm text-(--text-dim) leading-relaxed mt-3 max-w-50">
+            <p className="text-sm text-[#6E6E73] leading-relaxed max-w-48">
               {t("tagline")}
             </p>
           </div>
@@ -84,7 +82,7 @@ export function Footer() {
           {/* Link columns */}
           {columns.map((col, i) => (
             <div key={i} className="space-y-4">
-              <p className="text-[10px] font-mono tracking-[0.2em] text-(--text-dim) uppercase">
+              <p className="text-[10px] tracking-[0.2em] text-[#6E6E73] uppercase">
                 {col.title}
               </p>
               <ul className="space-y-3">
@@ -92,7 +90,7 @@ export function Footer() {
                   <li key={j}>
                     <Link
                       href={link.href as never}
-                      className="text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors duration-200"
+                      className="text-sm text-[#6E6E73] hover:text-white/90 transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -104,11 +102,11 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-(--border) flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-(--text-dim) font-mono">
+        <div className="mt-16 pt-8 border-t border-[rgba(255,255,255,0.05)] flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[#6E6E73]">
             {t("bottomLine1")}
           </p>
-          <p className="text-xs text-(--text-dim) font-mono">
+          <p className="text-xs text-[#6E6E73]">
             {t("bottomLine2")}
           </p>
         </div>

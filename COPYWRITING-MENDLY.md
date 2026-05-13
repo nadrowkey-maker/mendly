@@ -1069,7 +1069,7 @@ LÉGAL
 **Bottom bar**
 ```
 © 2026 Mendly. Fait par des fondateurs, pour des fondateurs.
-Propulsé par Claude, GPT-4 et Gemini.
+
 EN · FR
 ```
 

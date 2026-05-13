@@ -10,7 +10,7 @@ export interface AgentSelection {
 export interface DebateMessage {
   id: string;
   agent: AgentRole;
-  round: 1 | 2;
+  turnIndex: number;
   content: string;
   isStreaming: boolean;
 }
@@ -19,30 +19,30 @@ export type DebateState =
   | { phase: "idle" }
   | { phase: "selecting"; question: string }
   | {
-      phase: "round1" | "round2";
+      phase: "threading";
       question: string;
       selection: AgentSelection;
       messages: DebateMessage[];
     }
   | {
-      phase: "synthesizing";
+      phase: "deciding";
       question: string;
       selection: AgentSelection;
       messages: DebateMessage[];
-      synthesis: string;
+      ceoCall: string;
     }
   | {
       phase: "done";
       question: string;
       selection: AgentSelection;
       messages: DebateMessage[];
-      synthesis: string;
+      ceoCall: string;
     }
   | {
       phase: "aborted";
       question: string;
       messages: DebateMessage[];
-      synthesis: string | null;
+      ceoCall: string | null;
     }
   | { phase: "error"; message: string };
 

@@ -1,13 +1,13 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GradientText } from "@/components/ui/gradient-text";
-import { LiquidButton } from "@/components/liquid-glass-button";
+
+const ease = [0.25, 1, 0.5, 1] as const;
 
 interface Tier {
   name: string;
@@ -23,143 +23,110 @@ interface Tier {
   ctaOnClick?: () => void;
 }
 
-function PricingCard({
-  tier,
-  index,
-  reduced,
-  isYearly,
-}: {
-  tier: Tier;
-  index: number;
-  reduced: boolean;
-  isYearly: boolean;
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (!cardRef.current) return;
-    const { left, top, width, height } = cardRef.current.getBoundingClientRect();
-    cardRef.current.style.setProperty("--mx", `${((e.clientX - left) / width) * 100}%`);
-    cardRef.current.style.setProperty("--my", `${((e.clientY - top) / height) * 100}%`);
-  }
-
-  function handleMouseLeave() {
-    if (!cardRef.current) return;
-    cardRef.current.style.removeProperty("--mx");
-    cardRef.current.style.removeProperty("--my");
-  }
-
+function PricingCard({ tier, index, reduced, isYearly }: { tier: Tier; index: number; reduced: boolean; isYearly: boolean }) {
   const displayPrice = isYearly && tier.priceYearly ? tier.priceYearly : tier.price;
   const displayPeriod = isYearly && tier.periodYearly ? tier.periodYearly : tier.period;
 
   return (
-    /* Outer wrapper: no overflow-hidden so the badge floats freely above */
     <motion.div
-      initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 24 }}
+      initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={tier.popular ? {} : { y: -5, scale: 1.02 }}
-      transition={{ duration: 0.7, delay: reduced ? 0 : index * 0.09, ease: [0.25, 1, 0.5, 1] }}
+      transition={{ duration: 0.6, delay: reduced ? 0 : index * 0.08, ease }}
       viewport={{ once: true, margin: "-60px" }}
-      className={cn("relative group/card", tier.popular ? "lg:scale-[1.04] z-10" : "")}
+      className={cn("relative", tier.popular ? "lg:scale-[1.03] z-10" : "")}
     >
-      {/* Badge — sits above the card, outside overflow-hidden */}
+      {/* Badge */}
       {tier.badge && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-(--accent-primary) text-white text-[11px] font-semibold tracking-[0.1em] whitespace-nowrap shadow-[0_0_24px_rgba(139,92,246,0.6)] z-20">
+        <div
+          className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-semibold tracking-[0.08em] whitespace-nowrap z-20"
+          style={{ background: "linear-gradient(135deg,#BF5AF2,#FF375F,#0A84FF)", color: "#fff" }}
+        >
           {tier.badge}
         </div>
       )}
 
-      {/* Inner card — has overflow-hidden for spotlight/shimmer */}
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className={cn(
-          "rounded-3xl border p-6 flex flex-col gap-5 overflow-hidden relative cursor-pointer h-full",
-          tier.popular
-            ? "bg-(--surface) border-(--accent-primary) shadow-[0_0_60px_rgba(139,92,246,0.30)]"
-            : "bg-(--surface)/60 border-(--border) hover:border-(--accent-primary)/40 transition-colors duration-300"
-        )}
-      >
-        {/* Mouse-tracking spotlight */}
+      {/* Card */}
+      {tier.popular ? (
         <div
-          className={cn(
-            "absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none",
-            tier.popular
-              ? "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.20)_0%,transparent_60%)]"
-              : "bg-[radial-gradient(circle_at_var(--mx,50%)_var(--my,50%),rgba(139,92,246,0.10)_0%,transparent_55%)]"
-          )}
-        />
-
-        {/* Diagonal gradient overlay on popular card */}
-        {tier.popular && (
-          <div className="absolute inset-0 pointer-events-none [background:linear-gradient(135deg,rgba(139,92,246,0.10)_0%,transparent_45%,rgba(6,182,212,0.07)_100%)]" />
-        )}
-
-        {/* Name + price */}
-        <div className={cn("relative z-10", tier.badge ? "mt-2" : "")}>
-          <p className="text-[11px] font-mono font-bold tracking-[0.2em] text-(--text-dim) uppercase">{tier.name}</p>
-          <div className="flex items-baseline gap-1.5 mt-2 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={displayPrice}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.2 }}
-                className="text-3xl font-bold text-white"
-              >
-                {displayPrice}
-              </motion.span>
-            </AnimatePresence>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={displayPeriod}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className="text-sm text-(--text-dim)"
-              >
-                {displayPeriod}
-              </motion.span>
-            </AnimatePresence>
-          </div>
-          <p className="text-sm text-(--text-muted) mt-1">{tier.tagline}</p>
+          className="rounded-3xl p-6 flex flex-col gap-5 h-full border border-[rgba(191,90,242,0.28)] transition-shadow duration-300 hover:shadow-[0_0_60px_rgba(191,90,242,0.12)]"
+          style={{
+            background: "rgba(191,90,242,0.05)",
+            boxShadow: "0 0 40px rgba(191,90,242,0.08)",
+          }}
+        >
+          <CardInner tier={tier} displayPrice={displayPrice} displayPeriod={displayPeriod} />
         </div>
-
-        {/* Divider */}
-        <div className={cn("h-px relative z-10", tier.popular ? "bg-(--accent-primary)/30" : "bg-(--border)")} />
-
-        {/* Features */}
-        <ul className="space-y-2.5 flex-1 relative z-10">
-          {tier.features.map((f) => (
-            <li key={f} className="flex items-start gap-2.5 text-sm text-(--text-muted)">
-              <Check
-                className={cn(
-                  "w-4 h-4 shrink-0 mt-0.5 transition-colors duration-300",
-                  tier.popular
-                    ? "text-(--accent-glow)"
-                    : "text-(--text-dim) group-hover/card:text-(--accent-glow)"
-                )}
-              />
-              {f}
-            </li>
-          ))}
-        </ul>
-
-        {/* CTA */}
-        <div className="relative z-10">
-          <LiquidButton
-            size="lg"
-            className={cn("w-full font-semibold", tier.popular ? "text-white" : "text-(--text-muted)")}
-            onClick={tier.ctaOnClick}
-          >
-            {tier.cta}
-          </LiquidButton>
+      ) : (
+        <div className="glass-card rounded-3xl p-6 flex flex-col gap-5 h-full hover:bg-[rgba(255,255,255,0.06)] transition-colors duration-300">
+          <CardInner tier={tier} displayPrice={displayPrice} displayPeriod={displayPeriod} />
         </div>
-      </div>
+      )}
     </motion.div>
+  );
+}
+
+function CardInner({ tier, displayPrice, displayPeriod }: { tier: Tier; displayPrice: string; displayPeriod: string }) {
+  return (
+    <>
+      {/* Name + price */}
+      <div className={tier.badge ? "mt-2" : ""}>
+        <p className="text-[11px] tracking-[0.2em] text-[#6E6E73] uppercase mb-3">{tier.name}</p>
+        <div className="flex items-baseline gap-1.5 overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={displayPrice}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2 }}
+              className="text-3xl font-semibold text-white"
+            >
+              {displayPrice}
+            </motion.span>
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={displayPeriod}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="text-sm text-[#6E6E73]"
+            >
+              {displayPeriod}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+        <p className="text-sm text-[#A1A1A6] mt-1.5">{tier.tagline}</p>
+      </div>
+
+      {/* Divider */}
+      <div className={cn("h-px", tier.popular ? "bg-[rgba(191,90,242,0.20)]" : "bg-[rgba(255,255,255,0.06)]")} />
+
+      {/* Features */}
+      <ul className="space-y-2.5 flex-1">
+        {tier.features.map((f) => (
+          <li key={f} className="flex items-start gap-2.5 text-sm text-[#A1A1A6]">
+            <Check className={cn("w-4 h-4 shrink-0 mt-0.5", tier.popular ? "text-[#BF5AF2]" : "text-[#6E6E73]")} />
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      {/* CTA */}
+      <button
+        onClick={tier.ctaOnClick}
+        className={cn(
+          "w-full h-11 rounded-2xl text-sm font-semibold transition-all duration-200 cursor-pointer",
+          tier.popular
+            ? "text-white hover:opacity-90 active:scale-[0.99]"
+            : "bg-[rgba(255,255,255,0.06)] text-white/80 hover:bg-[rgba(255,255,255,0.10)] hover:text-white active:scale-[0.99]"
+        )}
+        style={tier.popular ? { background: "linear-gradient(135deg,#BF5AF2,#FF375F,#0A84FF)" } : {}}
+      >
+        {tier.cta}
+      </button>
+    </>
   );
 }
 
@@ -202,131 +169,88 @@ export function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-(--bg-secondary)">
-      {/* Static ambient glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)",
-        }}
-      />
-      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
-      {/* Shooting stars */}
-      {!reduced && ([
-        { top: "12%", left: "8%",  delay: 0,   dur: 0.7 },
-        { top: "28%", left: "55%", delay: 2.4, dur: 0.6 },
-        { top: "55%", left: "20%", delay: 5.1, dur: 0.8 },
-        { top: "70%", left: "72%", delay: 1.8, dur: 0.65 },
-        { top: "40%", left: "88%", delay: 7.2, dur: 0.55 },
-      ].map((s, i) => (
-        <motion.div
-          key={i}
-          className="absolute pointer-events-none w-20 h-px rounded-full"
-          style={{
-            top: s.top, left: s.left, rotate: "35deg",
-            background: "linear-gradient(to right, transparent, rgba(167,139,250,0.9), rgba(240,171,252,0.6), transparent)",
-            boxShadow: "0 0 6px rgba(167,139,250,0.6)",
-          }}
-          initial={{ scaleX: 0, opacity: 0, x: 0 }}
-          animate={{ scaleX: [0, 1, 1, 0], opacity: [0, 1, 0.8, 0], x: [0, 120, 160] }}
-          transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, repeatDelay: 9 + i * 1.3, ease: "easeOut" }}
-        />
-      )))}
+    <section id="pricing" className="relative scroll-mt-20 overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-black">
+      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent pointer-events-none" />
 
-
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-6xl mx-auto">
         {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
+          transition={{ duration: 0.7, ease }}
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-10 md:mb-12"
         >
-          <p className="text-sm font-semibold tracking-[0.15em] text-(--accent-glow) uppercase mb-6">{t("eyebrow")}</p>
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white mb-6">
+          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">{t("eyebrow")}</p>
+          <h2 className="font-bold leading-[1.05] tracking-tight text-white mb-6"
+            style={{ fontSize: "clamp(40px, 6vw, 80px)" }}>
             {t("title")}{" "}
-            <GradientText as="span" className="bg-transparent dark:bg-transparent">
-              <em className="font-fraunces">{t("titleEm")}</em>
-            </GradientText>
+            <span className="ai-gradient-text">{t("titleEm")}</span>
           </h2>
-          <p className="text-lg md:text-xl text-(--text-muted) max-w-xl mx-auto">{t("sub")}</p>
+          <p className="text-xl text-[#86868b] max-w-xl mx-auto leading-[1.47]">{t("sub")}</p>
         </motion.div>
 
-        {/* Billing toggle */}
+        {/* Billing toggle — segmented pill */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
           viewport={{ once: true }}
-          className="flex items-center justify-center gap-3 mb-16"
+          className="flex items-center justify-center mb-16"
         >
-          <button
-            onClick={() => setIsYearly(false)}
-            className={cn(
-              "text-sm font-medium transition-colors duration-200 cursor-pointer",
-              !isYearly ? "text-white" : "text-(--text-dim)"
-            )}
-          >
-            {t("billingMonthly")}
-          </button>
-
-          {/* Toggle track */}
-          <button
-            onClick={() => setIsYearly((v) => !v)}
-            aria-checked={isYearly}
-            role="switch"
-            aria-label="Toggle billing period"
-            className="relative w-12 h-6 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-(--accent-primary) cursor-pointer"
-          >
-            <span
-              className={cn(
-                "absolute inset-0 rounded-full transition-colors duration-300",
-                isYearly ? "bg-(--accent-primary)" : "bg-(--surface-elevated)"
+          <div className="relative inline-flex items-center rounded-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] p-1">
+            {/* Monthly */}
+            <button
+              onClick={() => setIsYearly(false)}
+              className="relative px-5 py-2 rounded-full text-sm font-medium cursor-pointer"
+            >
+              {!isYearly && (
+                <motion.div
+                  layoutId="billing-pill"
+                  className="absolute inset-0 rounded-full bg-[rgba(255,255,255,0.12)]"
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
               )}
-            />
-            <span
-              className={cn(
-                "absolute top-1 left-0 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300",
-                isYearly ? "translate-x-7" : "translate-x-1"
+              <span className={cn("relative z-10 transition-colors duration-200", !isYearly ? "text-white" : "text-[#6E6E73]")}>
+                {t("billingMonthly")}
+              </span>
+            </button>
+
+            {/* Yearly */}
+            <button
+              onClick={() => setIsYearly(true)}
+              className="relative px-5 py-2 rounded-full text-sm font-medium cursor-pointer"
+            >
+              {isYearly && (
+                <motion.div
+                  layoutId="billing-pill"
+                  className="absolute inset-0 rounded-full bg-[rgba(255,255,255,0.12)]"
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
               )}
-            />
-          </button>
-
-          <button
-            onClick={() => setIsYearly(true)}
-            className={cn(
-              "text-sm font-medium transition-colors duration-200 cursor-pointer",
-              isYearly ? "text-white" : "text-(--text-dim)"
-            )}
-          >
-            {t("billingYearly")}
-          </button>
-
-          <AnimatePresence>
-            {isYearly && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.8, x: -4 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.8, x: -4 }}
-                transition={{ duration: 0.2 }}
-                className="text-xs px-2.5 py-1 rounded-full bg-(--accent-primary)/20 text-(--accent-glow) border border-(--accent-primary)/30 font-medium"
-              >
-                {t("yearlyBadge")}
-              </motion.span>
-            )}
-          </AnimatePresence>
+              <span className={cn("relative z-10 inline-flex items-center gap-2 transition-colors duration-200", isYearly ? "text-white" : "text-[#6E6E73]")}>
+                {t("billingYearly")}
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold text-white transition-opacity duration-300"
+                  style={{
+                    background: "linear-gradient(135deg,#BF5AF2,#0A84FF)",
+                    opacity: isYearly ? 1 : 0.4,
+                  }}
+                >
+                  {t("yearlyBadge")}
+                </span>
+              </span>
+            </button>
+          </div>
         </motion.div>
 
-        {/* Cards — py-6 leaves room for the badge to float above */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start py-6">
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start py-6">
           {tiers.map((tier, i) => (
             <PricingCard key={tier.name} tier={tier} index={i} reduced={reduced} isYearly={isYearly} />
           ))}
         </div>
-
       </div>
     </section>
   );

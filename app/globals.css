@@ -1,51 +1,67 @@
 
 
 /* ============================================================
-   GEIST FONTS - Premium typography (Vercel/Apple-inspired)
+   GEIST FONTS
    ============================================================ */
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
 @import "tailwindcss";
+
 /* ============================================================
-   ROOT TOKENS — The new Mendly design system
-   Apple x Vercel premium, no neon, no AI cliche
+   ROOT TOKENS — Apple Intelligence Design System
+   Pure black canvas. Prismatic gradient used surgically.
    ============================================================ */
 :root {
-  /* Surfaces - Deep, warm blacks (not pure #000) */
-  --bg-primary: #111113;
-  --bg-secondary: #161618;
-  --surface: #1c1c1f;
-  --surface-elevated: #232327;
-  --surface-hover: #2a2a2e;
+  /* Surfaces — pure void */
+  --bg-primary: #000000;
+  --bg-secondary: #080808;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-elevated: rgba(255, 255, 255, 0.07);
+  --surface-hover: rgba(255, 255, 255, 0.10);
 
-  /* Borders - Subtle hierarchy */
-  --border: #1f1f1f;
-  --border-strong: #2a2a2a;
-  --border-emphasis: #3a3a3a;
+  /* Borders — nearly invisible */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-emphasis: rgba(255, 255, 255, 0.22);
 
-  /* Text - Apple-like off-white, never pure */
-  --text-primary: #ffffff;
-  --text-secondary: #d4d4d8;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
+  /* Text — Apple system greys */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.80);
+  --text-muted: #A1A1A6;
+  --text-dim: #6E6E73;
 
-  /* Accent - One single deep premium violet, used sparingly */
-  --accent-primary: #7c3aed;
-  --accent-glow: #8b5cf6;
-  --accent-warm: #a78bfa;
-  --accent-deep: #5b21b6;
+  /* Apple Intelligence prismatic palette */
+  --ai-purple: #BF5AF2;
+  --ai-pink: #FF375F;
+  --ai-orange: #FF9F0A;
+  --ai-green: #30D158;
+  --ai-blue: #0A84FF;
+  --ai-gradient: linear-gradient(135deg, #BF5AF2 0%, #FF375F 30%, #FF9F0A 55%, #30D158 75%, #0A84FF 100%);
 
-  /* Status colors (kept subtle) */
-  --success: #22c55e;
-  --warning: #eab308;
-  --danger: #ef4444;
+  /* Backward compat aliases for components */
+  --accent-primary: #BF5AF2;
+  --accent-glow: #BF5AF2;
+  --accent-warm: #FF375F;
+  --accent-hot: #0A84FF;
+  --accent-deep: #9B59D0;
 
-  /* Shadows - Clean, no rainbow glows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 32px 0 rgba(0, 0, 0, 0.6);
-  --shadow-violet: 0 8px 32px 0 rgba(124, 58, 237, 0.25);
+  /* Status */
+  --success: #30D158;
+  --warning: #FF9F0A;
+  --danger: #FF375F;
+
+  /* Shadows — deep blacks */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 1);
 }
 
+/* GradientText color vars — Apple Intelligence hues */
+:root {
+  --color-1: 280 89% 64%;   /* #BF5AF2 apple purple */
+  --color-2: 349 100% 60%;  /* #FF375F apple pink */
+  --color-3: 210 100% 52%;  /* #0A84FF apple blue */
+  --color-4: 35 100% 52%;   /* #FF9F0A apple orange */
+}
 
 /* ============================================================
    BASE STYLES
@@ -55,7 +71,7 @@
 }
 
 html {
-  background: var(--bg-primary);
+  background: #000000;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -64,155 +80,107 @@ html {
 }
 
 body {
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-feature-settings: "ss01", "ss02", "cv01", "cv11";
-  font-weight: 450;
+  /* SF Pro on Apple devices, Geist fallback on other platforms */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Geist", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
   letter-spacing: -0.01em;
-  background: var(--bg-primary);
+  background: #000000;
   color: var(--text-primary);
   margin: 0;
   min-height: 100vh;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.47;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Headings - Bold, confident, Apple-like */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+h1, h2, h3, h4, h5, h6 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
   color: var(--text-primary);
 }
 
 h1 {
   font-weight: 800;
   letter-spacing: -0.04em;
+  line-height: 1.0;
 }
 
-/* Mono for code, eyebrows, technical labels */
-code,
-pre,
-.font-mono,
-[class*="font-mono"] {
+code, pre, .font-mono, [class*="font-mono"] {
   font-family: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   font-feature-settings: "ss01", "cv01";
 }
 
-/* Override Tailwind's default font for fraunces (legacy) */
 .font-fraunces {
   font-family: "Geist", sans-serif !important;
-  font-weight: 700;
+  font-weight: 600;
   font-style: normal !important;
   letter-spacing: -0.03em;
 }
 
 em {
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ============================================================
-   SCROLLBAR — Subtle premium styling
+   SCROLLBAR
    ============================================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-emphasis);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 /* ============================================================
-   SELECTION — Subtle violet
+   SELECTION
    ============================================================ */
 ::selection {
-  background: var(--accent-deep);
-  color: var(--text-primary);
+  background: rgba(191, 90, 242, 0.35);
+  color: #FFFFFF;
 }
 
 /* ============================================================
-   FOCUS STATES — Premium ring
+   FOCUS STATES
    ============================================================ */
 :focus-visible {
-  outline: 2px solid var(--accent-glow);
+  outline: 2px solid rgba(191, 90, 242, 0.7);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-button:focus,
-a:focus,
-input:focus,
-textarea:focus {
-  outline: none;
-}
-
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--accent-glow);
+button:focus, a:focus, input:focus, textarea:focus { outline: none; }
+button:focus-visible, a:focus-visible {
+  outline: 2px solid rgba(191, 90, 242, 0.7);
   outline-offset: 2px;
 }
 
 /* ============================================================
-   ANIMATIONS — Subtle premium motion
+   ANIMATIONS
    ============================================================ */
+
+/* Fade in */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes hero-pill-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
+/* Scroll indicator dot */
 @keyframes scroll-dot-bounce {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(10px); }
+  50%       { transform: translateY(10px); }
 }
-
-/* Use animation-name + separate props so inline style can override duration/delay */
-.hero-pill-float {
-  animation-name: hero-pill-float;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-duration: 4s;
-}
-
 .scroll-dot-bounce {
   animation-name: scroll-dot-bounce;
   animation-timing-function: ease-in-out;
@@ -220,30 +188,46 @@ a:focus-visible {
   animation-duration: 1.5s;
 }
 
-@keyframes ceo-glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px #8B5CF640; }
-  50% { box-shadow: 0 0 18px #8B5CF680; }
+/* AI gradient shimmer on text */
+@keyframes ai-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
 }
 
+/* Apple Intelligence ring rotation — the signature effect */
+@keyframes ai-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Breathing orb / center glow */
+@keyframes ai-orb-breathe {
+  0%        { opacity: 0.72; transform: scale(0.97); }
+  33%       { opacity: 0.92; transform: scale(1.04); }
+  66%       { opacity: 0.78; transform: scale(1.01); }
+  100%      { opacity: 0.72; transform: scale(0.97); }
+}
+
+/* Apple-style reveal: slide up + fade */
+@keyframes apple-reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.apple-reveal {
+  animation: apple-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Typing dots */
 @keyframes typing-dot {
   0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-3px); }
+  30%           { opacity: 1; transform: translateY(-3px); }
 }
-
-.ceo-glow-pulse {
-  animation-name: ceo-glow-pulse;
-  animation-duration: 1.8s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
 .typing-dot-1 {
   animation-name: typing-dot;
   animation-duration: 0.9s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
-
 .typing-dot-2 {
   animation-name: typing-dot;
   animation-duration: 0.9s;
@@ -251,7 +235,6 @@ a:focus-visible {
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
-
 .typing-dot-3 {
   animation-name: typing-dot;
   animation-duration: 0.9s;
@@ -260,51 +243,155 @@ a:focus-visible {
   animation-iteration-count: infinite;
 }
 
+/* CEO pulse */
+@keyframes ceo-glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(191,90,242,0.3); }
+  50%       { box-shadow: 0 0 18px rgba(191,90,242,0.6); }
+}
+.ceo-glow-pulse {
+  animation-name: ceo-glow-pulse;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Hero pill float (kept for backward compat) */
+@keyframes hero-pill-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.hero-pill-float {
+  animation-name: hero-pill-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 4s;
+}
+
+/* GradientText blob animations */
+@keyframes gradient-border {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  33%       { transform: rotate(120deg) scale(1.05); }
+  66%       { transform: rotate(240deg) scale(0.97); }
+}
+@keyframes gradient-1 {
+  0%, 100% { top: -50%; left: 0%; }
+  50%       { top: 0%; left: -20%; }
+}
+@keyframes gradient-2 {
+  0%, 100% { top: 0%; right: 0%; }
+  50%       { top: -30%; right: -20%; }
+}
+@keyframes gradient-3 {
+  0%, 100% { bottom: 0%; left: 0%; }
+  50%       { bottom: -30%; left: -20%; }
+}
+@keyframes gradient-4 {
+  0%, 100% { bottom: -50%; right: 0%; }
+  50%       { bottom: 0%; right: -20%; }
+}
+
+/* Marquee */
+@keyframes marquee-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-pill-float,
   .scroll-dot-bounce,
   .ceo-glow-pulse,
   .typing-dot-1,
   .typing-dot-2,
-  .typing-dot-3 { animation: none !important; }
+  .typing-dot-3 {
+    animation: none !important;
+  }
 }
 
 /* ============================================================
-   UTILITY CLASSES — Premium look
+   UTILITY CLASSES — Apple Intelligence
    ============================================================ */
+
+/* The prismatic gradient on text — Apple Intelligence signature */
+.ai-gradient-text {
+  background: linear-gradient(
+    100deg,
+    #BF5AF2 0%,
+    #FF375F 22%,
+    #FF9F0A 44%,
+    #30D158 66%,
+    #0A84FF 88%,
+    #BF5AF2 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ai-gradient-shift 5s ease-in-out infinite;
+}
+
+@keyframes ai-gradient-shift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* Ultra-subtle frosted glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Glass with stronger blur for nav/overlays */
 .glass {
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-strong {
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid var(--border-strong);
+  background: rgba(0, 0, 0, 0.90);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-/* Subtle text gradient (used very sparingly) */
+/* Gradient text (legacy, kept for compat) */
 .text-gradient {
-  background: linear-gradient(
-    135deg,
-    var(--text-primary) 0%,
-    var(--accent-warm) 100%
-  );
+  background: linear-gradient(135deg, #BF5AF2 0%, #FF375F 30%, #0A84FF 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* No more neon glows. Subtle hover lift instead. */
+/* Hover lift */
 .hover-lift {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
-
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+/* AI gradient border wrapper — soft rotating border */
+.ai-border-wrapper {
+  position: relative;
+  border-radius: inherit;
+}
+.ai-border-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, #BF5AF2 0%, #0A84FF 60%, #BF5AF2 100%);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.30;
+  filter: blur(2px);
 }

@@ -123,9 +123,9 @@
     "title": "Watch your team",
     "titleEm": "at work.",
     "sub": "Real collaboration. Real deliverables. Real-time. This is what Monday morning looks like inside Mendly.",
-    "caption1": "Your CMO just delivered the week's marketing plan",
-    "caption2": "Your CTO is reviewing it against technical constraints",
-    "caption3": "Your CEO will arbitrate in the Friday sprint review"
+    "caption1": "CMO drops the Q2 plan. CFO fires back: budget is too high.",
+    "caption2": "CTO flags a freeze conflict. Three agents disagree at once.",
+    "caption3": "CEO makes the call — with hard caps, owners, and no wiggle room."
   },
   "comparison": {
     "eyebrow": "WHY NOT JUST CHATGPT?",
@@ -577,10 +577,10 @@
     "ceoSelecting": "The CEO is selecting the team…",
     "ceoBringsIn": "THE CEO BRINGS IN",
     "round": "Round",
-    "synthesisLabel": "SYNTHESIS",
-    "synthesisTitle": "CEO Recommendation",
-    "ceoSynthesizing": "The CEO is thinking…",
-    "ceoSynthesizingSub": "Synthesis in progress",
+    "synthesisLabel": "CEO DECISION",
+    "synthesisTitle": "The call",
+    "ceoSynthesizing": "The CEO is making the call…",
+    "ceoSynthesizingSub": "Decision in progress",
     "debateAborted": "Debate interrupted",
     "debateError": "An error occurred. Try again.",
     "liveLabel": "Live",

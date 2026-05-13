@@ -24,7 +24,7 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -51,35 +51,35 @@ export function Nav() {
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -16 }}
+      initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 z-50"
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4"
     >
       <div
         className={[
-          "transition-all duration-500",
+          "w-full max-w-5xl rounded-2xl transition-all duration-500",
           scrolled
-            ? "backdrop-blur-xl bg-[var(--bg-primary)]/80 border-b border-[var(--border)]"
-            : "bg-transparent border-b border-transparent",
+            ? "bg-black/80 backdrop-blur-2xl border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
+            : "bg-black/40 backdrop-blur-xl border border-[rgba(255,255,255,0.05)]",
         ].join(" ")}
       >
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-12">
+        <nav className="flex h-14 items-center justify-between px-5">
           {/* Logo */}
           <Link
             href="/"
-            className="font-mono text-base font-bold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--accent-glow)] transition-colors duration-200"
+            className="text-sm font-semibold tracking-[0.15em] text-white/90 hover:text-white transition-colors duration-200"
           >
             MENDLY
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-0.5">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-200 rounded-full hover:bg-[var(--surface)]/40"
+                className="px-4 py-2 text-sm text-[#6E6E73] hover:text-white transition-colors duration-200 rounded-xl"
               >
                 {link.label}
               </a>
@@ -88,17 +88,18 @@ export function Nav() {
 
           {/* Desktop right */}
           <div className="hidden md:flex items-center gap-3">
-            <div className="flex items-center p-1 rounded-full border border-[var(--border)] bg-[var(--surface)]/30">
+            {/* Locale switcher */}
+            <div className="flex items-center p-0.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)]">
               {(["en", "fr"] as const).map((l) => (
                 <button
                   key={l}
                   onClick={() => switchLocale(l)}
                   aria-label={`Switch to ${l.toUpperCase()}`}
                   className={[
-                    "px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase transition-all duration-200",
+                    "px-3 py-1 rounded-full text-[10px] tracking-widest uppercase transition-all duration-200 cursor-pointer",
                     locale === l
-                      ? "bg-[var(--accent-primary)] text-white shadow-sm"
-                      : "text-[var(--text-dim)] hover:text-[var(--text-muted)]",
+                      ? "bg-white text-black font-semibold"
+                      : "text-[#6E6E73] hover:text-[#A1A1A6]",
                   ].join(" ")}
                 >
                   {l}
@@ -117,14 +118,14 @@ export function Nav() {
             </PremiumButton>
           </div>
 
-          {/* Mobile drawer */}
+          {/* Mobile menu toggle */}
           <Sheet open={open} onOpenChange={setOpen}>
             <button
-              className="flex md:hidden items-center justify-center p-2 rounded-full border border-[var(--border)] bg-[var(--surface)]/30 text-[var(--text-muted)]"
+              className="flex md:hidden items-center justify-center p-2 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-[#A1A1A6]"
               aria-label={open ? "Close menu" : "Open menu"}
             >
               <MenuToggle
-                strokeWidth={2.5}
+                strokeWidth={2}
                 open={open}
                 onOpenChange={setOpen}
                 className="size-5"
@@ -133,44 +134,41 @@ export function Nav() {
             <SheetContent
               side="left"
               showClose={false}
-              className="bg-[var(--bg-primary)]/95 backdrop-blur-xl border-r border-[var(--border-strong)] flex flex-col"
+              className="bg-black/95 backdrop-blur-2xl border-r border-[rgba(255,255,255,0.08)] flex flex-col"
             >
-              <div className="grid gap-y-1 overflow-y-auto px-4 pt-16 pb-5 flex-1">
+              <div className="grid gap-y-0.5 overflow-y-auto px-4 pt-16 pb-5 flex-1">
                 {links.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                    className="px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                   >
                     {link.label}
                   </a>
                 ))}
 
-                {/* Account section in mobile drawer */}
-                <div className="mt-4 pt-4 border-t border-[var(--border)]">
-                  <p className="px-4 py-2 text-[10px] font-mono tracking-widest text-[var(--accent-glow)] uppercase">
+                <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)]">
+                  <p className="px-4 py-2 text-[10px] tracking-widest text-[#6E6E73] uppercase">
                     {tAccount("section")}
                   </p>
                   {isLoggedIn ? (
                     <>
                       <div className="px-4 py-2">
-                        <p className="text-xs text-[var(--text-dim)] mb-0.5">
-                          {tAccount("loggedInAs")}
-                        </p>
+                        <p className="text-xs text-[#6E6E73] mb-0.5">{tAccount("loggedInAs")}</p>
                         <p className="text-sm text-white truncate">{email}</p>
                       </div>
                       <Link
                         href="/dashboard"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                       >
-                        <LayoutDashboard className="w-4 h-4 text-[var(--accent-glow)]" />
+                        <LayoutDashboard className="w-4 h-4" />
                         {tAccount("dashboard")}
                       </Link>
                       <button
                         onClick={handleMobileSignOut}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors text-left cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
                         {tAccount("signOut")}
@@ -181,17 +179,17 @@ export function Nav() {
                       <Link
                         href="/login"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                       >
-                        <LogIn className="w-4 h-4 text-[var(--accent-glow)]" />
+                        <LogIn className="w-4 h-4" />
                         {tAccount("signIn")}
                       </Link>
                       <Link
                         href="/signup"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--surface)]/50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                       >
-                        <UserPlus className="w-4 h-4 text-[var(--accent-glow)]" />
+                        <UserPlus className="w-4 h-4" />
                         {tAccount("signUp")}
                       </Link>
                     </>
@@ -204,15 +202,12 @@ export function Nav() {
                   {(["en", "fr"] as const).map((l) => (
                     <button
                       key={l}
-                      onClick={() => {
-                        switchLocale(l);
-                        setOpen(false);
-                      }}
+                      onClick={() => { switchLocale(l); setOpen(false); }}
                       className={[
-                        "flex-1 py-2 rounded-full text-xs font-mono tracking-widest uppercase transition-all duration-200",
+                        "flex-1 py-2 rounded-full text-xs tracking-widest uppercase transition-all duration-200 cursor-pointer",
                         locale === l
-                          ? "bg-[var(--accent-primary)] text-white"
-                          : "border border-[var(--border)] text-[var(--text-muted)]",
+                          ? "bg-white text-black font-semibold"
+                          : "border border-[rgba(255,255,255,0.10)] text-[#6E6E73]",
                       ].join(" ")}
                     >
                       {l}

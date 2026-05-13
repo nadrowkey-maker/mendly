@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { PremiumButton } from "@/components/ui/PremiumButton";
-import { HeroParticles } from "@/components/hero-particles";
+import { AIAura } from "@/components/ui/AIAura";
 
 const ease = [0.25, 1, 0.5, 1] as const;
 
@@ -13,137 +13,98 @@ export function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 md:px-12 bg-(--bg-primary)">
-      {/* ─── BG: Particles ─── */}
-      <div className="absolute inset-0 pointer-events-none z-1">
-        <HeroParticles />
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+      {/* ── Apple Intelligence Aura Ring ─────────────────────── */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <AIAura size={860} speed={7} opacity={0.9} />
       </div>
 
-      {/* ─── BG: Auroras (static — CSS opacity, no JS animation) ─── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
-        <svg
-          className="absolute inset-0 w-full h-full opacity-60"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
-          viewBox="0 0 1920 1080"
-          aria-hidden
-        >
-          <defs>
-            <radialGradient id="hero-violet" cx="20%" cy="30%" r="50%">
-              <stop offset="0%" stopColor="rgba(139, 92, 246, 0.55)" />
-              <stop offset="100%" stopColor="rgba(139, 92, 246, 0)" />
-            </radialGradient>
-            <radialGradient id="hero-cyan" cx="80%" cy="25%" r="45%">
-              <stop offset="0%" stopColor="rgba(6, 182, 212, 0.4)" />
-              <stop offset="100%" stopColor="rgba(6, 182, 212, 0)" />
-            </radialGradient>
-            <radialGradient id="hero-fuchsia" cx="50%" cy="80%" r="40%">
-              <stop offset="0%" stopColor="rgba(240, 171, 252, 0.3)" />
-              <stop offset="100%" stopColor="rgba(240, 171, 252, 0)" />
-            </radialGradient>
-          </defs>
-          <rect width="1920" height="1080" fill="url(#hero-violet)" />
-          <rect width="1920" height="1080" fill="url(#hero-cyan)" />
-          <rect width="1920" height="1080" fill="url(#hero-fuchsia)" />
-        </svg>
-      </div>
-
-      {/* ─── BG: Grid ─── */}
+      {/* ── Background deepening vignette ─────────────────────── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.12] z-2"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-          maskImage:
-            "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 80% 50% at 50% 50%, black 30%, transparent 100%)",
+          background:
+            "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.55) 55%, #000 85%)",
         }}
       />
 
-      {/* ─── MAIN CONTENT ─── */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center pb-28 mt-20">
+      {/* ── Content ─────────────────────────────────────────── */}
+      <div className="relative z-10 max-w-5xl mx-auto text-center px-6 md:px-12 pb-32 mt-20">
+
         {/* Eyebrow */}
-        <motion.div
-          className="inline-flex items-center gap-3 px-5 py-2 mb-8 rounded-full border border-(--border-strong) bg-(--surface)/80"
-          initial={{ opacity: 0, y: 20 }}
+        <motion.p
+          className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-8"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease }}
         >
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-(--accent-primary)" />
-          <span className="text-xs font-semibold tracking-[0.15em] text-white/60 uppercase">
-            {t("eyebrow")}
-          </span>
-        </motion.div>
+          {t("eyebrow")}
+        </motion.p>
 
-        {/* Title */}
+        {/* Main headline — Apple product page scale */}
         <motion.h1
-          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.85] tracking-tighter text-white mb-10"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease }}
-        >
-          <span className="block">{t("titleLine1")}</span>
-          <span className="block">{t("titleLine2")}</span>
-        </motion.h1>
-
-        {/* Description */}
-        <motion.p
-          className="text-base md:text-xl text-white/50 max-w-2xl mx-auto mb-14 leading-relaxed font-medium"
+          className="font-bold leading-[1.0] tracking-[-0.035em] text-white mb-7"
+          style={{ fontSize: "clamp(56px, 9vw, 108px)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.34, ease }}
+          transition={{ duration: 0.7, delay: 0.08, ease }}
+        >
+          <span className="block text-white">{t("titleLine1")}</span>
+          <span className="block ai-gradient-text">{t("titleLine2")}</span>
+        </motion.h1>
+
+        {/* Apple body — 21px, generous grey */}
+        <motion.p
+          className="text-xl md:text-2xl text-[#86868b] max-w-2xl mx-auto mb-14 leading-[1.47] font-normal"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.22, ease }}
         >
           {t("sub")}
         </motion.p>
 
-        {/* Buttons */}
+        {/* CTAs */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-5 items-center justify-center"
-          initial={{ opacity: 0, y: 20 }}
+          className="flex flex-col sm:flex-row gap-4 items-center justify-center"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.46, ease }}
+          transition={{ duration: 0.5, delay: 0.34, ease }}
         >
-          <PremiumButton
-            variant="primary"
-            size="lg"
+          {/* Primary — Apple-style white pill */}
+          <button
             onClick={() => router.push("/signup")}
+            className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-white text-black text-[15px] font-semibold tracking-tight hover:bg-white/90 transition-all duration-200 hover:-translate-y-px cursor-pointer"
           >
             {t("ctaPrimary")}
-          </PremiumButton>
-          <PremiumButton
-            variant="secondary"
-            size="lg"
-            onClick={() => {
-              document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
-            }}
+          </button>
+
+          {/* Secondary — ghost pill */}
+          <button
+            onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
+            className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-transparent text-white text-[15px] font-semibold tracking-tight border border-[rgba(255,255,255,0.20)] hover:border-[rgba(255,255,255,0.35)] hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200 cursor-pointer"
           >
             {t("ctaSecondary")}
-          </PremiumButton>
+          </button>
         </motion.div>
       </div>
 
-      {/* Bottom Vignette */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_120%,rgba(5,3,14,0.8),transparent_50%)] z-3" />
-
-      {/* Scroll indicator */}
+      {/* Scroll caret */}
       <motion.div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1 }}
+        transition={{ duration: 0.5, delay: 1 }}
       >
-        <span className="text-[9px] font-mono tracking-[0.4em] text-white/30 uppercase font-bold">
-          Scroll to explore
-        </span>
-        <div className="w-6 h-10 rounded-full border-2 border-white/10 flex justify-center p-1.5">
-          {/* CSS animation = GPU, no JS thread */}
+        <div className="w-5 h-8 rounded-full border border-[rgba(255,255,255,0.14)] flex justify-center pt-1.5">
           <div
-            className="scroll-dot-bounce w-1 h-2 rounded-full bg-(--accent-glow)"
-            style={{ animationDuration: "1.5s" }}
+            className="scroll-dot-bounce w-0.5 h-1.5 rounded-full"
+            style={{ background: "linear-gradient(to bottom, #BF5AF2, #0A84FF)" }}
           />
         </div>
       </motion.div>
+
+      {/* Bottom fade to black */}
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-black to-transparent pointer-events-none z-10" />
     </section>
   );
 }

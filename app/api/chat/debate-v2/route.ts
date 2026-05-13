@@ -4,8 +4,8 @@ import { geminiFlash } from "@/lib/ai/gemini";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { PLANS } from "@/lib/stripe/plans";
 import { selectAgents } from "@/lib/ai/debate/selector";
-import { buildRound1Prompt, buildRound2Prompt } from "@/lib/ai/debate/orchestrator";
-import { buildSynthesisPrompt } from "@/lib/ai/debate/synthesizer";
+import { buildThreadTurnPrompt } from "@/lib/ai/debate/orchestrator";
+import { buildCeoCallPrompt } from "@/lib/ai/debate/synthesizer";
 import type { Project } from "@/lib/types/project";
 import type { DebateAgentRole } from "@/lib/types/debate";
 
@@ -123,21 +123,20 @@ export async function POST(req: NextRequest) {
 
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);
 
-          const round1Map = new Map<DebateAgentRole, string>();
-          const round2Map = new Map<DebateAgentRole, string>();
+          // Thread: each agent speaks in sequence, sees all previous turns
+          const thread: { agent: DebateAgentRole; content: string }[] = [];
 
-          // ─── Round 1 ────────────────────────────────────────────
-          write("[[ROUND:1]]");
+          write("[[THREAD]]");
 
           for (const agent of selection.agents) {
             if (cancelled) break;
 
-            write(`[[AGENT:${agent}:1]]`);
+            write(`[[TURN:${agent}]]`);
 
-            const prompt = buildRound1Prompt({
+            const prompt = buildThreadTurnPrompt({
               agent,
               question: userMessage,
-              otherAgents: selection.agents,
+              previousTurns: [...thread],
               project,
               locale: targetLocale,
             });
@@ -151,12 +150,12 @@ export async function POST(req: NextRequest) {
                 if (text) { content += text; write(text); }
               }
             } catch (err) {
-              console.error(`[debate-v2] ${agent} round1 error:`, err);
+              console.error(`[debate-v2] ${agent} turn error:`, err);
               write(targetLocale === "en" ? "[Error generating response]" : "[Erreur lors de la génération]");
             }
 
-            round1Map.set(agent, content);
-            write(`[[/AGENT:${agent}:1]]`);
+            thread.push({ agent, content });
+            write(`[[/TURN:${agent}]]`);
 
             if (!cancelled && content) {
               await supabase.from("messages").insert({
@@ -169,105 +168,45 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          write("[[/ROUND:1]]");
+          write("[[/THREAD]]");
 
           if (cancelled) {
             controller.close();
             return;
           }
 
-          // ─── Round 2 ────────────────────────────────────────────
-          write("[[ROUND:2]]");
+          // CEO makes the call
+          write("[[CEO_CALL]]");
 
-          const round1Content = selection.agents.map((a) => ({
-            agent: a,
-            content: round1Map.get(a) ?? "",
-          }));
-
-          for (const agent of selection.agents) {
-            if (cancelled) break;
-
-            write(`[[AGENT:${agent}:2]]`);
-
-            const prompt = buildRound2Prompt({
-              agent,
-              question: userMessage,
-              round1Content,
-              project,
-              locale: targetLocale,
-            });
-
-            let content = "";
-            try {
-              const result = await streamAgent(prompt);
-              for await (const chunk of result.stream) {
-                if (cancelled) break;
-                const text = chunk.text();
-                if (text) { content += text; write(text); }
-              }
-            } catch (err) {
-              console.error(`[debate-v2] ${agent} round2 error:`, err);
-              write(targetLocale === "en" ? "[Error generating response]" : "[Erreur lors de la génération]");
-            }
-
-            round2Map.set(agent, content);
-            write(`[[/AGENT:${agent}:2]]`);
-
-            if (!cancelled && content) {
-              await supabase.from("messages").insert({
-                conversation_id: conversationId,
-                user_id: user.id,
-                role: "assistant",
-                agent_role: agent,
-                content,
-              });
-            }
-          }
-
-          write("[[/ROUND:2]]");
-
-          if (cancelled) {
-            controller.close();
-            return;
-          }
-
-          // ─── CEO Synthesis ───────────────────────────────────────
-          write("[[SYNTHESIS]]");
-
-          const transcript = [
-            ...selection.agents.map((a) => ({ agent: a, round: 1 as const, content: round1Map.get(a) ?? "" })),
-            ...selection.agents.map((a) => ({ agent: a, round: 2 as const, content: round2Map.get(a) ?? "" })),
-          ];
-
-          const synthPrompt = buildSynthesisPrompt({
+          const ceoPrompt = buildCeoCallPrompt({
             question: userMessage,
             project,
-            transcript,
+            thread,
             locale: targetLocale,
           });
 
-          let synthContent = "";
+          let ceoContent = "";
           try {
-            const synthResult = await streamAgent(synthPrompt);
-            for await (const chunk of synthResult.stream) {
+            const ceoResult = await streamAgent(ceoPrompt);
+            for await (const chunk of ceoResult.stream) {
               if (cancelled) break;
               const text = chunk.text();
-              if (text) { synthContent += text; write(text); }
+              if (text) { ceoContent += text; write(text); }
             }
           } catch (err) {
-            console.error("[debate-v2] synthesis error:", err);
-            write(targetLocale === "en" ? "[Synthesis error — please retry]" : "[Erreur de synthèse — réessaie]");
+            console.error("[debate-v2] CEO call error:", err);
+            write(targetLocale === "en" ? "[CEO call error — please retry]" : "[Erreur CEO — réessaie]");
           }
 
-          write("[[/SYNTHESIS]]");
+          write("[[/CEO_CALL]]");
 
-          if (synthContent) {
+          if (ceoContent) {
             await supabase.from("messages").insert({
               conversation_id: conversationId,
               user_id: user.id,
               role: "assistant",
               agent_role: "CEO",
-              content: synthContent,
+              content: ceoContent,
             });
           }
 

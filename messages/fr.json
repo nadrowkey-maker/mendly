@@ -123,9 +123,9 @@
     "title": "Regarde ton équipe",
     "titleEm": "travailler.",
     "sub": "Vraie collaboration. Vrais livrables. En temps réel. Voilà à quoi ressemble un lundi matin chez Mendly.",
-    "caption1": "Ton CMO vient de livrer le plan marketing de la semaine",
-    "caption2": "Ton CTO le relit à l'aune des contraintes techniques",
-    "caption3": "Ton CEO arbitrera en revue de sprint vendredi"
+    "caption1": "Le CMO pose le plan Q2. Le CFO réplique : budget trop élevé.",
+    "caption2": "Le CTO signale un conflit de freeze. Trois agents en désaccord.",
+    "caption3": "Le CEO tranche — plafond ferme, responsables assignés, aucune marge."
   },
   "comparison": {
     "eyebrow": "POURQUOI PAS JUSTE CHATGPT ?",
@@ -577,10 +577,10 @@
     "ceoSelecting": "Le CEO sélectionne l’équipe…",
     "ceoBringsIn": "LE CEO RAMÈNE",
     "round": "Round",
-    "synthesisLabel": "SYNTHÈSE",
-    "synthesisTitle": "Recommandation du CEO",
-    "ceoSynthesizing": "Le CEO réfléchit…",
-    "ceoSynthesizingSub": "Synthèse en cours",
+    "synthesisLabel": "DÉCISION CEO",
+    "synthesisTitle": "Le verdict",
+    "ceoSynthesizing": "Le CEO tranche…",
+    "ceoSynthesizingSub": "Décision en cours",
     "debateAborted": "Débat interrompu",
     "debateError": "Une erreur est survenue. Réessaie.",
     "liveLabel": "Live",

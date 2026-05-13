@@ -3,7 +3,6 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { motion, useReducedMotion, useInView } from "framer-motion";
 import { Globe } from "@/components/ui/cobe-globe";
-import { GradientText } from "@/components/ui/gradient-text";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Zap, Globe as GlobeIcon } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -50,7 +49,7 @@ export function Trust() {
     <section
       ref={sectionRef}
       id="trust"
-      className="relative bg-(--bg-primary) overflow-hidden py-24 md:py-32 px-6 md:px-12"
+      className="relative bg-black overflow-hidden py-24 md:py-32 px-6 md:px-12"
     >
       {/* Ambient glow */}
       <div
@@ -70,14 +69,13 @@ export function Trust() {
           viewport={{ once: true, margin: "-80px" }}
           className="text-center mb-10"
         >
-          <p className="text-[10px] md:text-xs tracking-[0.3em] text-(--accent-glow) uppercase mb-4">
+          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
             {t("eyebrow")}
           </p>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4">
+          <h2 className="font-bold leading-[1.05] tracking-tight text-white mb-4"
+            style={{ fontSize: "clamp(36px, 5.5vw, 72px)" }}>
             {t("title")}{" "}
-            <GradientText as="span" className="bg-transparent dark:bg-transparent">
-              <em className="font-fraunces">{t("titleEm")}</em>
-            </GradientText>
+            <span className="ai-gradient-text">{t("titleEm")}</span>
           </h2>
         </motion.div>
 

@@ -1,64 +1,67 @@
 "use client";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { GlowCard } from "@/components/spotlight-card";
 
-const FADE_UP = (delay: number) => ({
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, delay, ease: [0.25, 1, 0.5, 1] as const },
-  viewport: { once: true, margin: "-80px" as const },
-});
+const ease = [0.25, 1, 0.5, 1] as const;
+
+interface StatCard {
+  number: string;
+  title: string;
+  desc: string;
+}
+
+function StatCard({ number, title, desc, index }: StatCard & { index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease }}
+      viewport={{ once: true, margin: "-60px" }}
+      className="glass-card rounded-3xl p-8 flex flex-col gap-4 hover:bg-[rgba(255,255,255,0.06)] transition-colors duration-300"
+    >
+      <span className="text-7xl md:text-8xl font-bold leading-none ai-gradient-text tracking-tight">
+        {number}
+      </span>
+      <p className="text-base font-semibold text-white/90 tracking-tight">{title}</p>
+      <p className="text-[15px] text-[#86868b] leading-[1.47]">{desc}</p>
+    </motion.div>
+  );
+}
 
 export function ProblemSection() {
   const t = useTranslations("problem");
 
-  const cards = [
-    { number: t("stat1Number"), title: t("stat1Title"), desc: t("stat1Desc"), glow: "purple" as const },
-    { number: t("stat2Number"), title: t("stat2Title"), desc: t("stat2Desc"), glow: "blue" as const },
-    { number: t("stat3Number"), title: t("stat3Title"), desc: t("stat3Desc"), glow: "red" as const },
+  const cards: StatCard[] = [
+    { number: t("stat1Number"), title: t("stat1Title"), desc: t("stat1Desc") },
+    { number: t("stat2Number"), title: t("stat2Title"), desc: t("stat2Desc") },
+    { number: t("stat3Number"), title: t("stat3Title"), desc: t("stat3Desc") },
   ];
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12">
-      {/* Static ambient glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 65% 55% at 50% 40%, rgba(139,92,246,0.11) 0%, transparent 70%)",
-        }}
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_10%,var(--bg-primary)_72%)] pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-(--bg-primary) to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
-      {/* Scanline sweep */}
-      <motion.div
-        className="absolute inset-x-0 h-px pointer-events-none z-0"
-        style={{ background: "linear-gradient(to right, transparent 5%, rgba(139,92,246,0.35) 50%, transparent 95%)" }}
-        animate={{ top: ["0%", "100%"] }}
-        transition={{ duration: 7, ease: "linear", repeat: Infinity, repeatDelay: 4 }}
-      />
-      {/* Second scanline offset */}
-      <motion.div
-        className="absolute inset-x-0 h-px pointer-events-none z-0"
-        style={{ background: "linear-gradient(to right, transparent 5%, rgba(6,182,212,0.2) 50%, transparent 95%)" }}
-        animate={{ top: ["0%", "100%"] }}
-        transition={{ duration: 7, ease: "linear", repeat: Infinity, repeatDelay: 4, delay: 3.5 }}
-      />
+    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-black">
+      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        <motion.div {...FADE_UP(0)} className="text-center mb-16 md:mb-24">
-          <p className="text-xs tracking-[0.3em] text-(--text-dim) uppercase mb-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease }}
+          viewport={{ once: true, margin: "-80px" }}
+          className="text-center mb-16 md:mb-20"
+        >
+          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
             {t("eyebrow")}
           </p>
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-(--text-primary)">
+          <h2 className="font-bold leading-[1.05] tracking-[-0.025em] text-white mb-6"
+            style={{ fontSize: "clamp(40px, 6vw, 80px)" }}>
             {t("title")}{" "}
-            <em className="font-fraunces text-(--text-muted)">
+            <span className="text-[#86868b] font-normal">
               {t("titleEm")}
-            </em>
+            </span>
           </h2>
-          <p className="mt-6 text-base md:text-lg text-(--text-muted) max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#86868b] max-w-2xl mx-auto leading-[1.47]">
             {t("intro")}
           </p>
         </motion.div>
@@ -66,38 +69,21 @@ export function ProblemSection() {
         {/* Mobile: horizontal swipe */}
         <div className="md:hidden -mx-6 overflow-x-auto pb-4 [scrollbar-width:none] [scroll-snap-type:x_mandatory]">
           <div className="flex gap-4 px-6 w-max">
-            {cards.map(({ number, title, desc, glow }, i) => (
+            {cards.map((card, i) => (
               <div key={i} className="w-[80vw] shrink-0 snap-start">
-                <GlowCard glowColor={glow} customSize className="w-full min-h-52">
-                  <div className="flex flex-col gap-3">
-                    <span className="text-6xl font-bold text-white leading-none">{number}</span>
-                    <p className="text-sm font-semibold text-(--text-primary)">{title}</p>
-                    <p className="text-xs text-(--text-muted) leading-relaxed">{desc}</p>
-                  </div>
-                </GlowCard>
+                <StatCard {...card} index={i} />
               </div>
             ))}
           </div>
         </div>
-        {/* Desktop: 3-col grid */}
-        <div className="hidden md:grid md:grid-cols-3 gap-8">
-          {cards.map(({ number, title, desc, glow }, i) => (
-            <motion.div key={i} {...FADE_UP(0.1 * (i + 1))}>
-              <GlowCard glowColor={glow} customSize className="w-full min-h-65">
-                <div className="flex flex-col gap-3">
-                  <span className="text-6xl md:text-7xl font-bold text-white leading-none">
-                    {number}
-                  </span>
-                  <p className="text-sm font-semibold text-(--text-primary)">{title}</p>
-                  <p className="text-xs text-(--text-muted) leading-relaxed">{desc}</p>
-                </div>
-              </GlowCard>
-            </motion.div>
+
+        {/* Desktop: 3-col */}
+        <div className="hidden md:grid md:grid-cols-3 gap-6">
+          {cards.map((card, i) => (
+            <StatCard key={i} {...card} index={i} />
           ))}
         </div>
       </div>
-
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-(--bg-primary) to-transparent pointer-events-none" />
     </section>
   );
 }

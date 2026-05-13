@@ -1,64 +1,72 @@
 import type { Project } from "@/lib/types/project";
 
-interface SynthInput {
+interface CeoCallInput {
   question: string;
   project: Project;
-  transcript: { agent: string; round: 1 | 2; content: string }[];
+  thread: { agent: string; content: string }[];
   locale: "fr" | "en";
 }
 
-export function buildSynthesisPrompt({
+export function buildCeoCallPrompt({
   question,
   project,
-  transcript,
+  thread,
   locale,
-}: SynthInput): string {
-  const transcriptStr = transcript
-    .map((m) => `[${m.agent} — Round ${m.round}]\n${m.content}`)
+}: CeoCallInput): string {
+  const projectCtx = `${project.name} | ${project.stage}` + (project.sector ? ` | ${project.sector}` : "");
+
+  const threadStr = thread
+    .map((t) => `[${t.agent}]: ${t.content}`)
     .join("\n\n");
 
-  const projectCtx = `${project.name} | ${project.stage} | ${project.sector ?? ""}`;
-
   if (locale === "en") {
-    return `You are the CEO synthesizing a board debate for a solo founder.
+    return `You are the CEO closing a board debate.
 
 PROJECT: ${projectCtx}
 QUESTION: "${question}"
 
-DEBATE TRANSCRIPT:
-${transcriptStr}
+DEBATE THREAD:
+${threadStr}
 
-YOUR JOB: Write the final synthesis. 200 words MAX.
-Follow this structure (no headers, flow naturally):
-1. Where the team agrees — 1 sentence
-2. Where they disagree — 1–2 sentences, cite what each side actually said
-3. Your CEO call — clear recommendation, pick a side or merge decisively
-4. 3 concrete action items — bullet list, max 3
+YOUR JOB: Make THE call. Not a summary. A decision.
 
-Be decisive. The founder pays you to decide, not to hedge.
-If the question itself is poorly framed, reframe it.
+FORMAT (no headers — write it as natural CEO voice):
+1. One sentence max on why this was a real disagreement worth having.
+2. Who you're siding with and why — or why you're overriding everyone if they're all wrong.
+3. Your decision stated clearly. Not "we should consider" — "We are doing X."
+4. Three bullet actions the founder executes in the next 48h. Specific, no fluff.
 
-CEO synthesis:`;
+RULES:
+- Pick a side. Merging all views into a consensus blob is cowardice.
+- You can tell someone they were wrong.
+- 200 words MAX.
+- The founder pays you to decide, not to keep the peace.
+
+CEO call:`;
   }
 
-  return `Tu es le CEO qui synthétise un débat d'équipe pour un fondateur solo.
+  return `Tu es le CEO qui clôt un débat d'équipe.
 
 PROJET : ${projectCtx}
 QUESTION : "${question}"
 
-TRANSCRIPT DU DÉBAT :
-${transcriptStr}
+FIL DU DÉBAT :
+${threadStr}
 
-TON JOB : Synthèse finale. 200 mots MAX.
-Suis cette structure (pas de titres, fais couler naturellement) :
-1. Sur quoi l'équipe est d'accord — 1 phrase
-2. Sur quoi ils divergent — 1–2 phrases, cite précisément ce que chaque camp a dit
-3. Ton arbitrage CEO — recommandation claire, tranche ou fusionne de manière décisive
-4. 3 actions concrètes — bullets, max 3
+TON JOB : Prendre LA décision. Pas un résumé. Une décision.
 
-Sois décisif. Le fondateur te paye pour décider, pas pour nuancer à l'infini.
-Si la question est mal posée, reformule-la.
-Tutoie le fondateur.
+FORMAT (pas de titres — voix CEO naturelle) :
+1. Une phrase max sur pourquoi ce désaccord valait la peine d'être eu.
+2. Qui tu soutiens et pourquoi — ou pourquoi tu passes outre tout le monde si tout le monde a tort.
+3. Ta décision formulée clairement. Pas "on devrait envisager" — "On fait X."
+4. Trois actions concrètes que le fondateur exécute dans les 48h. Précis, sans remplissage.
 
-Synthèse CEO :`;
+RÈGLES :
+- Choisis un camp. Fusionner toutes les vues en consensus mou, c'est de la lâcheté.
+- Tu peux dire à quelqu'un qu'il avait tort.
+- 200 mots MAX.
+- Le fondateur te paye pour décider, pas pour maintenir la paix.
+- Tutoie le fondateur.
+
+Décision CEO :`;
 }

@@ -334,56 +334,42 @@ export function ChatInterface({
       const decoder = new TextDecoder();
       let buffer = "";
 
-      type Round = 1 | 2;
       let currentAgent: DebateAgentRole | null = null;
-      let currentRound: Round | null = null;
-      let inSynthesis = false;
+      let inCeoCall = false;
+      let turnIndex = 0;
       let messages: import("@/lib/types/debate").DebateMessage[] = [];
-      let synthesis = "";
+      let ceoCall = "";
       let selection: AgentSelection | null = null;
 
-      const upsertMessage = (
+      const upsertTurn = (
         agent: DebateAgentRole,
-        round: Round,
+        idx: number,
         contentDelta: string,
         streaming: boolean
       ) => {
         messages = [...messages];
-        const idx = messages.findIndex((m) => m.agent === agent && m.round === round);
-        if (idx === -1) {
+        const pos = messages.findIndex((m) => m.agent === agent && m.turnIndex === idx);
+        if (pos === -1) {
           messages.push({
-            id: `${agent}-r${round}-${Date.now()}`,
+            id: `${agent}-t${idx}-${Date.now()}`,
             agent,
-            round,
+            turnIndex: idx,
             content: contentDelta,
             isStreaming: streaming,
           });
         } else {
-          messages[idx] = {
-            ...messages[idx],
-            content: messages[idx].content + contentDelta,
+          messages[pos] = {
+            ...messages[pos],
+            content: messages[pos].content + contentDelta,
             isStreaming: streaming,
           };
         }
       };
 
-      const finalizeMessage = (agent: DebateAgentRole, round: Round) => {
+      const finalizeTurn = (agent: DebateAgentRole, idx: number) => {
         messages = messages.map((m) =>
-          m.agent === agent && m.round === round ? { ...m, isStreaming: false } : m
+          m.agent === agent && m.turnIndex === idx ? { ...m, isStreaming: false } : m
         );
-      };
-
-      const flushState = (
-        phase: "round1" | "round2" | "synthesizing" | "done",
-        sel: AgentSelection,
-        msgs: typeof messages,
-        synth: string | null
-      ) => {
-        if (phase === "synthesizing" || phase === "done") {
-          setDebateState({ phase, question: trimmed, selection: sel, messages: msgs, synthesis: synth ?? "" });
-        } else {
-          setDebateState({ phase, question: trimmed, selection: sel, messages: msgs });
-        }
       };
 
       let streamDone = false;
@@ -393,89 +379,72 @@ export function ChatInterface({
         streamDone = done;
         if (!done && value) buffer += decoder.decode(value, { stream: true });
 
-        // Inner loop: process all complete tokens in buffer before fetching next chunk
         let madeProgress = true;
         while (madeProgress) {
           madeProgress = false;
-
-          // All patterns are anchored with ^ so they only match at the buffer head.
-          // Text is drained last, ensuring markers are only at the front when checked.
 
           // [[META]]{json}[[/META]]
           const metaMatch = buffer.match(/^\[\[META\]\]([\s\S]*?)\[\[\/META\]\]/);
           if (metaMatch) {
             try {
               selection = JSON.parse(metaMatch[1]) as AgentSelection;
-              if (selection) setDebateState({ phase: "round1", question: trimmed, selection, messages: [] });
-            } catch { /* ignore bad json */ }
+              if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [] });
+            } catch { /* ignore */ }
             buffer = buffer.slice(metaMatch[0].length);
             madeProgress = true;
             continue;
           }
 
-          // [[ROUND:1]] / [[ROUND:2]]
-          const roundStart = buffer.match(/^\[\[ROUND:(1|2)\]\]/);
-          if (roundStart) {
-            const roundNum = (roundStart[1] === "1" ? 1 : 2) as Round;
-            currentRound = roundNum;
-            if (selection) flushState(roundNum === 1 ? "round1" : "round2", selection, messages, null);
-            buffer = buffer.slice(roundStart[0].length);
+          // [[THREAD]] / [[/THREAD]]
+          const threadBound = buffer.match(/^\[\[\/?THREAD\]\]/);
+          if (threadBound) {
+            buffer = buffer.slice(threadBound[0].length);
             madeProgress = true;
             continue;
           }
 
-          // [[/ROUND:1]] / [[/ROUND:2]]
-          const roundEnd = buffer.match(/^\[\[\/ROUND:(1|2)\]\]/);
-          if (roundEnd) {
-            buffer = buffer.slice(roundEnd[0].length);
-            madeProgress = true;
-            continue;
-          }
-
-          // [[AGENT:CFO:1]]
-          const agentStart = buffer.match(/^\[\[AGENT:([A-Z]+):(1|2)\]\]/);
-          if (agentStart) {
-            const agentRole = agentStart[1] as DebateAgentRole;
-            const round = (agentStart[2] === "1" ? 1 : 2) as Round;
+          // [[TURN:CFO]]
+          const turnStart = buffer.match(/^\[\[TURN:([A-Z]+)\]\]/);
+          if (turnStart) {
+            const agentRole = turnStart[1] as DebateAgentRole;
             currentAgent = agentRole;
-            currentRound = round;
-            upsertMessage(agentRole, round, "", true);
-            if (selection) flushState(round === 1 ? "round1" : "round2", selection, messages, null);
-            buffer = buffer.slice(agentStart[0].length);
+            upsertTurn(agentRole, turnIndex, "", true);
+            if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
+            buffer = buffer.slice(turnStart[0].length);
             madeProgress = true;
             continue;
           }
 
-          // [[/AGENT:CFO:1]]
-          const agentEnd = buffer.match(/^\[\[\/AGENT:([A-Z]+):(1|2)\]\]/);
-          if (agentEnd) {
-            const agentRole = agentEnd[1] as DebateAgentRole;
-            const round = (agentEnd[2] === "1" ? 1 : 2) as Round;
-            finalizeMessage(agentRole, round);
+          // [[/TURN:CFO]]
+          const turnEnd = buffer.match(/^\[\[\/TURN:([A-Z]+)\]\]/);
+          if (turnEnd) {
+            const agentRole = turnEnd[1] as DebateAgentRole;
+            finalizeTurn(agentRole, turnIndex);
+            turnIndex++;
             currentAgent = null;
-            if (selection) flushState(round === 1 ? "round1" : "round2", selection, messages, null);
-            buffer = buffer.slice(agentEnd[0].length);
+            if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
+            buffer = buffer.slice(turnEnd[0].length);
             madeProgress = true;
             continue;
           }
 
-          // [[SYNTHESIS]]
-          const synthStart = buffer.match(/^\[\[SYNTHESIS\]\]/);
-          if (synthStart) {
-            inSynthesis = true;
+          // [[CEO_CALL]]
+          const ceoStart = buffer.match(/^\[\[CEO_CALL\]\]/);
+          if (ceoStart) {
+            inCeoCall = true;
             currentAgent = null;
-            if (selection) flushState("synthesizing", selection, messages, synthesis || "");
-            buffer = buffer.slice(synthStart[0].length);
+            if (selection) setDebateState({ phase: "deciding", question: trimmed, selection, messages: [...messages], ceoCall: "" });
+            buffer = buffer.slice(ceoStart[0].length);
             madeProgress = true;
             continue;
           }
 
-          // [[/SYNTHESIS]]
-          const synthEnd = buffer.match(/^\[\[\/SYNTHESIS\]\]/);
-          if (synthEnd) {
-            inSynthesis = false;
-            if (selection) flushState("done", selection, messages, synthesis);
-            buffer = buffer.slice(synthEnd[0].length);
+          // [[/CEO_CALL]]
+          const ceoEnd = buffer.match(/^\[\[\/CEO_CALL\]\]/);
+          if (ceoEnd) {
+            inCeoCall = false;
+            if (selection) setDebateState({ phase: "done", question: trimmed, selection, messages: [...messages], ceoCall });
+            buffer = buffer.slice(ceoEnd[0].length);
             madeProgress = true;
             continue;
           }
@@ -499,24 +468,22 @@ export function ChatInterface({
             continue;
           }
 
-          // Drain plain text (up to the next marker, or all of buffer if no marker).
-          // This must run last so markers are only matched when at the buffer head.
+          // Drain plain text
           if (buffer.length > 0 && !buffer.startsWith("[[")) {
             const nextMarkerIdx = buffer.indexOf("[[");
             const drainable = nextMarkerIdx === -1 ? buffer : buffer.slice(0, nextMarkerIdx);
             if (drainable) {
-              if (inSynthesis) {
-                synthesis += drainable;
-                if (selection) flushState("synthesizing", selection, messages, synthesis);
-              } else if (currentAgent && currentRound !== null) {
-                upsertMessage(currentAgent, currentRound, drainable, true);
-                if (selection) flushState(currentRound === 1 ? "round1" : "round2", selection, messages, null);
+              if (inCeoCall) {
+                ceoCall += drainable;
+                if (selection) setDebateState({ phase: "deciding", question: trimmed, selection, messages: [...messages], ceoCall });
+              } else if (currentAgent !== null) {
+                upsertTurn(currentAgent, turnIndex, drainable, true);
+                if (selection) setDebateState({ phase: "threading", question: trimmed, selection, messages: [...messages] });
               }
               buffer = buffer.slice(drainable.length);
               madeProgress = true;
             }
           }
-          // If buffer starts with [[ and no complete marker matched, wait for more data
         }
       }
 
@@ -524,12 +491,12 @@ export function ChatInterface({
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         setDebateState((prev) => {
-          if (prev.phase === "round1" || prev.phase === "round2" || prev.phase === "synthesizing") {
+          if (prev.phase === "threading" || prev.phase === "deciding") {
             return {
               phase: "aborted",
               question: trimmed,
               messages: "messages" in prev ? prev.messages : [],
-              synthesis: prev.phase === "synthesizing" ? prev.synthesis : null,
+              ceoCall: prev.phase === "deciding" ? prev.ceoCall : null,
             };
           }
           return { phase: "idle" };

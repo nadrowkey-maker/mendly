@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "gradient";
 type Size = "sm" | "md" | "lg";
 
 interface PremiumButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,15 +11,17 @@ interface PremiumButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseClasses =
-  "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-(--bg-primary) focus-visible:ring-(--accent-glow)";
+  "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[rgba(191,90,242,0.7)]";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-white text-black hover:bg-(--text-primary) shadow-[0_1px_2px_0_rgba(0,0,0,0.4)] hover:shadow-[0_4px_16px_0_rgba(255,255,255,0.15)] hover:-translate-y-px",
+    "bg-white text-black hover:bg-white/90 shadow-[0_1px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[0_4px_20px_0_rgba(255,255,255,0.12)] hover:-translate-y-px active:translate-y-0 active:scale-[0.99]",
   secondary:
-    "bg-(--surface) text-(--text-primary) border border-(--border-strong) hover:border-(--border-emphasis) hover:bg-(--surface-elevated)",
+    "bg-[rgba(255,255,255,0.06)] text-white border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.10)] hover:border-[rgba(255,255,255,0.20)] active:scale-[0.99]",
   ghost:
-    "bg-transparent text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--surface)/60",
+    "bg-transparent text-[#A1A1A6] hover:text-white hover:bg-[rgba(255,255,255,0.05)] active:scale-[0.99]",
+  gradient:
+    "relative overflow-hidden text-white before:absolute before:inset-0 before:bg-[linear-gradient(135deg,#BF5AF2_0%,#FF375F_30%,#FF9F0A_55%,#30D158_75%,#0A84FF_100%)] before:opacity-90 hover:before:opacity-100 before:transition-opacity before:duration-200 hover:shadow-[0_4px_24px_rgba(191,90,242,0.35)] hover:-translate-y-px active:translate-y-0",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -29,16 +31,7 @@ const sizeClasses: Record<Size, string> = {
 };
 
 export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
-  (
-    {
-      variant = "primary",
-      size = "md",
-      className = "",
-      children,
-      ...props
-    },
-    ref
-  ) => {
+  ({ variant = "primary", size = "md", className = "", children, ...props }, ref) => {
     return (
       <button
         ref={ref}
@@ -50,7 +43,11 @@ export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
         ].join(" ")}
         {...props}
       >
-        {children}
+        {variant === "gradient" ? (
+          <span className="relative z-10">{children}</span>
+        ) : (
+          children
+        )}
       </button>
     );
   }
