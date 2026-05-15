@@ -114,7 +114,7 @@ export function Nav() {
               size="sm"
               onClick={() => router.push(isLoggedIn ? "/dashboard" : "/signup")}
             >
-              {t("cta")}
+              {isLoggedIn ? tAccount("dashboard") : t("cta")}
             </PremiumButton>
           </div>
 
@@ -223,7 +223,7 @@ export function Nav() {
                     setOpen(false);
                   }}
                 >
-                  {t("cta")}
+                  {isLoggedIn ? tAccount("dashboard") : t("cta")}
                 </PremiumButton>
               </div>
             </SheetContent>
