@@ -9,9 +9,9 @@ export function PromiseSection() {
   const t = useTranslations("promise");
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-black">
-      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent pointer-events-none" />
+    <section className="relative overflow-hidden py-24 md:py-40 px-6 md:px-12 bg-[#080808]">
+      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-[#080808] to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#080808] to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Eyebrow + headline */}
@@ -22,7 +22,7 @@ export function PromiseSection() {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-16 md:mb-24"
         >
-          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
+          <p className="text-[13px] font-medium tracking-[0.18em] text-white/40 uppercase mb-6">
             {t("eyebrow")}
           </p>
           <h2 className="font-bold leading-[1.05] tracking-tight text-white"
@@ -45,7 +45,7 @@ export function PromiseSection() {
                 "font-fraunces italic leading-relaxed",
                 key === "body3"
                   ? "text-xl md:text-2xl text-white/80 font-semibold"
-                  : "text-lg md:text-xl text-[#6E6E73]",
+                  : "text-lg md:text-xl text-white/35",
               ].join(" ")}
             >
               {t(key)}
@@ -58,7 +58,7 @@ export function PromiseSection() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
           viewport={{ once: true }}
-          className="mt-14 text-center text-sm text-[#6E6E73] tracking-wide"
+          className="mt-14 text-center text-sm text-white/35 tracking-wide"
         >
           {t("support")}
         </motion.p>
@@ -66,3 +66,5 @@ export function PromiseSection() {
     </section>
   );
 }
+
+

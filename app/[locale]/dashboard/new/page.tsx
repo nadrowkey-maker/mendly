@@ -1,29 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createProject } from "@/lib/actions/projects";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { useSearchParams } from "next/navigation";
 import type {
   ProjectSector,
   ProjectStage,
   ProjectPriority,
   ProjectTimeCommitment,
 } from "@/lib/types/project";
+import { PrivacyReassurance } from "@/components/project/PrivacyReassurance";
+
+const COLORS = ["#0071e3", "#5b9dff", "#34d8b4", "#f472b6", "#fbbf24", "#fb7185", "#818cf8", "#38bdf8"];
+const EMOJIS = ["🚀", "💡", "🧪", "📱", "🛍️", "🎯", "🧠", "⚡", "🌱", "🎨", "📦", "🔭"];
 
 export default function NewProjectPage() {
   const t = useTranslations("newProject");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    const desc = searchParams.get("desc");
+    if (desc) setDescription(decodeURIComponent(desc));
+    nameRef.current?.focus();
+  }, [searchParams]);
   const [sector, setSector] = useState<ProjectSector>("tech");
   const [stage, setStage] = useState<ProjectStage>("idea");
   const [priority, setPriority] = useState<ProjectPriority>("strategy");
   const [timeCommitment, setTimeCommitment] =
     useState<ProjectTimeCommitment>("parttime");
+  const [accentColor, setAccentColor] = useState(COLORS[0]);
+  const [emoji, setEmoji] = useState(EMOJIS[0]);
+  const [vision, setVision] = useState("");
 
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -40,6 +56,9 @@ export default function NewProjectPage() {
       stage,
       priority,
       time_commitment: timeCommitment,
+      accent_color: accentColor,
+      emoji,
+      vision: vision || undefined,
     });
 
     if (!result.success) {
@@ -63,7 +82,7 @@ export default function NewProjectPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(139,92,246,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,113,227,0.06) 0%, transparent 70%)",
         }}
       />
 
@@ -118,6 +137,7 @@ export default function NewProjectPage() {
               {t("nameLabel")} *
             </label>
             <input
+              ref={nameRef}
               id="name"
               type="text"
               value={name}
@@ -152,6 +172,23 @@ export default function NewProjectPage() {
             <p className="text-[10px] text-(--text-dim)">
               {description.length}/500
             </p>
+          </div>
+
+          {/* Vision (Bloc 8.3) */}
+          <div className="space-y-2">
+            <label htmlFor="vision" className="text-xs font-mono tracking-widest text-(--text-dim) uppercase">
+              {t("visionLabel")}
+            </label>
+            <textarea
+              id="vision"
+              value={vision}
+              onChange={(e) => setVision(e.target.value)}
+              maxLength={300}
+              rows={2}
+              disabled={status === "loading"}
+              placeholder={t("visionPlaceholder")}
+              className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50 resize-none"
+            />
           </div>
 
           {/* Stage */}
@@ -256,6 +293,53 @@ export default function NewProjectPage() {
             </div>
           </div>
 
+          {/* Identity */}
+          <div className="space-y-3">
+            <label className="text-xs font-mono tracking-widest text-(--text-dim) uppercase">
+              {t("identityLabel")}
+            </label>
+            <div className="flex flex-wrap items-center gap-4">
+              <div
+                className="grid place-items-center h-12 w-12 rounded-2xl text-2xl shrink-0"
+                style={{ background: `${accentColor}1f`, border: `1px solid ${accentColor}66` }}
+              >
+                {emoji || "•"}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setAccentColor(c)}
+                    aria-label={`Color ${c}`}
+                    className="h-7 w-7 rounded-full transition-transform hover:scale-110 cursor-pointer"
+                    style={{
+                      background: c,
+                      outline: accentColor === c ? "2px solid #fff" : "none",
+                      outlineOffset: 2,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {EMOJIS.map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => setEmoji(e)}
+                  aria-label={`Emoji ${e}`}
+                  className={`h-9 w-9 rounded-xl text-lg grid place-items-center cursor-pointer transition-colors ${
+                    emoji === e ? "bg-(--surface-3)" : "hover:bg-(--surface-2)"
+                  }`}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-(--text-dim)">{t("identityHint")}</p>
+          </div>
+
           {/* Submit */}
           <div className="pt-2">
             <PremiumButton
@@ -269,6 +353,8 @@ export default function NewProjectPage() {
             </PremiumButton>
           </div>
         </motion.form>
+
+        <PrivacyReassurance className="mt-6 max-w-2xl mx-auto" />
       </div>
     </main>
   );

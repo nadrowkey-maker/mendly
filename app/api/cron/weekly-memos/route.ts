@@ -32,18 +32,19 @@ export async function GET(req: NextRequest) {
   const results: { userId: string; ok: boolean; error?: string }[] = [];
 
   try {
-    const { data: proUsers, error: usersErr } = await supabase
+    const { data: payingUsers, error: usersErr } = await supabase
       .from("subscriptions")
-      .select("user_id")
-      .eq("plan", "pro")
+      .select("user_id, plan")
+      .in("plan", ["starter", "pro"])
       .eq("status", "active");
 
     if (usersErr) throw usersErr;
-    if (!proUsers || proUsers.length === 0) {
-      return NextResponse.json({ message: "No Pro users", count: 0 });
+    if (!payingUsers || payingUsers.length === 0) {
+      return NextResponse.json({ message: "No paying users", count: 0 });
     }
 
-    for (const sub of proUsers) {
+    for (const sub of payingUsers) {
+      const isPro = sub.plan === "pro";
       try {
         const { data: userData } = await supabase.auth.admin.getUserById(sub.user_id);
         if (!userData?.user?.email) continue;
@@ -73,19 +74,59 @@ export async function GET(req: NextRequest) {
             .map((m) => `[${m.role === "user" ? "FOUNDER" : (m.agent_role ?? "ASSISTANT")}]\n${m.content}`)
             .join("\n\n");
 
-          const prompt = `Tu es le CEO de ${project.name}. C'est lundi matin. Tu dois envoyer au fondateur un memo hebdomadaire (200 mots MAX) qui synthétise la semaine.
+          // Durable project state for the recap (decisions made, open actions).
+          const [actionsRes, decisionsRes] = await Promise.all([
+            supabase.from("actions").select("content").eq("project_id", project.id).eq("status", "todo").limit(10),
+            supabase
+              .from("memory_events")
+              .select("title, kind")
+              .eq("project_id", project.id)
+              .gte("created_at", sevenDaysAgo.toISOString())
+              .limit(10),
+          ]);
+          const actionsStr =
+            (actionsRes.data ?? []).map((a) => `- ${a.content}`).join("\n") || "(aucune action en cours)";
+          const decisionsStr =
+            (decisionsRes.data ?? []).map((d) => `- [${d.kind}] ${d.title}`).join("\n") ||
+            "(aucune décision enregistrée)";
+
+          const prompt = isPro
+            ? `Tu es le CEO de ${project.name}. Rédige le memo hebdomadaire ENRICHI du fondateur — version "vraie réunion de direction" (350 mots max). Formulation NON datée ("voici tes priorités pour la semaine", jamais "aujourd'hui").
 
 CONVERSATIONS DE LA SEMAINE :
 ${transcript}
 
-STRUCTURE DU MEMO :
-1. **Ce qui s'est passé cette semaine** (1-2 phrases)
-2. **Ton observation clé** en tant que CEO
-3. **Tes 3 priorités pour la semaine prochaine** (bullets, 3 max)
+DÉCISIONS RÉCENTES :
+${decisionsStr}
 
-Sois punchy, direct, exécutable. Pas de blabla. Le fondateur n'a pas le temps.
+ACTIONS EN COURS :
+${actionsStr}
 
-Maintenant écris le memo (200 mots max) :`;
+STRUCTURE :
+1. **Bilan de la semaine** (2-3 phrases, honnête)
+2. **Analyse des risques** (2 risques + comment les mitiger)
+3. **Recommandations proactives** (2 angles que le fondateur ne voit peut-être pas)
+4. **Tes 3 priorités pour la semaine** (bullets exécutables)
+5. **Suivi des actions** : reviens sur les actions en cours, sans reproche ; si bloqué, propose une version plus réaliste.
+
+Direct, dense, sans remplissage. Tutoie.`
+            : `Tu es le CEO de ${project.name}. Rédige un memo hebdomadaire BASIQUE pour le fondateur (180 mots max). Formulation NON datée ("voici où on en est", jamais "aujourd'hui").
+
+CONVERSATIONS DE LA SEMAINE :
+${transcript}
+
+DÉCISIONS RÉCENTES :
+${decisionsStr}
+
+ACTIONS EN COURS :
+${actionsStr}
+
+STRUCTURE :
+1. **Décisions prises cette semaine** (1-2 phrases)
+2. **Actions en cours / ce qui reste à faire** (bullets)
+3. **Tes priorités pour la semaine** (3 max)
+
+Punchy, direct, exécutable. Pas de blabla. Tutoie.`;
 
           let memoContent = "";
           try {

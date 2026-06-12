@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { updateProject } from "@/lib/actions/projects";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { MilestoneCelebration } from "@/components/dashboard/MilestoneCelebration";
+
+const STAGE_ORDER: ProjectStage[] = ["idea", "mvp", "launched", "scaling"];
 import type {
   Project,
   ProjectSector,
@@ -33,6 +36,7 @@ export function EditProjectModal({ project, onClose, onUpdated }: Props) {
 
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [celebration, setCelebration] = useState<{ from: string; to: string } | null>(null);
 
   useEffect(() => {
     if (!project) return;
@@ -77,10 +81,18 @@ export function EditProjectModal({ project, onClose, onUpdated }: Props) {
     }
 
     onUpdated(res.project);
-    onClose();
+
+    // Bloc 8.3 — celebrate when the project advances a stage.
+    const advanced = STAGE_ORDER.indexOf(stage) > STAGE_ORDER.indexOf(project.stage);
+    if (advanced) {
+      setCelebration({ from: t(`stage_${project.stage}`), to: t(`stage_${stage}`) });
+    } else {
+      onClose();
+    }
   };
 
   return (
+    <>
     <AnimatePresence>
       {project && (
         <motion.div
@@ -287,5 +299,19 @@ export function EditProjectModal({ project, onClose, onUpdated }: Props) {
         </motion.div>
       )}
     </AnimatePresence>
+
+    <AnimatePresence>
+      {celebration && (
+        <MilestoneCelebration
+          fromLabel={celebration.from}
+          toLabel={celebration.to}
+          onDone={() => {
+            setCelebration(null);
+            onClose();
+          }}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }

@@ -16,11 +16,11 @@ function useP(ref: React.RefObject<HTMLDivElement | null>): MotionValue<number> 
   return scrollYProgress;
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRANSITION 1 · CRYSTAL IRIS   Problem → Promise
-   A prismatic mandala iris blooms open — rotating rings, conic gradient,
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TRANSITION 1 Â· CRYSTAL IRIS   Problem â†’ Promise
+   A prismatic mandala iris blooms open â€” rotating rings, conic gradient,
    20 spokes, dilating pupil, and a violet-white flash at peak
-════════════════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function IrisRing({ p, size, appear, color, thick, rotDir, rotDeg }: {
   p: MotionValue<number>; size: number; appear: number; color: string;
@@ -140,11 +140,11 @@ export function TransitionCrystalRings() {
   );
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRANSITION 2 · HYPERSPACE TUNNEL   HowItWorks → Team
-   20 rings surge from the void and rush past at lightspeed — you're entering
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TRANSITION 2 Â· HYPERSPACE TUNNEL   HowItWorks â†’ Team
+   20 rings surge from the void and rush past at lightspeed â€” you're entering
    deep space. White-violet rings accelerate inward with trailing star streaks.
-════════════════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function TunnelRing({ p, delay, color, thick }: {
   p: MotionValue<number>; delay: number; color: string; thick: number;
@@ -224,7 +224,7 @@ export function TransitionStellarGate() {
   return (
     <div ref={ref} style={{ height: "150vh", background: "var(--bg-primary)" }}>
       <div className="sticky top-0 h-screen overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
+        <div className="absolute inset-0 bg-[#080808]" />
         <HyperCore p={p} />
         {TUNNEL_RINGS_CFG.map((cfg, i) => <TunnelRing key={i} p={p} {...cfg} />)}
         {SPEED_LINES_CFG.map((cfg, i) => <SpeedLine key={i} p={p} {...cfg} />)}
@@ -234,11 +234,11 @@ export function TransitionStellarGate() {
   );
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRANSITION 3 · CYBER SCAN   Action → Deliverables
-   A full-screen data scan pulses across the viewport — tight horizontal grid,
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TRANSITION 3 Â· CYBER SCAN   Action â†’ Deliverables
+   A full-screen data scan pulses across the viewport â€” tight horizontal grid,
    two sweeping neon beams, vertical data columns, and a terminal flash
-════════════════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function ScanLine({ p, yPct, delay }: {
   p: MotionValue<number>; yPct: number; delay: number;
@@ -334,11 +334,11 @@ export function TransitionLightSweep() {
   );
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRANSITION 4 · EVENT HORIZON   Comparison → Pricing
-   A gravitational singularity forms — nebula cloud → glowing accretion disk →
-   expanding warp rings → the void swallows everything → final flash
-════════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TRANSITION 4 Â· EVENT HORIZON   Comparison â†’ Pricing
+   A gravitational singularity forms â€” nebula cloud â†’ glowing accretion disk â†’
+   expanding warp rings â†’ the void swallows everything â†’ final flash
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function NebulaCloud({ p }: { p: MotionValue<number> }) {
   const scale   = useTransform(p, [0, 0.12, 0.72, 1], [0, 1.2, 1.8, 0]);
@@ -403,7 +403,7 @@ export function TransitionEventHorizon() {
   return (
     <div ref={ref} style={{ height: "150vh", background: "var(--bg-secondary)" }}>
       <div className="sticky top-0 h-screen overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
+        <div className="absolute inset-0 bg-[#080808]" />
         <NebulaCloud p={p} />
         <WarpRing p={p} delay={0.10} size={500} color="rgba(240,171,252,0.4)" />
         <WarpRing p={p} delay={0.18} size={500} color="rgba(167,139,250,0.5)" />
@@ -415,12 +415,12 @@ export function TransitionEventHorizon() {
   );
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRANSITION 5 · SUPERNOVA   Pricing → Trust
-   A compressed singularity detonates — shockwave rings blast outward,
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TRANSITION 5 Â· SUPERNOVA   Pricing â†’ Trust
+   A compressed singularity detonates â€” shockwave rings blast outward,
    38 particles scatter to the edges, 16 radial rays fill the screen,
    and a color burst fades from white to violet to darkness
-════════════════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function ShockRing({ p, delay, color, thick }: {
   p: MotionValue<number>; delay: number; color: string; thick: number;
@@ -524,7 +524,7 @@ export function TransitionCosmicIgnite() {
   return (
     <div ref={ref} style={{ height: "150vh", background: "var(--bg-primary)" }}>
       <div className="sticky top-0 h-screen overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
+        <div className="absolute inset-0 bg-[#080808]" />
         {NOVA_STARS_CFG.map((cfg, i) => <NovaStar key={i} p={p} {...cfg} />)}
         {NOVA_RAYS_CFG.map((cfg, i) => <NovaRay key={i} p={p} {...cfg} />)}
         {SHOCK_RINGS_CFG.map((cfg, i) => <ShockRing key={i} p={p} {...cfg} />)}
@@ -533,3 +533,4 @@ export function TransitionCosmicIgnite() {
     </div>
   );
 }
+

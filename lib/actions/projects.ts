@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { track } from "@/lib/actions/analytics";
+import { createMemoryEvent } from "@/lib/actions/memory";
 import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import type {
   CreateProjectInput,
@@ -63,6 +65,9 @@ export async function createProject(input: CreateProjectInput): Promise<{
       stage: input.stage,
       priority: input.priority || null,
       time_commitment: input.time_commitment || null,
+      accent_color: input.accent_color || null,
+      emoji: input.emoji || null,
+      vision: input.vision?.trim() || null,
     })
     .select()
     .single();
@@ -72,6 +77,7 @@ export async function createProject(input: CreateProjectInput): Promise<{
     return { success: false, error: "Impossible de créer le projet" };
   }
 
+  void track("project_created", { stage: input.stage, sector: input.sector ?? null });
   revalidatePath("/dashboard");
   return { success: true, project: data as Project };
 }
@@ -124,6 +130,16 @@ export async function updateProject(
   } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Not authenticated" };
 
+  let prevStage: string | null = null;
+  if (patch.stage !== undefined) {
+    const { data: cur } = await supabase
+      .from("projects")
+      .select("stage")
+      .eq("id", projectId)
+      .single();
+    prevStage = (cur as { stage?: string } | null)?.stage ?? null;
+  }
+
   const cleanPatch: Record<string, unknown> = {};
   if (patch.name !== undefined) {
     const trimmed = patch.name.trim();
@@ -159,6 +175,20 @@ export async function updateProject(
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/projects/${projectId}`);
+
+  // Celebrate stage advancement (Bloc 8.3) — lands a milestone in project memory.
+  if (patch.stage && prevStage) {
+    const order: Record<string, number> = { idea: 0, mvp: 1, launched: 2, scaling: 3 };
+    if ((order[patch.stage] ?? 0) > (order[prevStage] ?? 0)) {
+      void createMemoryEvent({
+        projectId,
+        kind: "milestone",
+        title: `Milestone: ${prevStage} → ${patch.stage}`,
+      });
+      void track("milestone_reached", { stage: patch.stage });
+    }
+  }
+
   return { success: true, project: data as Project };
 }
 

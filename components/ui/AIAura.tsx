@@ -1,132 +1,101 @@
 "use client";
 
+/**
+ * AIAura — the signature "the AI is present / speaking" element.
+ * A calm, premium multicolor aurora: a slowly rotating conic ring of
+ * violet → blue → teal → pink, with a soft breathing field inside.
+ * No neon, no red/orange. Quiet until it matters.
+ *
+ * Uses global keyframes `aurora-rotate` and `aurora-breathe` (globals.css).
+ */
 interface AIAuraProps {
+  /** Diameter in px. */
   size?: number;
+  /** Seconds for one full rotation (lower = faster). */
   speed?: number;
+  /** 0–1 master opacity. */
   opacity?: number;
+  /** Extra ring thickness (px). */
+  thickness?: number;
   className?: string;
-  glow?: boolean;
 }
 
+const VIOLET = "167, 139, 250";
+const BLUE = "91, 157, 255";
+const TEAL = "52, 216, 180";
+const PINK = "244, 114, 182";
+
 export function AIAura({
-  size = 800,
-  speed = 7,
+  size = 520,
+  speed = 14,
   opacity = 1,
+  thickness = 0,
   className = "",
-  glow = true,
 }: AIAuraProps) {
-  const blur1 = size * 0.05;
-  const blur2 = size * 0.07;
-  const blur3 = size * 0.12;
+  const ringBlur = size * 0.04 + thickness;
 
   return (
     <div
-      className={`absolute pointer-events-none select-none ${className}`}
-      style={{ width: size, height: size }}
+      className={`pointer-events-none select-none ${className}`}
+      style={{ width: size, height: size, position: "absolute" }}
       aria-hidden
     >
-      {/* Primary ring — breathes + spins */}
+      {/* Rotating conic ring — the multicolor aurora */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           borderRadius: "50%",
-          animation: `ai-orb-breathe ${speed * 1.4}s ease-in-out infinite`,
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "50%",
-            background: `conic-gradient(
-              from 0deg,
-              rgba(191,90,242,${opacity * 0.65}),
-              rgba(255,55,95,${opacity * 0.55}),
-              rgba(255,159,10,${opacity * 0.45}),
-              rgba(48,209,88,${opacity * 0.40}),
-              rgba(10,132,255,${opacity * 0.60}),
-              rgba(162,89,255,${opacity * 0.55}),
-              rgba(191,90,242,${opacity * 0.65})
-            )`,
-            filter: `blur(${blur1}px)`,
-            animation: `ai-spin ${speed}s linear infinite`,
-            WebkitMaskImage:
-              "radial-gradient(transparent 48%, black 56%, black 82%, transparent 94%)",
-            maskImage:
-              "radial-gradient(transparent 48%, black 56%, black 82%, transparent 94%)",
-          }}
-        />
-      </div>
-
-      {/* Secondary ring — counter-rotates + breathes offset */}
-      <div
-        style={{
-          position: "absolute",
-          inset: size * 0.06,
-          borderRadius: "50%",
-          animation: `ai-orb-breathe ${speed * 1.8}s ease-in-out infinite`,
-          animationDelay: `${speed * 0.6}s`,
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "50%",
-            background: `conic-gradient(
-              from 90deg,
-              rgba(10,132,255,${opacity * 0.45}),
-              rgba(48,209,88,${opacity * 0.30}),
-              rgba(255,159,10,${opacity * 0.35}),
-              rgba(255,55,95,${opacity * 0.40}),
-              rgba(191,90,242,${opacity * 0.45}),
-              rgba(10,132,255,${opacity * 0.45})
-            )`,
-            filter: `blur(${blur2}px)`,
-            animation: `ai-spin ${speed * 1.7}s linear infinite reverse`,
-            WebkitMaskImage:
-              "radial-gradient(transparent 46%, black 55%, black 80%, transparent 92%)",
-            maskImage:
-              "radial-gradient(transparent 46%, black 55%, black 80%, transparent 92%)",
-          }}
-        />
-      </div>
-
-      {/* Outer atmospheric haze — very slow drift, very blurred */}
-      <div
-        style={{
-          position: "absolute",
-          inset: -size * 0.10,
-          borderRadius: "50%",
-          background: `conic-gradient(
-            from 45deg,
-            rgba(191,90,242,${opacity * 0.20}),
-            rgba(255,55,95,${opacity * 0.13}),
-            rgba(10,132,255,${opacity * 0.18}),
-            rgba(48,209,88,${opacity * 0.10}),
-            rgba(191,90,242,${opacity * 0.20})
-          )`,
-          filter: `blur(${blur3}px)`,
-          animation: `ai-spin ${speed * 3.5}s linear infinite`,
+          background: `conic-gradient(from 0deg,
+            rgba(${VIOLET}, ${0.7 * opacity}),
+            rgba(${BLUE}, ${0.6 * opacity}),
+            rgba(${TEAL}, ${0.5 * opacity}),
+            rgba(${PINK}, ${0.6 * opacity}),
+            rgba(${VIOLET}, ${0.7 * opacity}))`,
+          filter: `blur(${ringBlur}px)`,
+          WebkitMaskImage:
+            "radial-gradient(closest-side, transparent 54%, black 64%, black 86%, transparent 99%)",
+          maskImage:
+            "radial-gradient(closest-side, transparent 54%, black 64%, black 86%, transparent 99%)",
+          animation: `aurora-rotate ${speed}s linear infinite`,
         }}
       />
 
-      {/* Center breathing glow */}
-      {glow && (
-        <div
-          style={{
-            position: "absolute",
-            inset: "18%",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(ellipse at center, rgba(191,90,242,0.14) 0%, rgba(10,132,255,0.07) 50%, transparent 75%)",
-            filter: `blur(${size * 0.07}px)`,
-            animation: `ai-orb-breathe ${speed * 1.1}s ease-in-out infinite`,
-            animationDelay: `${speed * 0.3}s`,
-          }}
-        />
-      )}
+      {/* Counter-rotating softer ring for depth */}
+      <div
+        style={{
+          position: "absolute",
+          inset: size * 0.05,
+          borderRadius: "50%",
+          background: `conic-gradient(from 140deg,
+            rgba(${BLUE}, ${0.4 * opacity}),
+            rgba(${TEAL}, ${0.3 * opacity}),
+            rgba(${PINK}, ${0.35 * opacity}),
+            rgba(${VIOLET}, ${0.4 * opacity}),
+            rgba(${BLUE}, ${0.4 * opacity}))`,
+          filter: `blur(${ringBlur * 1.6}px)`,
+          WebkitMaskImage:
+            "radial-gradient(closest-side, transparent 50%, black 62%, black 84%, transparent 98%)",
+          maskImage:
+            "radial-gradient(closest-side, transparent 50%, black 62%, black 84%, transparent 98%)",
+          animation: `aurora-rotate ${speed * 1.7}s linear infinite reverse`,
+        }}
+      />
+
+      {/* Breathing inner glow */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "22%",
+          borderRadius: "50%",
+          background: `radial-gradient(ellipse at center,
+            rgba(${VIOLET}, ${0.16 * opacity}) 0%,
+            rgba(${BLUE}, ${0.08 * opacity}) 48%,
+            transparent 74%)`,
+          filter: `blur(${size * 0.06}px)`,
+          animation: `aurora-breathe ${speed * 0.6}s ease-in-out infinite`,
+        }}
+      />
     </div>
   );
 }

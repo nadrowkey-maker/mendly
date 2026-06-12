@@ -11,7 +11,7 @@ interface PremiumButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseClasses =
-  "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[rgba(191,90,242,0.7)]";
+  "inline-flex items-center justify-center font-medium tracking-tight transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080808] focus-visible:ring-[rgba(167,139,250,0.6)]";
 
 const variantClasses: Record<Variant, string> = {
   primary:
@@ -21,7 +21,7 @@ const variantClasses: Record<Variant, string> = {
   ghost:
     "bg-transparent text-[#A1A1A6] hover:text-white hover:bg-[rgba(255,255,255,0.05)] active:scale-[0.99]",
   gradient:
-    "relative overflow-hidden text-white before:absolute before:inset-0 before:bg-[linear-gradient(135deg,#BF5AF2_0%,#FF375F_30%,#FF9F0A_55%,#30D158_75%,#0A84FF_100%)] before:opacity-90 hover:before:opacity-100 before:transition-opacity before:duration-200 hover:shadow-[0_4px_24px_rgba(191,90,242,0.35)] hover:-translate-y-px active:translate-y-0",
+    "relative overflow-hidden text-white before:absolute before:inset-0 before:bg-[linear-gradient(135deg,#a78bfa_0%,#60a5fa_50%,#34d399_100%)] before:opacity-90 hover:before:opacity-100 before:transition-opacity before:duration-200 hover:shadow-[0_4px_24px_rgba(167,139,250,0.30)] hover:-translate-y-px active:translate-y-0",
 };
 
 const sizeClasses: Record<Size, string> = {

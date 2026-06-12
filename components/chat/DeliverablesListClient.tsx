@@ -18,7 +18,7 @@ interface Props {
 }
 
 const AGENT_COLOR: Record<string, string> = {
-  CEO: "#8B5CF6",
+  CEO: "#0071e3",
   CTO: "#06B6D4",
   CMO: "#F0ABFC",
 };
@@ -62,7 +62,7 @@ export function DeliverablesListClient({ project, deliverables: initial }: Props
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(139,92,246,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,113,227,0.06) 0%, transparent 70%)",
         }}
       />
 
@@ -112,7 +112,7 @@ export function DeliverablesListClient({ project, deliverables: initial }: Props
           // List
           <div className="space-y-3">
             {items.map((d, i) => {
-              const color = AGENT_COLOR[d.agent_role] ?? "#8B5CF6";
+              const color = AGENT_COLOR[d.agent_role] ?? "#0071e3";
               const date = new Date(d.created_at).toLocaleDateString(undefined, {
                 day: "numeric",
                 month: "long",

@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import type { DebateAgentRole, TensionLink } from "@/lib/types/debate";
 
 const AGENT_COLORS: Record<string, string> = {
-  CEO: "#BF5AF2",
-  CTO: "#0A84FF",
-  CMO: "#FF375F",
+  CEO: "#8B5CF6",
+  CTO: "#06B6D4",
+  CMO: "#F0ABFC",
   CFO: "#FF9F0A",
   CPO: "#30D158",
   CDO: "#06B6D4",
@@ -18,7 +18,7 @@ const AGENT_COLORS: Record<string, string> = {
 const INTENSITY_COLORS: Record<1 | 2 | 3, string> = {
   1: "#FF9F0A",
   2: "#FF6B35",
-  3: "#FF375F",
+  3: "#F0ABFC",
 };
 
 const SVG_SIZE = 260;
@@ -65,10 +65,10 @@ export function TensionMapSVG({ agents, links }: Props) {
       className="rounded-2xl border border-white/[0.06] p-4 mt-2"
       style={{ background: "rgba(255,255,255,0.02)" }}
     >
-      <p className="text-[9px] font-mono tracking-[0.25em] text-[#6E6E73] uppercase mb-1">
+      <p className="text-[9px] font-mono tracking-[0.25em] text-white/35 uppercase mb-1">
         {t("tensionMapTitle")}
       </p>
-      <p className="text-[10px] text-[#6E6E73] mb-3">{t("tensionMapSub")}</p>
+      <p className="text-[10px] text-white/35 mb-3">{t("tensionMapSub")}</p>
 
       <div className="flex justify-center">
         <svg
@@ -156,3 +156,4 @@ export function TensionMapSVG({ agents, links }: Props) {
     </motion.div>
   );
 }
+

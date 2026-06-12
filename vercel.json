@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/weekly-memos",
       "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/post-mortems",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/nudges",
+      "schedule": "0 10 * * *"
     }
   ]
 }

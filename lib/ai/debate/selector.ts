@@ -2,19 +2,24 @@ import { geminiFlash } from "@/lib/ai/gemini";
 import type { Project } from "@/lib/types/project";
 import type { AgentSelection, DebateAgentRole } from "@/lib/types/debate";
 
-const VALID_AGENTS: DebateAgentRole[] = [
-  "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO",
-];
+const VALID_AGENTS: DebateAgentRole[] = ["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"];
 
-const FALLBACK: AgentSelection = {
-  agents: ["CTO", "CMO"],
-  rationale: "Default balanced tech/growth perspective.",
+const SPECIALIST_DESC: Record<DebateAgentRole, string> = {
+  CTO: "CTO: Tech architecture, stack, technical risks",
+  CMO: "CMO: Marketing, positioning, growth, brand",
+  CPO: "CPO: Product strategy, prioritization, user stories",
+  CFO: "CFO: Finance, pricing, fundraising, unit economics",
+  CDO: "CDO: Data, metrics, analytics, KPIs",
+  DEV: "DEV: Concrete coding, implementation",
+  CCO: "CCO: Communication, copy, content, PR",
 };
 
 interface SelectorInput {
   question: string;
   project: Project;
   locale: "fr" | "en";
+  /** Restrict selectable agents (e.g. to the founder's plan). CEO excluded. */
+  allowed?: DebateAgentRole[];
 }
 
 async function callWithRetry(prompt: string) {
@@ -43,17 +48,29 @@ async function callWithRetry(prompt: string) {
 }
 
 export async function selectAgents(input: SelectorInput): Promise<AgentSelection> {
-  const prompt = buildPrompt(input);
+  const pool =
+    input.allowed && input.allowed.length >= 2
+      ? input.allowed.filter((a) => VALID_AGENTS.includes(a))
+      : VALID_AGENTS;
+
+  const fallback: AgentSelection = {
+    agents: pool.slice(0, 2),
+    rationale:
+      input.locale === "en"
+        ? "Default balanced perspective."
+        : "Perspective équilibrée par défaut.",
+  };
+
   try {
-    const result = await callWithRetry(prompt);
-    if (!result) return FALLBACK;
+    const result = await callWithRetry(buildPrompt(input, pool));
+    if (!result) return fallback;
     const raw = result.response.text();
-    if (!raw) return FALLBACK;
+    if (!raw) return fallback;
 
     const jsonStr = extractJson(raw);
     const parsed = JSON.parse(jsonStr) as { agents?: unknown; rationale?: unknown };
-    const agents = sanitizeAgents(parsed.agents);
-    if (agents.length < 2) return FALLBACK;
+    const agents = sanitizeAgents(parsed.agents, pool);
+    if (agents.length < 2) return fallback;
 
     const rationale =
       typeof parsed.rationale === "string" && parsed.rationale.trim()
@@ -65,18 +82,13 @@ export async function selectAgents(input: SelectorInput): Promise<AgentSelection
     return { agents, rationale };
   } catch (err) {
     console.error("[selector]", err);
-    return FALLBACK;
+    return fallback;
   }
 }
 
-function buildPrompt({ question, project, locale }: SelectorInput): string {
-  const specialists = `- CTO: Tech architecture, stack, technical risks
-- CMO: Marketing, positioning, growth, brand
-- CPO: Product strategy, prioritization, user stories
-- CFO: Finance, pricing, fundraising, unit economics
-- CDO: Data, metrics, analytics, KPIs
-- DEV: Concrete coding, implementation
-- CCO: Communication, copy, content, PR`;
+function buildPrompt({ question, project, locale }: SelectorInput, pool: DebateAgentRole[]): string {
+  const specialists = pool.map((a) => `- ${SPECIALIST_DESC[a]}`).join("\n");
+  const maxPick = Math.min(4, pool.length);
 
   if (locale === "en") {
     return `You are a CEO selecting debate participants for a founder's question.
@@ -88,8 +100,8 @@ Description: ${project.description ?? "(none)"}
 Available specialists (CEO excluded):
 ${specialists}
 
-Select 2–4 specialists with the most distinct, relevant perspectives.
-2 is fine for focused questions. 4 max for broad multi-faceted ones.
+Select 2–${maxPick} specialists with the most distinct, relevant perspectives.
+2 is fine for focused questions. ${maxPick} max for broad multi-faceted ones.
 
 Respond ONLY with valid JSON (no markdown, no commentary):
 {"agents":["XXX","XXX"],"rationale":"Brief explanation in English (max 100 chars)"}`;
@@ -104,30 +116,27 @@ Description : ${project.description ?? "(aucune)"}
 Spécialistes disponibles (CEO exclu) :
 ${specialists}
 
-Sélectionne 2–4 spécialistes avec les perspectives les plus distinctes et pertinentes.
-2 suffit pour une question précise. 4 max pour les questions larges.
+Sélectionne 2–${maxPick} spécialistes avec les perspectives les plus distinctes et pertinentes.
+2 suffit pour une question précise. ${maxPick} max pour les questions larges.
 
 Réponds UNIQUEMENT avec du JSON valide (pas de markdown, pas d'explication) :
 {"agents":["XXX","XXX"],"rationale":"Explication courte en français (max 100 chars)"}`;
 }
 
-function sanitizeAgents(input: unknown): DebateAgentRole[] {
+function sanitizeAgents(input: unknown, pool: DebateAgentRole[]): DebateAgentRole[] {
   if (!Array.isArray(input)) return [];
   return Array.from(
     new Set(
       input
         .filter((x): x is string => typeof x === "string")
         .map((x) => x.toUpperCase().trim() as DebateAgentRole)
-        .filter((x): x is DebateAgentRole => VALID_AGENTS.includes(x))
+        .filter((x): x is DebateAgentRole => pool.includes(x))
     )
   ).slice(0, 4);
 }
 
 function extractJson(text: string): string {
-  const stripped = text
-    .replace(/```json\s*/gi, "")
-    .replace(/```\s*/g, "")
-    .trim();
+  const stripped = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
   const start = stripped.indexOf("{");
   const end = stripped.lastIndexOf("}");
   if (start === -1 || end === -1) return stripped;

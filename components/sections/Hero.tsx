@@ -1,3 +1,4 @@
+// @deprecated â€” replaced by HeroInput.tsx (Phase 1 redesign)
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -13,13 +14,13 @@ export function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-      {/* ── Apple Intelligence Aura Ring ─────────────────────── */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#080808]">
+      {/* â”€â”€ Apple Intelligence Aura Ring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <AIAura size={860} speed={7} opacity={0.9} />
       </div>
 
-      {/* ── Background deepening vignette ─────────────────────── */}
+      {/* â”€â”€ Background deepening vignette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -28,7 +29,7 @@ export function Hero() {
         }}
       />
 
-      {/* ── Content ─────────────────────────────────────────── */}
+      {/* â”€â”€ Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="relative z-10 max-w-5xl mx-auto text-center px-6 md:px-12 pb-32 mt-20">
 
         {/* Eyebrow */}
@@ -41,7 +42,7 @@ export function Hero() {
           {t("eyebrow")}
         </motion.p>
 
-        {/* Main headline — Apple product page scale */}
+        {/* Main headline â€” Apple product page scale */}
         <motion.h1
           className="font-bold leading-[1.0] tracking-[-0.035em] text-white mb-7"
           style={{ fontSize: "clamp(56px, 9vw, 108px)" }}
@@ -53,7 +54,7 @@ export function Hero() {
           <span className="block ai-gradient-text">{t("titleLine2")}</span>
         </motion.h1>
 
-        {/* Apple body — 21px, generous grey */}
+        {/* Apple body â€” 21px, generous grey */}
         <motion.p
           className="text-xl md:text-2xl text-[#86868b] max-w-2xl mx-auto mb-14 leading-[1.47] font-normal"
           initial={{ opacity: 0, y: 14 }}
@@ -70,7 +71,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.34, ease }}
         >
-          {/* Primary — Apple-style white pill */}
+          {/* Primary â€” Apple-style white pill */}
           <button
             onClick={() => router.push("/signup")}
             className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-white text-black text-[15px] font-semibold tracking-tight hover:bg-white/90 transition-all duration-200 hover:-translate-y-px cursor-pointer"
@@ -78,7 +79,7 @@ export function Hero() {
             {t("ctaPrimary")}
           </button>
 
-          {/* Secondary — ghost pill */}
+          {/* Secondary â€” ghost pill */}
           <button
             onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
             className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-transparent text-white text-[15px] font-semibold tracking-tight border border-[rgba(255,255,255,0.20)] hover:border-[rgba(255,255,255,0.35)] hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200 cursor-pointer"
@@ -98,13 +99,15 @@ export function Hero() {
         <div className="w-5 h-8 rounded-full border border-[rgba(255,255,255,0.14)] flex justify-center pt-1.5">
           <div
             className="scroll-dot-bounce w-0.5 h-1.5 rounded-full"
-            style={{ background: "linear-gradient(to bottom, #BF5AF2, #0A84FF)" }}
+            style={{ background: "linear-gradient(to bottom, #8B5CF6, #06B6D4)" }}
           />
         </div>
       </motion.div>
 
       {/* Bottom fade to black */}
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-black to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-[#080808] to-transparent pointer-events-none z-10" />
     </section>
   );
 }
+
+

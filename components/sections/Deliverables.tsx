@@ -15,7 +15,7 @@ function DeliverableCard({ icon, title, meta }: DeliverableItem) {
     <div className="shrink-0 w-52 md:w-60 glass-card rounded-2xl p-5 flex flex-col gap-3 hover:bg-[rgba(255,255,255,0.07)] hover:scale-[1.03] hover:z-10 transition-all duration-300 select-none cursor-default">
       <span className="text-2xl leading-none">{icon}</span>
       <p className="font-semibold text-white/90 text-sm leading-snug">{title}</p>
-      <p className="font-mono text-[11px] text-[#6E6E73] leading-relaxed">{meta}</p>
+      <p className="font-mono text-[11px] text-white/35 leading-relaxed">{meta}</p>
     </div>
   );
 }
@@ -39,9 +39,9 @@ export function DeliverablesSection() {
   const row2 = [...items].reverse().concat([...items].reverse());
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-40 bg-black">
-      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-black to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent pointer-events-none" />
+    <section className="relative overflow-hidden py-24 md:py-40 bg-[#080808]">
+      <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-[#080808] to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#080808] to-transparent pointer-events-none" />
 
       {/* Heading */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-12 text-center mb-16 md:mb-20">
@@ -51,7 +51,7 @@ export function DeliverablesSection() {
           transition={{ duration: 0.7, ease }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
+          <p className="text-[13px] font-medium tracking-[0.18em] text-white/40 uppercase mb-6">
             {t("eyebrow")}
           </p>
           <h2 className="font-bold leading-[1.05] tracking-tight text-white mb-6"
@@ -59,7 +59,7 @@ export function DeliverablesSection() {
             {t("title")}{" "}
             <span className="ai-gradient-text">{t("titleEm")}</span>
           </h2>
-          <p className="text-xl text-[#86868b] leading-[1.47]">{t("sub")}</p>
+          <p className="text-xl text-white/40 leading-[1.47]">{t("sub")}</p>
         </motion.div>
       </div>
 
@@ -69,7 +69,7 @@ export function DeliverablesSection() {
           <div key={i} className="glass-card rounded-2xl p-4 flex flex-col gap-2">
             <span className="text-xl leading-none">{icon}</span>
             <p className="font-semibold text-white/90 text-xs leading-snug">{title}</p>
-            <p className="font-mono text-[10px] text-[#6E6E73] leading-relaxed">{meta}</p>
+            <p className="font-mono text-[10px] text-white/35 leading-relaxed">{meta}</p>
           </div>
         ))}
       </div>
@@ -78,13 +78,13 @@ export function DeliverablesSection() {
       <div className="hidden md:block relative z-10 mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
         <div className="perspective-[1400px]">
           <div className="transform-[rotateX(-4deg)] space-y-3 py-2">
-            {/* Row 1 — left */}
+            {/* Row 1 â€” left */}
             <div className="group/r1 overflow-visible">
               <div className={`flex gap-3 w-max ${reduced ? "" : "animate-[marquee-left_36s_linear_infinite]"} group-hover/r1:[animation-play-state:paused]`}>
                 {row1.map((item, i) => <DeliverableCard key={`r1-${i}`} {...item} />)}
               </div>
             </div>
-            {/* Row 2 — right */}
+            {/* Row 2 â€” right */}
             <div className="group/r2 overflow-visible">
               <div className={`flex gap-3 w-max ${reduced ? "" : "animate-[marquee-right_30s_linear_infinite]"} group-hover/r2:[animation-play-state:paused]`}>
                 {row2.map((item, i) => <DeliverableCard key={`r2-${i}`} {...item} />)}
@@ -96,3 +96,5 @@ export function DeliverablesSection() {
     </section>
   );
 }
+
+

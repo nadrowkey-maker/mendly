@@ -3,16 +3,20 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ChevronRight, PanelLeft } from "lucide-react";
+import { ChevronRight, PanelLeft, ShieldQuestion, LifeBuoy } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
+import { AISpeakingAura } from "./AISpeakingAura";
+import { AIAura } from "@/components/ui/AIAura";
 import { GenerateMemoButton } from "./GenerateMemoButton";
+import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
 import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
 import {
   getOrCreateConversation,
   listMessages,
 } from "@/lib/actions/conversations";
+import { harvestVerdict } from "@/lib/actions/harvest";
 import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
@@ -30,6 +34,7 @@ interface ChatInterfaceProps {
   userPlan: string;
   userEmail: string | null;
   allProjects: Project[];
+  lastAgentActivity: Record<string, string>;
 }
 
 interface DisplayMessage {
@@ -59,6 +64,17 @@ const AGENT_LABELS: Record<AgentRole, string> = {
   CCO: "CCO",
 };
 
+const AGENT_COLORS: Record<AgentRole, string> = {
+  CEO: "#0071e3",
+  CTO: "#06B6D4",
+  CMO: "#F0ABFC",
+  CPO: "#34D399",
+  CFO: "#FBBF24",
+  CDO: "#60A5FA",
+  DEV: "#94A3B8",
+  CCO: "#FB923C",
+};
+
 function toDisplayMessages(messages: Message[]): DisplayMessage[] {
   return messages.map((m) => ({
     id: m.id,
@@ -66,6 +82,38 @@ function toDisplayMessages(messages: Message[]): DisplayMessage[] {
     content: m.content,
     agentRole: m.agent_role,
   }));
+}
+
+/** Rebuild a finished DebateState from a stored "DEBATE" message so it
+ *  re-renders as the full debate view (not flat bubbles) after reload. */
+function reconstructDebate(content: string): DebateState | null {
+  try {
+    const d = JSON.parse(content) as {
+      question?: string;
+      selection?: AgentSelection;
+      thread?: { agent: DebateAgentRole; content: string }[];
+      ceoCall?: string;
+      consensus?: ConsensusVote[];
+    };
+    if (!d || !Array.isArray(d.thread)) return null;
+    return {
+      phase: "done",
+      question: d.question ?? "",
+      selection: d.selection ?? { agents: [], rationale: "" },
+      messages: d.thread.map((t, i) => ({
+        id: `dr-${i}`,
+        agent: t.agent,
+        turnIndex: i,
+        content: t.content,
+        isStreaming: false,
+      })),
+      ceoCall: d.ceoCall ?? "",
+      consensus: Array.isArray(d.consensus) ? d.consensus : [],
+      tensionMap: null,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export function ChatInterface({
@@ -78,11 +126,13 @@ export function ChatInterface({
   userPlan,
   userEmail,
   allProjects,
+  lastAgentActivity,
 }: ChatInterfaceProps) {
   const t = useTranslations("chat");
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
   const [switchingAgent, setSwitchingAgent] = useState(false);
   const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
@@ -111,6 +161,27 @@ export function ChatInterface({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeMessages, activeAgent, debateState]);
+
+  // Auto-harvest: when a debate ends, persist the decision + 3 actions (Bloc 2 / 3.2).
+  const harvestedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (
+      debateState.phase === "done" &&
+      "ceoCall" in debateState &&
+      debateState.ceoCall &&
+      harvestedRef.current !== debateState.ceoCall
+    ) {
+      harvestedRef.current = debateState.ceoCall;
+      const agents = "selection" in debateState ? debateState.selection.agents : [];
+      void harvestVerdict({
+        projectId: project.id,
+        conversationId: activeConversationId || null,
+        question: debateState.question,
+        verdict: debateState.ceoCall,
+        agents,
+      }).catch(() => {});
+    }
+  }, [debateState, project.id, activeConversationId]);
 
   const busy = isLoading || isDebating || switchingAgent;
 
@@ -144,8 +215,8 @@ export function ChatInterface({
     }
   };
 
-  const handleSubmit = async () => {
-    const trimmed = input.trim();
+  const handleSubmit = async (override?: string, mode?: "viability" | "overwhelmed") => {
+    const trimmed = (typeof override === "string" ? override : input).trim();
     if (!trimmed || busy || !activeConversationId) return;
 
     setError(null);
@@ -192,6 +263,7 @@ export function ChatInterface({
           locale,
           agentRole: activeAgent,
           attachments: fileToSend ? [fileToSend] : undefined,
+          mode,
         }),
       });
 
@@ -267,9 +339,9 @@ export function ChatInterface({
     }
   };
 
-  const handleDebate = async () => {
+  const handleDebate = async (boardroom = false) => {
     const trimmed = input.trim();
-    if (!trimmed || busy || activeAgent !== "CEO" || !activeConversationId) return;
+    if (!trimmed || busy || !activeConversationId) return;
 
     setError(null);
     setInput("");
@@ -300,6 +372,7 @@ export function ChatInterface({
           projectId: project.id,
           userMessage: trimmed,
           locale,
+          boardroom,
         }),
         signal: ac.signal,
       });
@@ -313,6 +386,26 @@ export function ChatInterface({
             ...prev.CEO!,
             messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId),
           },
+        }));
+        return;
+      }
+
+      if (response.status === 403) {
+        let when = locale === "en" ? "soon" : "bientôt";
+        try {
+          const j = await response.json();
+          if (j?.nextAvailableAt) {
+            when = new Date(j.nextAvailableAt).toLocaleDateString(
+              locale === "en" ? "en-US" : "fr-FR",
+              { day: "numeric", month: "long" }
+            );
+          }
+        } catch {}
+        setError(t("debateRecharge", { when }));
+        setDebateState({ phase: "idle" });
+        setAgentData((prev) => ({
+          ...prev,
+          CEO: { ...prev.CEO!, messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId) },
         }));
         return;
       }
@@ -715,6 +808,10 @@ export function ChatInterface({
   };
 
   return (
+    <>
+    {showIntro && (
+      <TeamIntroSequence projectId={project.id} onDone={() => setShowIntro(false)} />
+    )}
     <div className="flex h-screen bg-(--bg-primary) overflow-hidden">
       {/* Desktop sidebar */}
       <div className="hidden md:flex">
@@ -730,6 +827,7 @@ export function ChatInterface({
           usageLimit={initialUsageLimit}
           userPlan={userPlan}
           userEmail={userEmail}
+          lastAgentActivity={lastAgentActivity}
         />
       </div>
 
@@ -756,18 +854,26 @@ export function ChatInterface({
               usageLimit={initialUsageLimit}
               userPlan={userPlan}
               userEmail={userEmail}
+              lastAgentActivity={lastAgentActivity}
             />
           </div>
         </div>
       )}
 
-      <main className="flex-1 flex flex-col min-w-0 relative">
-        <header className="h-14 border-b border-(--border) flex items-center justify-between px-4 md:px-6 bg-(--bg-primary)/80 backdrop-blur-xl sticky top-0 z-20">
+      <main className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
+        <AISpeakingAura active={busy} />
+        <header
+          className="h-14 border-b flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 backdrop-blur-xl"
+          style={{
+            borderBottomColor: `${AGENT_COLORS[activeAgent]}25`,
+            background: `linear-gradient(to bottom, ${AGENT_COLORS[activeAgent]}06, rgba(8,8,8,0.85))`,
+          }}
+        >
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile: open sidebar */}
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface) transition-colors cursor-pointer"
+              className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors cursor-pointer"
               aria-label={t("expandSidebar")}
             >
               <PanelLeft className="w-4 h-4" />
@@ -776,26 +882,39 @@ export function ChatInterface({
             {sidebarCollapsed && (
               <button
                 onClick={() => setSidebarCollapsed(false)}
-                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--surface) transition-colors cursor-pointer"
+                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors cursor-pointer"
                 title={t("expandSidebar")}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             )}
-            <div className="min-w-0">
-              <p className="text-[10px] font-mono tracking-[0.25em] text-(--text-dim) uppercase">
-                {project.name}
-              </p>
-              <p className="text-sm font-bold text-(--text-primary) truncate">
-                {t("chattingWith")} {AGENT_LABELS[activeAgent]}
-              </p>
+            {/* Active agent badge + project name */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[9px] font-mono font-bold shrink-0"
+                style={{
+                  background: `${AGENT_COLORS[activeAgent]}22`,
+                  border: `1px solid ${AGENT_COLORS[activeAgent]}45`,
+                  color: AGENT_COLORS[activeAgent],
+                }}
+              >
+                {AGENT_LABELS[activeAgent]}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-mono tracking-[0.2em] text-white/28 uppercase">
+                  {project.name}
+                </p>
+                <p className="text-sm font-semibold text-white/90 truncate">
+                  {AGENT_LABELS[activeAgent]}
+                </p>
+              </div>
             </div>
           </div>
 
           {activeAgent === "CEO" && <GenerateMemoButton projectId={project.id} userPlan={userPlan} />}
         </header>
 
-        <div className="flex-1 overflow-y-auto px-4 md:px-8 py-8">
+        <div className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8 py-8">
           <div className="max-w-3xl mx-auto space-y-6">
             {switchingAgent ? (
               <div className="flex items-center justify-center py-20">
@@ -810,8 +929,13 @@ export function ChatInterface({
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-16 md:py-24"
               >
-                <div className="w-14 h-14 rounded-2xl bg-(--surface-elevated) border border-(--border-strong) flex items-center justify-center mx-auto mb-6 text-sm font-bold font-mono text-(--text-primary) tracking-wider">
-                  {activeAgent}
+                <div className="relative flex justify-center mb-6 h-[120px]">
+                  <AIAura
+                    size={120}
+                    speed={15}
+                    opacity={0.9}
+                    className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  />
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-(--text-primary) mb-3 tracking-tight">
                   {t("welcomeTitle")}
@@ -819,22 +943,65 @@ export function ChatInterface({
                 <p className="text-(--text-secondary) max-w-md mx-auto text-[15px] leading-relaxed">
                   {t(`welcomeBody${activeAgent}`, { projectName: project.name })}
                 </p>
+                {activeAgent === "CEO" && (
+                  <div className="mt-8 max-w-md mx-auto text-left">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <button
+                        onClick={() => handleSubmit(t("modeViabilityMsg"), "viability")}
+                        disabled={busy}
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-(--border-strong) bg-(--surface-1) text-[13px] text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--surface-2) transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-(--accent-primary)" />
+                        {t("modeViabilityBtn")}
+                      </button>
+                      <button
+                        onClick={() => handleSubmit(t("modeOverwhelmedMsg"), "overwhelmed")}
+                        disabled={busy}
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-(--border-strong) bg-(--surface-1) text-[13px] text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--surface-2) transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <LifeBuoy className="w-4 h-4 text-(--aurora-teal)" />
+                        {t("modeOverwhelmedBtn")}
+                      </button>
+                    </div>
+                    <p className="text-[12px] text-(--text-dim) mb-3">{t("starterIntro")}</p>
+                    <div className="flex flex-col gap-2">
+                      {[t("starter1"), t("starter2"), t("starter3")].map((q, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleSubmit(q)}
+                          disabled={busy}
+                          className="text-left px-4 py-3 rounded-2xl border border-(--border) bg-(--surface-1) text-[14px] text-(--text-secondary) hover:text-(--text-primary) hover:border-(--border-strong) hover:bg-(--surface-2) transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ) : (
-              activeMessages.map((m) => (
-                <ChatMessage
-                  key={m.id}
-                  role={m.role}
-                  content={m.content}
-                  agentRole={m.agentRole}
-                  isStreaming={m.isStreaming}
-                  attachmentName={m.attachmentName}
-                  attachmentMime={m.attachmentMime}
-                  onInviteAccept={activeAgent === "CEO" ? handleInviteAccept : undefined}
-                  busy={busy}
-                />
-              ))
+              activeMessages.map((m) => {
+                if (m.role === "assistant" && m.agentRole === "DEBATE") {
+                  const st = reconstructDebate(m.content);
+                  if (st) return <DebateView key={m.id} state={st} onAbort={() => {}} />;
+                }
+                return (
+                  <ChatMessage
+                    key={m.id}
+                    role={m.role}
+                    content={m.content}
+                    agentRole={m.agentRole}
+                    isStreaming={m.isStreaming}
+                    attachmentName={m.attachmentName}
+                    attachmentMime={m.attachmentMime}
+                    onInviteAccept={handleInviteAccept}
+                    busy={busy}
+                  />
+                );
+              })
             )}
+
+            {/* Live debate renders in DebateView below; the ambient aura conveys "speaking". */}
 
             {debateState.phase !== "idle" && (
               <DebateView state={debateState} onAbort={handleAbortDebate} />
@@ -853,19 +1020,24 @@ export function ChatInterface({
           </div>
         </div>
 
-        <ChatComposer
-          value={input}
-          onChange={setInput}
-          onSubmit={handleSubmit}
-          onDebate={handleDebate}
-          busy={busy}
-          isDebating={isDebating}
-          canDebate={activeAgent === "CEO" && PLANS[userPlan as PlanTier]?.debateEnabled === true}
-          agentLabel={AGENT_LABELS[activeAgent]}
-          selectedFile={selectedFile}
-          onFileChange={setSelectedFile}
-        />
+        <div className="relative z-10">
+          <ChatComposer
+            value={input}
+            onChange={setInput}
+            onSubmit={handleSubmit}
+            onDebate={() => handleDebate(false)}
+            onBoardroom={() => handleDebate(true)}
+            isPro={userPlan === "pro"}
+            busy={busy}
+            isDebating={isDebating}
+            canDebate={PLANS[userPlan as PlanTier]?.debateEnabled === true}
+            agentLabel={AGENT_LABELS[activeAgent]}
+            selectedFile={selectedFile}
+            onFileChange={setSelectedFile}
+          />
+        </div>
       </main>
     </div>
+    </>
   );
 }

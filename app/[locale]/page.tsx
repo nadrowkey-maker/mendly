@@ -1,17 +1,17 @@
 import { Nav } from "@/components/layout/Nav";
-import { Hero } from "@/components/sections/Hero";
+import { HeroInput } from "@/components/sections/HeroInput";
 import { ProblemSection } from "@/components/sections/Problem";
-import { WhatYouGetSection } from "@/components/sections/WhatYouGet";
+import { Comparison } from "@/components/sections/Comparison";
 import { HowItWorksSection } from "@/components/sections/HowItWorks";
 import { TeamSection } from "@/components/sections/Team";
-import { ActionSection } from "@/components/sections/Action";
-import { DeliverablesSection } from "@/components/sections/Deliverables";
-import { Comparison } from "@/components/sections/Comparison";
+import { WhatYouGetSection } from "@/components/sections/WhatYouGet";
+import { SoloFounderProof } from "@/components/sections/SoloFounderProof";
 import { PricingSection } from "@/components/sections/Pricing";
+import { FaqSection } from "@/components/sections/FaqSection";
 import { FinalCtaSection } from "@/components/sections/FinalCta";
 import { Footer } from "@/components/layout/Footer";
+import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { routing } from "@/i18n/routing";
-import { SectionTransition } from "@/components/ui/SectionTransition";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -20,18 +20,19 @@ export function generateStaticParams() {
 export default function HomePage() {
   return (
     <>
+      <SmoothScroll />
       <Nav />
-      <main>
-        <Hero /> 
-        <SectionTransition><ProblemSection /></SectionTransition>
-        <SectionTransition><WhatYouGetSection /></SectionTransition>
-        <SectionTransition><HowItWorksSection /></SectionTransition>
+      <main className="bg-(--apple-bg)">
+        <HeroInput />
+        <ProblemSection />
+        <Comparison />
+        <HowItWorksSection />
         <TeamSection />
-        <SectionTransition><ActionSection /></SectionTransition>
-        <SectionTransition><DeliverablesSection /></SectionTransition>
-        <SectionTransition><Comparison /></SectionTransition>
-        <SectionTransition><PricingSection /></SectionTransition>
-        <SectionTransition><FinalCtaSection /></SectionTransition>
+        <WhatYouGetSection />
+        <SoloFounderProof />
+        <PricingSection />
+        <FaqSection />
+        <FinalCtaSection />
       </main>
       <Footer />
     </>

@@ -96,7 +96,7 @@ export function OnboardingFlow() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(139,92,246,0.10) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,113,227,0.10) 0%, transparent 70%)",
         }}
       />
 

@@ -1,136 +1,50 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
+
 import { useTranslations } from "next-intl";
-import { AGENTS } from "@/lib/agents";
+import { Flame } from "lucide-react";
+import { AppleSection } from "./AppleSection";
+import { SectionHeading } from "./SectionHeading";
+import { Reveal } from "@/components/ui/Reveal";
 
-const ease = [0.25, 1, 0.5, 1] as const;
-
-interface AgentCardProps {
-  id: string;
-  color: string;
-  role: string;
-  title: string;
-  tagline: string;
-  tags: string;
-  deliverables: string;
-  index: number;
-  reduced: boolean;
-}
-
-function AgentCard({ color, role, title, tagline, tags, deliverables, index, reduced }: AgentCardProps) {
-  return (
-    <motion.div
-      initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: reduced ? 0 : index * 0.05, ease }}
-      viewport={{ once: true, margin: "-20px" }}
-      className="glass-card rounded-2xl p-5 flex flex-col gap-3 h-full hover:bg-[rgba(255,255,255,0.06)] transition-colors duration-300 group cursor-default"
-    >
-      {/* Role badge */}
-      <span
-        className="text-xs font-semibold tracking-[0.12em] uppercase"
-        style={{ color }}
-      >
-        {role}
-      </span>
-
-      <p className="text-[11px] text-[#6E6E73] tracking-[0.12em] uppercase font-medium">
-        {title}
-      </p>
-
-      <p className="text-sm text-white/75 leading-relaxed italic font-fraunces">
-        {tagline}
-      </p>
-
-      <div className="h-px w-8 bg-[rgba(255,255,255,0.08)] mt-1" />
-
-      <p className="text-[11px] text-[#6E6E73] leading-relaxed font-mono">
-        {tags}
-      </p>
-
-      <p className="text-[11px] text-[#6E6E73] leading-relaxed mt-auto pt-1">
-        {deliverables}
-      </p>
-    </motion.div>
-  );
-}
+const AGENT_IDS = ["ceo", "cto", "cmo", "cpo", "cfo", "cdo", "dev", "cco"] as const;
 
 export function TeamSection() {
   const t = useTranslations("team");
-  const reduced = useReducedMotion() ?? false;
-
-  const cards = AGENTS.map((agent, index) => ({
-    id: agent.id,
-    color: agent.color,
-    role: t(`${agent.id}Role`),
-    title: t(`${agent.id}Title`),
-    tagline: t(`${agent.id}Tagline`),
-    tags: t(`${agent.id}Tags`),
-    deliverables: t(`${agent.id}Deliverables`),
-    index,
-    reduced,
-  }));
 
   return (
-    <section id="team" className="relative scroll-mt-20 bg-black min-h-screen overflow-hidden flex flex-col py-24 md:py-32">
-      {/* Subtle ambient orb */}
-      <div
-        className="absolute top-1/2 left-1/2 w-[700px] h-[500px] rounded-full pointer-events-none"
-        style={{
-          transform: "translate(-50%, -50%)",
-          background: "radial-gradient(ellipse at center, rgba(191,90,242,0.07) 0%, rgba(10,132,255,0.04) 50%, transparent 70%)",
-          filter: "blur(80px)",
-        }}
-        aria-hidden
-      />
+    <AppleSection id="team">
+      <Reveal>
+        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} accent={t("titleEm")} sub={t("sub")} />
+      </Reveal>
 
-      <div className="relative z-10 flex flex-col flex-1 px-6 md:px-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease }}
-          viewport={{ once: true, margin: "-60px" }}
-          className="text-center max-w-3xl mx-auto w-full mb-4"
-        >
-          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
-            {t("eyebrow")}
-          </p>
-          <h2 className="font-bold leading-[1.05] tracking-tight text-white"
-            style={{ fontSize: "clamp(36px, 5.5vw, 72px)" }}>
-            {t("title")}{" "}
-            <span className="ai-gradient-text">{t("titleEm")}</span>
-          </h2>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease }}
-          viewport={{ once: true, margin: "-60px" }}
-          className="text-center text-xl text-[#86868b] max-w-xl mx-auto mb-16 leading-[1.47]"
-        >
-          {t("sub")}
-        </motion.p>
-
-        {/* Mobile: horizontal scroll */}
-        <div className="md:hidden overflow-x-auto pb-4 [scrollbar-width:none] [scroll-snap-type:x_mandatory]">
-          <div className="flex gap-3 w-max px-4">
-            {cards.map((card) => (
-              <div key={card.id} className="w-64 shrink-0 snap-start">
-                <AgentCard {...card} />
+      <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {AGENT_IDS.map((id, i) => (
+          <Reveal key={id} delay={(i % 4) * 0.06} className="h-full">
+            <div className="group h-full card-apple p-5 transition-all duration-300 hover:-translate-y-1.5">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="grid place-items-center h-11 w-11 rounded-2xl text-[11px] font-semibold shrink-0 bg-(--apple-accent)/12 text-(--apple-accent) border border-(--apple-accent)/25">
+                  {t(`${id}Role`)}
+                </span>
+                <h3 className="text-[15px] font-semibold leading-tight">{t(`${id}Title`)}</h3>
               </div>
-            ))}
+              <p className="text-[14px] text-(--apple-text-2) leading-snug mb-3">{t(`${id}Tagline`)}</p>
+              <p className="text-[11px] text-(--apple-text-2) font-medium leading-relaxed">{t(`${id}Tags`)}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={0.1} className="mt-5">
+        <div className="card-apple p-8 md:p-10 flex flex-col sm:flex-row items-start gap-5">
+          <span className="grid place-items-center h-14 w-14 shrink-0 rounded-2xl bg-(--apple-accent)/12 border border-(--apple-accent)/25">
+            <Flame className="w-7 h-7 text-(--apple-accent)" strokeWidth={1.5} />
+          </span>
+          <div>
+            <h3 className="text-[22px] font-semibold mb-2">{t("tensionTitle")}</h3>
+            <p className="text-[17px] text-(--apple-text-2) leading-relaxed max-w-2xl">{t("tensionDesc")}</p>
           </div>
         </div>
-
-        {/* Desktop: 4-column grid */}
-        <div className="hidden md:grid grid-cols-4 gap-4 max-w-7xl mx-auto w-full">
-          {cards.map((card) => (
-            <AgentCard key={card.id} {...card} />
-          ))}
-        </div>
-      </div>
-    </section>
+      </Reveal>
+    </AppleSection>
   );
 }

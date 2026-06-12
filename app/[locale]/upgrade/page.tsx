@@ -51,7 +51,7 @@ export default async function UpgradePage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(139,92,246,0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,113,227,0.08) 0%, transparent 70%)",
         }}
       />
 

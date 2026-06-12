@@ -11,6 +11,8 @@ import { buildCcoSystemPrompt } from "@/lib/ai/agents/cco";
 import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
+import { withAgentCore } from "@/lib/ai/prompts/core-principles";
+import { viabilityVerdictModule, overwhelmedModule } from "@/lib/ai/prompts/special-modes";
 import type { Project } from "@/lib/types/project";
 import type { Message } from "@/lib/types/conversation";
 import type { AgentRole } from "@/lib/types/conversation";
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest) {
       locale,
       agentRole = "CEO",
       attachments,
+      mode,
     }: {
       conversationId: string;
       projectId: string;
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest) {
       locale?: string;
       agentRole?: string;
       attachments?: FileAttachment[];
+      mode?: "viability" | "overwhelmed";
     } = await req.json();
 
     if (!conversationId || !projectId || !userMessage) {
@@ -115,11 +119,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch project + history + founder profile in parallel
-    const [projectRes, historyRes, profileRes] = await Promise.all([
+    const [projectRes, historyRes, profileRes, actionsRes] = await Promise.all([
       supabase.from("projects").select("*").eq("id", projectId).single(),
       supabase
         .from("messages")
-        .select("role, content")
+        .select("role, content, agent_role")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true }),
       supabase
@@ -127,6 +131,13 @@ export async function POST(req: NextRequest) {
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle(),
+      supabase
+        .from("actions")
+        .select("content, created_at")
+        .eq("project_id", projectId)
+        .eq("status", "todo")
+        .order("created_at", { ascending: false })
+        .limit(8),
     ]);
 
     const { data: project, error: projectErr } = projectRes;
@@ -152,9 +163,44 @@ export async function POST(req: NextRequest) {
       project as Project,
       targetLocale
     );
-    const systemPrompt = withFounderContext(baseSystemPrompt, profile, targetLocale);
+    let systemPrompt = withAgentCore(
+      withFounderContext(baseSystemPrompt, profile, targetLocale),
+      targetLocale
+    );
+    const vision = (project as Project).vision;
+    if (vision) {
+      systemPrompt +=
+        targetLocale === "fr"
+          ? `\n\n# Pourquoi ce fondateur se lance\n${vision}\n\nGarde cette motivation profonde en tête : rappelle-la dans les coups de doute, et célèbre les jalons qui s'en rapprochent.`
+          : `\n\n# Why this founder is building this\n${vision}\n\nKeep this deeper motivation in mind: bring it back in moments of doubt, and celebrate milestones that move toward it.`;
+    }
+    // Bloc 3.2 — "le retour" : ramener les actions non terminées dans le contexte,
+    // sans jamais culpabiliser. La conversation repart de là, pas de zéro.
+    const openActions = (actionsRes.data ?? []) as { content: string; created_at: string }[];
+    if (openActions.length > 0) {
+      const list = openActions.map((a) => `- ${a.content}`).join("\n");
+      systemPrompt +=
+        targetLocale === "fr"
+          ? `\n\n# Actions en cours (décidées lors de sessions précédentes)\nLe fondateur a ces actions non terminées :\n${list}\n\nSi c'est pertinent pour la conversation, reviens dessus naturellement ("la dernière fois on avait décidé X — où tu en es ?"). JAMAIS de reproche : cherche la cause (pas le temps ? trop ambitieux ? bloqué ?) et propose une version plus réaliste. On repart de là, pas de zéro.`
+          : `\n\n# Open actions (decided in previous sessions)\nThe founder has these unfinished actions:\n${list}\n\nWhen relevant to the conversation, revisit them naturally ("last time we decided X — where are you with it?"). NEVER blame: find the cause (no time? too ambitious? blocked?) and offer a more realistic version. Pick up from there, not from zero.`;
+    }
+
+    if (mode === "viability") systemPrompt += viabilityVerdictModule(targetLocale);
+    else if (mode === "overwhelmed") systemPrompt += overwhelmedModule(targetLocale);
+    const cleanedHistory = (history ?? []).map((m) => {
+      const row = m as { role: string; content: string; agent_role?: string | null };
+      if (row.agent_role === "DEBATE") {
+        try {
+          const d = JSON.parse(row.content) as { ceoCall?: string };
+          return { role: row.role, content: `[Team debate — CEO decision] ${d.ceoCall ?? ""}` };
+        } catch {
+          return { role: row.role, content: "" };
+        }
+      }
+      return { role: row.role, content: row.content };
+    });
     const geminiHistory = toGeminiHistory(
-      (history ?? []) as Pick<Message, "role" | "content">[]
+      cleanedHistory as Pick<Message, "role" | "content">[]
     );
 
     const encoder = new TextEncoder();

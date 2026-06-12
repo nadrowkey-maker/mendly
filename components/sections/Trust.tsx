@@ -49,7 +49,7 @@ export function Trust() {
     <section
       ref={sectionRef}
       id="trust"
-      className="relative bg-black overflow-hidden py-24 md:py-32 px-6 md:px-12"
+      className="relative bg-[#080808] overflow-hidden py-24 md:py-32 px-6 md:px-12"
     >
       {/* Ambient glow */}
       <div
@@ -69,7 +69,7 @@ export function Trust() {
           viewport={{ once: true, margin: "-80px" }}
           className="text-center mb-10"
         >
-          <p className="text-[13px] font-medium tracking-[0.18em] text-[#86868b] uppercase mb-6">
+          <p className="text-[13px] font-medium tracking-[0.18em] text-white/40 uppercase mb-6">
             {t("eyebrow")}
           </p>
           <h2 className="font-bold leading-[1.05] tracking-tight text-white mb-4"
@@ -79,7 +79,7 @@ export function Trust() {
           </h2>
         </motion.div>
 
-        {/* Globe — decorative, centered, modest size */}
+        {/* Globe â€” decorative, centered, modest size */}
         <motion.div
           initial={{ opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.92 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -173,3 +173,4 @@ export function Trust() {
     </section>
   );
 }
+

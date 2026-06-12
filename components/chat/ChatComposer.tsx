@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Zap, ArrowUp, X, Image, FileText } from "lucide-react";
+import { Plus, Zap, ArrowUp, X, Image, FileText, Gavel } from "lucide-react";
 import type { FileAttachment } from "@/lib/ai/gemini";
 
 interface Props {
@@ -11,6 +11,8 @@ interface Props {
   onChange: (v: string) => void;
   onSubmit: () => void;
   onDebate?: () => void;
+  onBoardroom?: () => void;
+  isPro?: boolean;
   busy: boolean;
   isDebating: boolean;
   canDebate: boolean;
@@ -34,6 +36,8 @@ export function ChatComposer({
   onChange,
   onSubmit,
   onDebate,
+  onBoardroom,
+  isPro,
   busy,
   isDebating,
   canDebate,
@@ -251,6 +255,19 @@ export function ChatComposer({
                   <span className="hidden md:inline">
                     {isDebating ? t("debating") : t("debate")}
                   </span>
+                </button>
+              )}
+
+              {canDebate && isPro && onBoardroom && (
+                <button
+                  type="button"
+                  onClick={onBoardroom}
+                  disabled={busy || !value.trim()}
+                  title={t("boardroomTooltip")}
+                  className="h-9 px-3 rounded-full hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer border border-(--border-strong) text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50"
+                >
+                  <Gavel className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">{t("boardroom")}</span>
                 </button>
               )}
 

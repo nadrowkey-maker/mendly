@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { Sheet, SheetContent } from "@/components/sheet";
 import { MenuToggle } from "@/components/menu-toggle";
-import { PremiumButton } from "@/components/ui/PremiumButton";
 import { AccountMenu } from "@/components/layout/AccountMenu";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -58,19 +57,22 @@ export function Nav() {
     >
       <div
         className={[
-          "w-full max-w-5xl rounded-2xl transition-all duration-500",
-          scrolled
-            ? "bg-black/80 backdrop-blur-2xl border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
-            : "bg-black/40 backdrop-blur-xl border border-[rgba(255,255,255,0.05)]",
+          "w-full max-w-5xl rounded-2xl transition-all duration-500 border",
+          scrolled ? "bg-white/70 border-black/[0.08]" : "bg-white/50 border-black/[0.05]",
         ].join(" ")}
+        style={{
+          backdropFilter: "blur(22px) saturate(185%)",
+          WebkitBackdropFilter: "blur(22px) saturate(185%)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55), 0 10px 30px -8px rgba(0,0,0,0.12)",
+        }}
       >
         <nav className="flex h-14 items-center justify-between px-5">
           {/* Logo */}
           <Link
             href="/"
-            className="text-sm font-semibold tracking-[0.15em] text-white/90 hover:text-white transition-colors duration-200"
+            className="text-[17px] font-semibold tracking-tight text-(--apple-text) transition-opacity duration-200 hover:opacity-70"
           >
-            MENDLY
+            Mendly
           </Link>
 
           {/* Desktop links */}
@@ -79,7 +81,7 @@ export function Nav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm text-[#6E6E73] hover:text-white transition-colors duration-200 rounded-xl"
+                className="px-4 py-2 text-sm text-(--apple-text-2) hover:text-(--apple-text) transition-colors duration-200 rounded-xl"
               >
                 {link.label}
               </a>
@@ -89,7 +91,7 @@ export function Nav() {
           {/* Desktop right */}
           <div className="hidden md:flex items-center gap-3">
             {/* Locale switcher */}
-            <div className="flex items-center p-0.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)]">
+            <div className="flex items-center p-0.5 rounded-full border border-black/10 bg-black/[0.04]">
               {(["en", "fr"] as const).map((l) => (
                 <button
                   key={l}
@@ -98,8 +100,8 @@ export function Nav() {
                   className={[
                     "px-3 py-1 rounded-full text-[10px] tracking-widest uppercase transition-all duration-200 cursor-pointer",
                     locale === l
-                      ? "bg-white text-black font-semibold"
-                      : "text-[#6E6E73] hover:text-[#A1A1A6]",
+                      ? "bg-(--apple-text) text-(--apple-bg) font-semibold"
+                      : "text-(--apple-text-2) hover:text-(--apple-text)",
                   ].join(" ")}
                 >
                   {l}
@@ -109,19 +111,18 @@ export function Nav() {
 
             <AccountMenu />
 
-            <PremiumButton
-              variant="primary"
-              size="sm"
+            <button
               onClick={() => router.push(isLoggedIn ? "/dashboard" : "/signup")}
+              className="btn-apple py-2 px-4 text-[14px]"
             >
               {isLoggedIn ? tAccount("dashboard") : t("cta")}
-            </PremiumButton>
+            </button>
           </div>
 
           {/* Mobile menu toggle */}
           <Sheet open={open} onOpenChange={setOpen}>
             <button
-              className="flex md:hidden items-center justify-center p-2 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-[#A1A1A6]"
+              className="flex md:hidden items-center justify-center p-2 rounded-xl border border-black/10 bg-black/[0.03] text-(--apple-text-2)"
               aria-label={open ? "Close menu" : "Open menu"}
             >
               <MenuToggle
@@ -134,7 +135,7 @@ export function Nav() {
             <SheetContent
               side="left"
               showClose={false}
-              className="bg-black/95 backdrop-blur-2xl border-r border-[rgba(255,255,255,0.08)] flex flex-col"
+              className="bg-white/95 backdrop-blur-2xl border-r border-black/10 flex flex-col"
             >
               <div className="grid gap-y-0.5 overflow-y-auto px-4 pt-16 pb-5 flex-1">
                 {links.map((link) => (
@@ -142,33 +143,33 @@ export function Nav() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                    className="px-4 py-3 text-(--apple-text-2) hover:text-(--apple-text) rounded-xl hover:bg-black/[0.04] transition-colors"
                   >
                     {link.label}
                   </a>
                 ))}
 
-                <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-                  <p className="px-4 py-2 text-[10px] tracking-widest text-[#6E6E73] uppercase">
+                <div className="mt-4 pt-4 border-t border-black/10">
+                  <p className="px-4 py-2 text-[10px] tracking-widest text-(--apple-text-2) uppercase">
                     {tAccount("section")}
                   </p>
                   {isLoggedIn ? (
                     <>
                       <div className="px-4 py-2">
-                        <p className="text-xs text-[#6E6E73] mb-0.5">{tAccount("loggedInAs")}</p>
-                        <p className="text-sm text-white truncate">{email}</p>
+                        <p className="text-xs text-(--apple-text-2) mb-0.5">{tAccount("loggedInAs")}</p>
+                        <p className="text-sm text-(--apple-text) truncate">{email}</p>
                       </div>
                       <Link
                         href="/dashboard"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-(--apple-text-2) hover:text-(--apple-text) rounded-xl hover:bg-black/[0.04] transition-colors"
                       >
                         <LayoutDashboard className="w-4 h-4" />
                         {tAccount("dashboard")}
                       </Link>
                       <button
                         onClick={handleMobileSignOut}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors text-left cursor-pointer"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-(--apple-text-2) hover:text-(--apple-text) rounded-xl hover:bg-black/[0.04] transition-colors text-left cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
                         {tAccount("signOut")}
@@ -179,7 +180,7 @@ export function Nav() {
                       <Link
                         href="/login"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-(--apple-text-2) hover:text-(--apple-text) rounded-xl hover:bg-black/[0.04] transition-colors"
                       >
                         <LogIn className="w-4 h-4" />
                         {tAccount("signIn")}
@@ -187,7 +188,7 @@ export function Nav() {
                       <Link
                         href="/signup"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white rounded-xl hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-(--apple-text-2) hover:text-(--apple-text) rounded-xl hover:bg-black/[0.04] transition-colors"
                       >
                         <UserPlus className="w-4 h-4" />
                         {tAccount("signUp")}
@@ -206,25 +207,23 @@ export function Nav() {
                       className={[
                         "flex-1 py-2 rounded-full text-xs tracking-widest uppercase transition-all duration-200 cursor-pointer",
                         locale === l
-                          ? "bg-white text-black font-semibold"
-                          : "border border-[rgba(255,255,255,0.10)] text-[#6E6E73]",
+                          ? "bg-(--apple-text) text-(--apple-bg) font-semibold"
+                          : "border border-black/10 text-(--apple-text-2)",
                       ].join(" ")}
                     >
                       {l}
                     </button>
                   ))}
                 </div>
-                <PremiumButton
-                  variant="primary"
-                  size="sm"
-                  className="w-full justify-center"
+                <button
+                  className="btn-apple w-full justify-center"
                   onClick={() => {
                     router.push(isLoggedIn ? "/dashboard" : "/signup");
                     setOpen(false);
                   }}
                 >
                   {isLoggedIn ? tAccount("dashboard") : t("cta")}
-                </PremiumButton>
+                </button>
               </div>
             </SheetContent>
           </Sheet>

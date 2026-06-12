@@ -7,16 +7,28 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 /**
- * Modèle Gemini Flash (rapide + gratuit dans les limites)
+ * Centralized model id. To upgrade the whole agent team to a more powerful
+ * Gemini, just set GEMINI_MODEL in the environment (e.g. a newer flash/pro id).
+ * Nothing else in the codebase needs to change.
  */
+export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+
+const GENERATION_CONFIG = {
+  temperature: 0.7,
+  topP: 0.95,
+  maxOutputTokens: 2048,
+} as const;
+
+/** Default team model (driven by GEMINI_MODEL). */
 export const geminiFlash = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
-  generationConfig: {
-    temperature: 0.7,
-    topP: 0.95,
-    maxOutputTokens: 2048,
-  },
+  model: GEMINI_MODEL,
+  generationConfig: GENERATION_CONFIG,
 });
+
+/** Build a model instance for a specific id (e.g. per-tier upgrades later). */
+export function getGeminiModel(modelId: string = GEMINI_MODEL) {
+  return genAI.getGenerativeModel({ model: modelId, generationConfig: GENERATION_CONFIG });
+}
 
 export interface ChatMessage {
   role: "user" | "model";

@@ -4,6 +4,8 @@ import { geminiFlash } from "@/lib/ai/gemini";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { PLANS } from "@/lib/stripe/plans";
 import { selectAgents } from "@/lib/ai/debate/selector";
+import { getDebateAccess } from "@/lib/actions/debates";
+import { track } from "@/lib/actions/analytics";
 import { buildThreadTurnPrompt } from "@/lib/ai/debate/orchestrator";
 import { buildCeoCallPrompt } from "@/lib/ai/debate/synthesizer";
 import { generateWhisper } from "@/lib/ai/debate/whisper";
@@ -101,12 +103,13 @@ async function streamAgent(prompt: string): Promise<{ stream: AsyncIterable<{ te
 
 export async function POST(req: NextRequest) {
   try {
-    const { conversationId, projectId, userMessage, locale } =
+    const { conversationId, projectId, userMessage, locale, boardroom } =
       (await req.json()) as {
         conversationId: string;
         projectId: string;
         userMessage: string;
         locale?: string;
+        boardroom?: boolean;
       };
 
     if (!conversationId || !projectId || !userMessage) {
@@ -133,6 +136,18 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
+
+    // Sliding-recharge gate: free gets one team debate per 7-day window.
+    const access = await getDebateAccess();
+    if (!access.canLaunch) {
+      return new Response(
+        JSON.stringify({ error: "debate_recharge", nextAvailableAt: access.nextAvailableAt }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    // Bloc 6.3.5 — "boardroom" mode: a deeper debate for critical decisions, Pro only.
+    const isBoardroom = boardroom === true && rateLimit.plan === "pro";
+    void track("debate_launched", { plan: rateLimit.plan });
 
     const { data: projectData, error: projectErr } = await supabase
       .from("projects")
@@ -175,12 +190,15 @@ export async function POST(req: NextRequest) {
             question: userMessage,
             project,
             locale: targetLocale,
+            allowed: (PLANS[rateLimit.plan].agentsAvailable as readonly string[]).filter(
+              (a) => a !== "CEO"
+            ) as DebateAgentRole[],
           });
 
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);
 
           const thread: { agent: DebateAgentRole; content: string }[] = [];
-          const numPasses = selection.agents.length <= 2 ? 3 : 2;
+          const numPasses = (selection.agents.length <= 2 ? 3 : 2) + (isBoardroom ? 1 : 0);
           let activeAgents = [...selection.agents];
           let whisperCount = 0;
 
@@ -240,15 +258,8 @@ export async function POST(req: NextRequest) {
                 }
               }
 
-              if (!cancelled && content) {
-                await supabase.from("messages").insert({
-                  conversation_id: conversationId,
-                  user_id: user.id,
-                  role: "assistant",
-                  agent_role: agent,
-                  content,
-                });
-              }
+              // Turns are persisted together as a single debate message at the end,
+              // so the debate re-renders as a debate (not flat bubbles) on reload.
             }
 
             // After pass 1: detect surprise expert
@@ -281,10 +292,16 @@ export async function POST(req: NextRequest) {
             thread,
             locale: targetLocale,
           });
+          const finalCeoPrompt = isBoardroom
+            ? ceoPrompt +
+              (targetLocale === "fr"
+                ? "\n\n# MODE BOARDROOM (décision critique)\nRigueur maximale : chiffre les enjeux, nomme explicitement le pire scénario et le plan B, pèse le coût de l'inaction, et tranche sans ambiguïté."
+                : "\n\n# BOARDROOM MODE (critical decision)\nMaximum rigor: quantify the stakes, explicitly name the worst case and the plan B, weigh the cost of inaction, and make an unambiguous call.")
+            : ceoPrompt;
 
           let ceoContent = "";
           try {
-            const ceoResult = await streamAgent(ceoPrompt);
+            const ceoResult = await streamAgent(finalCeoPrompt);
             for await (const chunk of ceoResult.stream) {
               if (cancelled) break;
               const text = chunk.text();
@@ -297,15 +314,7 @@ export async function POST(req: NextRequest) {
 
           write("[[/CEO_CALL]]");
 
-          if (ceoContent) {
-            await supabase.from("messages").insert({
-              conversation_id: conversationId,
-              user_id: user.id,
-              role: "assistant",
-              agent_role: "CEO",
-              content: ceoContent,
-            });
-          }
+          // (verdict is persisted inside the consolidated debate message below)
 
           await supabase
             .from("conversations")
@@ -337,6 +346,26 @@ export async function POST(req: NextRequest) {
             }
 
             write("[[CONSENSUS_END]]");
+
+            // Persist the entire debate as ONE structured message → re-renders
+            // as the full DebateView (not flat bubbles) when the page reloads.
+            await supabase.from("messages").insert({
+              conversation_id: conversationId,
+              user_id: user.id,
+              role: "assistant",
+              agent_role: "DEBATE",
+              content: JSON.stringify({
+                question: userMessage,
+                selection,
+                thread,
+                ceoCall: ceoContent,
+                consensus: voteResults.map((v, i) => ({
+                  agent: activeAgents[i],
+                  verdict: v.verdict,
+                  note: v.note,
+                })),
+              }),
+            });
           }
 
           write("[[END]]");

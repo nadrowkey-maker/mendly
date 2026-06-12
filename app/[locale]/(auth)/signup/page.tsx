@@ -1,15 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { PremiumButton } from "@/components/ui/PremiumButton";
+import { useSearchParams } from "next/navigation";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
+  const tHero = useTranslations("hero");
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const pendingQuestion = searchParams.get("q");
+
+  useEffect(() => {
+    if (pendingQuestion) {
+      localStorage.setItem("mendly:pending_question", pendingQuestion);
+    }
+  }, [pendingQuestion]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,7 +60,7 @@ export default function SignupPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(0,113,227,0.08) 0%, transparent 70%)",
         }}
       />
 
@@ -74,6 +84,12 @@ export default function SignupPage() {
           </div>
         ) : (
           <>
+            {pendingQuestion && (
+              <div className="mb-8 px-4 py-3 rounded-xl border border-(--accent-primary)/30 bg-(--accent-primary)/10 text-(--accent-glow) text-sm text-center">
+                {tHero("pendingBanner")}
+              </div>
+            )}
+
             <div className="text-center mb-10">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
                 {t("signupTitle")}

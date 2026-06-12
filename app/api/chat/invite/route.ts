@@ -72,6 +72,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!(PLANS[rateLimit.plan].agentsAvailable as readonly string[]).includes(invitedAgent)) {
+      return new Response(
+        JSON.stringify({ error: "agent_not_available", message: "This agent is not available on your plan" }),
+        { status: 403 }
+      );
+    }
+
     const { data: projectData, error: projectErr } = await supabase
       .from("projects")
       .select("*")
