@@ -32,7 +32,7 @@ export function SoloFounderProof() {
               <div
                 className="font-semibold tracking-[-0.03em] leading-none"
                 style={{
-                  fontSize: "clamp(48px, 8vw, 84px)",
+                  fontSize: "clamp(34px, 5vw, 58px)",
                   background: "linear-gradient(180deg, #1d1d1f 0%, #0071e3 150%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
