@@ -52,7 +52,7 @@ export function AccountMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-label={t("ariaLabel")}
         aria-expanded={open}
-        className="flex items-center justify-center w-9 h-9 rounded-full border border-(--border) bg-(--surface)/30 text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50 transition-all"
+        className="flex items-center justify-center w-9 h-9 rounded-full border border-(--border) bg-(--bg-primary)/90 text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50 transition-all"
       >
         <User className="w-4 h-4" />
         {isLoggedIn && (
