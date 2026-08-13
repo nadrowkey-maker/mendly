@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { track } from "@/lib/actions/analytics";
 import { createMemoryEvent } from "@/lib/actions/memory";
+import { assignProjectTeam } from "@/lib/ai/team/assign-team";
 import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import type {
   CreateProjectInput,
@@ -55,12 +56,26 @@ export async function createProject(input: CreateProjectInput): Promise<{
     return { success: false, error: "Le nom du projet est trop long" };
   }
 
+  // Mendly assembles this project's permanent specialist team once, here —
+  // before the row exists, since we already have everything the assignment
+  // needs (name/description/stage/sector) straight from the form input.
+  const trimmedName = input.name.trim();
+  const trimmedDescription = input.description?.trim() || null;
+  const team = await assignProjectTeam({
+    name: trimmedName,
+    description: trimmedDescription,
+    stage: input.stage,
+    sector: input.sector || null,
+    locale: input.locale === "en" ? "en" : "fr",
+    maxAgents: PLANS[plan].teamSize,
+  });
+
   const { data, error } = await supabase
     .from("projects")
     .insert({
       user_id: user.id,
-      name: input.name.trim(),
-      description: input.description?.trim() || null,
+      name: trimmedName,
+      description: trimmedDescription,
       sector: input.sector || null,
       stage: input.stage,
       priority: input.priority || null,
@@ -68,6 +83,8 @@ export async function createProject(input: CreateProjectInput): Promise<{
       accent_color: input.accent_color || null,
       emoji: input.emoji || null,
       vision: input.vision?.trim() || null,
+      assigned_agents: team.agents,
+      team_rationale: team.rationale,
     })
     .select()
     .single();

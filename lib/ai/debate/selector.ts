@@ -2,9 +2,9 @@ import { geminiFlash } from "@/lib/ai/gemini";
 import type { Project } from "@/lib/types/project";
 import type { AgentSelection, DebateAgentRole } from "@/lib/types/debate";
 
-const VALID_AGENTS: DebateAgentRole[] = ["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"];
+export const VALID_AGENTS: DebateAgentRole[] = ["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"];
 
-const SPECIALIST_DESC: Record<DebateAgentRole, string> = {
+export const SPECIALIST_DESC: Record<DebateAgentRole, string> = {
   CTO: "CTO: Tech architecture, stack, technical risks",
   CMO: "CMO: Marketing, positioning, growth, brand",
   CPO: "CPO: Product strategy, prioritization, user stories",
@@ -22,7 +22,7 @@ interface SelectorInput {
   allowed?: DebateAgentRole[];
 }
 
-async function callWithRetry(prompt: string) {
+export async function callWithRetry(prompt: string) {
   for (let i = 1; i <= 3; i++) {
     try {
       return await geminiFlash.generateContent(prompt);
@@ -123,7 +123,11 @@ Réponds UNIQUEMENT avec du JSON valide (pas de markdown, pas d'explication) :
 {"agents":["XXX","XXX"],"rationale":"Explication courte en français (max 100 chars)"}`;
 }
 
-function sanitizeAgents(input: unknown, pool: DebateAgentRole[]): DebateAgentRole[] {
+export function sanitizeAgents(
+  input: unknown,
+  pool: DebateAgentRole[],
+  limit = 4
+): DebateAgentRole[] {
   if (!Array.isArray(input)) return [];
   return Array.from(
     new Set(
@@ -132,10 +136,10 @@ function sanitizeAgents(input: unknown, pool: DebateAgentRole[]): DebateAgentRol
         .map((x) => x.toUpperCase().trim() as DebateAgentRole)
         .filter((x): x is DebateAgentRole => pool.includes(x))
     )
-  ).slice(0, 4);
+  ).slice(0, limit);
 }
 
-function extractJson(text: string): string {
+export function extractJson(text: string): string {
   const stripped = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
   const start = stripped.indexOf("{");
   const end = stripped.lastIndexOf("}");

@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ChevronRight, PanelLeft, ShieldQuestion, LifeBuoy } from "lucide-react";
+import { ChevronRight, PanelLeft, ShieldQuestion, LifeBuoy, Users } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
+import { TeamRoomHeader, TeamRoomEmptyState } from "./TeamRoomView";
 import { AISpeakingAura } from "./AISpeakingAura";
 import { AIAura } from "@/components/ui/AIAura";
 import { GenerateMemoButton } from "./GenerateMemoButton";
@@ -62,6 +63,7 @@ const AGENT_LABELS: Record<AgentRole, string> = {
   CDO: "CDO",
   DEV: "DEV",
   CCO: "CCO",
+  MENDLY: "MENDLY",
 };
 
 const AGENT_COLORS: Record<AgentRole, string> = {
@@ -73,6 +75,7 @@ const AGENT_COLORS: Record<AgentRole, string> = {
   CDO: "#60A5FA",
   DEV: "#94A3B8",
   CCO: "#FB923C",
+  MENDLY: "#8B5CF6",
 };
 
 function toDisplayMessages(messages: Message[]): DisplayMessage[] {
@@ -135,6 +138,7 @@ export function ChatInterface({
   const [showIntro, setShowIntro] = useState(true);
   const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
   const [switchingAgent, setSwitchingAgent] = useState(false);
+  const [teamRoomActive, setTeamRoomActive] = useState(false);
   const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
     CEO: {
       conversationId,
@@ -185,9 +189,22 @@ export function ChatInterface({
 
   const busy = isLoading || isDebating || switchingAgent;
 
+  // The team room reuses the CEO conversation — debates already live there
+  // (agent_role: "DEBATE" messages) regardless of which agent tab triggered
+  // them. Forcing activeAgent back to CEO keeps activeConversationId (and so
+  // handleDebate's target) pointed at the thread the room actually reads from.
+  const handleTeamRoomOpen = () => {
+    if (busy) return;
+    setActiveAgent("CEO");
+    setTeamRoomActive(true);
+    setError(null);
+    setDebateState({ phase: "idle" });
+  };
+
   const handleAgentSwitch = async (agent: AgentRole) => {
-    if (agent === activeAgent || busy) return;
+    if ((agent === activeAgent && !teamRoomActive) || busy) return;
     setActiveAgent(agent);
+    setTeamRoomActive(false);
     setError(null);
     setDebateState({ phase: "idle" });
 
@@ -828,6 +845,8 @@ export function ChatInterface({
           userPlan={userPlan}
           userEmail={userEmail}
           lastAgentActivity={lastAgentActivity}
+          teamRoomActive={teamRoomActive}
+          onTeamRoomClick={handleTeamRoomOpen}
         />
       </div>
 
@@ -855,6 +874,11 @@ export function ChatInterface({
               userPlan={userPlan}
               userEmail={userEmail}
               lastAgentActivity={lastAgentActivity}
+              teamRoomActive={teamRoomActive}
+              onTeamRoomClick={() => {
+                handleTeamRoomOpen();
+                setMobileSidebarOpen(false);
+              }}
             />
           </div>
         </div>
@@ -888,35 +912,65 @@ export function ChatInterface({
                 <ChevronRight className="w-4 h-4" />
               </button>
             )}
-            {/* Active agent badge + project name */}
+            {/* Active agent badge + project name, or team room badge */}
             <div className="flex items-center gap-2.5 min-w-0">
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[9px] font-mono font-bold shrink-0"
-                style={{
-                  background: `${AGENT_COLORS[activeAgent]}22`,
-                  border: `1px solid ${AGENT_COLORS[activeAgent]}45`,
-                  color: AGENT_COLORS[activeAgent],
-                }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={
+                  teamRoomActive
+                    ? {
+                        background: "var(--accent-glow)22",
+                        border: "1px solid var(--accent-glow)45",
+                        color: "var(--accent-glow)",
+                      }
+                    : {
+                        background: `${AGENT_COLORS[activeAgent]}22`,
+                        border: `1px solid ${AGENT_COLORS[activeAgent]}45`,
+                        color: AGENT_COLORS[activeAgent],
+                      }
+                }
               >
-                {AGENT_LABELS[activeAgent]}
+                {teamRoomActive ? (
+                  <Users className="w-3.5 h-3.5" />
+                ) : (
+                  <span className="text-[9px] font-mono font-bold">{AGENT_LABELS[activeAgent]}</span>
+                )}
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] font-mono tracking-[0.2em] text-white/28 uppercase">
                   {project.name}
                 </p>
                 <p className="text-sm font-semibold text-white/90 truncate">
-                  {AGENT_LABELS[activeAgent]}
+                  {teamRoomActive ? t("teamRoomNav") : AGENT_LABELS[activeAgent]}
                 </p>
               </div>
             </div>
           </div>
 
-          {activeAgent === "CEO" && <GenerateMemoButton projectId={project.id} userPlan={userPlan} />}
+          {!teamRoomActive && activeAgent === "CEO" && (
+            <GenerateMemoButton projectId={project.id} userPlan={userPlan} />
+          )}
         </header>
 
         <div className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8 py-8">
           <div className="max-w-3xl mx-auto space-y-6">
-            {switchingAgent ? (
+            {teamRoomActive ? (
+              <>
+                <TeamRoomHeader project={project} />
+                {(() => {
+                  const debateMessages = activeMessages.filter(
+                    (m) => m.role === "assistant" && m.agentRole === "DEBATE"
+                  );
+                  if (debateMessages.length === 0 && debateState.phase === "idle") {
+                    return <TeamRoomEmptyState />;
+                  }
+                  return debateMessages.map((m) => {
+                    const st = reconstructDebate(m.content);
+                    return st ? <DebateView key={m.id} state={st} onAbort={() => {}} /> : null;
+                  });
+                })()}
+              </>
+            ) : switchingAgent ? (
               <div className="flex items-center justify-center py-20">
                 <div className="flex items-center gap-3 text-(--text-muted) text-sm">
                   <div className="w-2 h-2 rounded-full bg-(--accent-glow) animate-pulse" />
@@ -1024,14 +1078,14 @@ export function ChatInterface({
           <ChatComposer
             value={input}
             onChange={setInput}
-            onSubmit={handleSubmit}
-            onDebate={() => handleDebate(false)}
+            onSubmit={teamRoomActive ? () => handleDebate(false) : handleSubmit}
+            onDebate={teamRoomActive ? undefined : () => handleDebate(false)}
             onBoardroom={() => handleDebate(true)}
             isPro={userPlan === "pro"}
             busy={busy}
             isDebating={isDebating}
-            canDebate={PLANS[userPlan as PlanTier]?.debateEnabled === true}
-            agentLabel={AGENT_LABELS[activeAgent]}
+            canDebate={!teamRoomActive && PLANS[userPlan as PlanTier]?.debateEnabled === true}
+            agentLabel={teamRoomActive ? t("teamRoomNav") : AGENT_LABELS[activeAgent]}
             selectedFile={selectedFile}
             onFileChange={setSelectedFile}
           />

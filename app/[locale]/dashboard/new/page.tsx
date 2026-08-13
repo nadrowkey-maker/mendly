@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createProject } from "@/lib/actions/projects";
@@ -20,6 +20,7 @@ const EMOJIS = ["🚀", "💡", "🧪", "📱", "🛍️", "🎯", "🧠", "⚡"
 
 export default function NewProjectPage() {
   const t = useTranslations("newProject");
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -59,6 +60,7 @@ export default function NewProjectPage() {
       accent_color: accentColor,
       emoji,
       vision: vision || undefined,
+      locale: locale === "en" ? "en" : "fr",
     });
 
     if (!result.success) {

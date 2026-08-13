@@ -9,32 +9,36 @@ export const PLANS = {
     priceId: null,
     dailyMessageLimit: 10,
     projectLimit: 1,
-    agentsAvailable: ["CEO", "CTO", "CMO"] as const,
+    agentsAvailable: ["CEO", "CTO", "CMO", "MENDLY"] as const,
     // Free gets one real team debate per sliding 7-day window (enforced in the
     // debate route via getDebateAccess()). Debates only use the 3 free agents.
     debateEnabled: true,
     debates: "weekly" as const,
+    // Specialists (non-CEO) Mendly can assign to a project's permanent team.
+    teamSize: 2,
   },
   starter: {
     name: "Starter",
     priceId: process.env.STRIPE_PRICE_STARTER ?? null,
     dailyMessageLimit: 100,
     projectLimit: 3,
-    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"] as const,
+    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO", "MENDLY"] as const,
     debateEnabled: true,
     debates: "unlimited" as const,
     weeklyMemos: true,
+    teamSize: 7,
   },
   pro: {
     name: "Pro",
     priceId: process.env.STRIPE_PRICE_PRO ?? null,
     dailyMessageLimit: 500,
     projectLimit: 10,
-    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"] as const,
+    agentsAvailable: ["CEO", "CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO", "MENDLY"] as const,
     debateEnabled: true,
     debates: "unlimited" as const,
     weeklyMemos: true,
     weeklyMemosEnriched: true,
+    teamSize: 7,
   },
 } as const;
 

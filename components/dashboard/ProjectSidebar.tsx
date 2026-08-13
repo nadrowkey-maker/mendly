@@ -15,6 +15,7 @@ import {
   Brain,
   Settings,
   Lock,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PLANS, type PlanTier } from "@/lib/stripe/plans";
@@ -34,6 +35,8 @@ interface Props {
   userPlan: string;
   userEmail: string | null;
   lastAgentActivity?: Record<string, string>;
+  teamRoomActive?: boolean;
+  onTeamRoomClick?: () => void;
 }
 
 function relTime(iso: string, locale: string): string {
@@ -53,6 +56,7 @@ function relTime(iso: string, locale: string): string {
 }
 
 const AGENTS: { role: AgentRole; label: string; description: string; color: string }[] = [
+  { role: "MENDLY", label: "Mendly", description: "the one",  color: "#8B5CF6" },
   { role: "CEO", label: "CEO", description: "strategy",  color: "#0071e3" },
   { role: "CTO", label: "CTO", description: "tech",      color: "#06B6D4" },
   { role: "CMO", label: "CMO", description: "growth",    color: "#F0ABFC" },
@@ -76,6 +80,8 @@ export function ProjectSidebar({
   userPlan,
   userEmail,
   lastAgentActivity,
+  teamRoomActive = false,
+  onTeamRoomClick,
 }: Props) {
   const t = useTranslations("sidebar");
   const locale = useLocale();
@@ -194,6 +200,38 @@ export function ProjectSidebar({
             )}
           </div>
         </div>
+
+        {/* Team room */}
+        {activeProjectId && onTeamRoomClick && (
+          <div className="mb-4">
+            <button
+              onClick={onTeamRoomClick}
+              disabled={agentBusy}
+              className={[
+                "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer",
+                agentBusy ? "opacity-60" : "",
+              ].join(" ")}
+              style={teamRoomActive ? { background: "var(--accent-glow)12" } : {}}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200"
+                style={{
+                  background: teamRoomActive ? "var(--accent-glow)28" : "rgba(255,255,255,0.05)",
+                  border: `1px solid ${teamRoomActive ? "var(--accent-glow)50" : "rgba(255,255,255,0.07)"}`,
+                  color: teamRoomActive ? "var(--accent-glow)" : "rgba(255,255,255,0.30)",
+                }}
+              >
+                <Users className="w-3.5 h-3.5" />
+              </div>
+              <span
+                className="flex-1 text-left font-mono text-[11px] font-semibold tracking-wider transition-colors duration-200"
+                style={{ color: teamRoomActive ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.40)" }}
+              >
+                {t("teamRoomLabel")}
+              </span>
+            </button>
+          </div>
+        )}
 
         {/* Agents */}
         {activeProjectId && (

@@ -185,14 +185,24 @@ export async function POST(req: NextRequest) {
             content: userMessage,
           });
 
-          // Select agents
+          // Select agents — scoped to this project's persistent team (assigned
+          // once by Mendly at creation, see lib/ai/team/assign-team.ts) when one
+          // exists, so debates draw from the project's own room, not the full
+          // plan-wide roster. Falls back to the plan pool if the intersection
+          // is too thin (e.g. the plan was downgraded after the team was set).
+          const planAllowed = (PLANS[rateLimit.plan].agentsAvailable as readonly string[]).filter(
+            (a) => a !== "CEO"
+          ) as DebateAgentRole[];
+          const teamAllowed = project.assigned_agents?.length
+            ? planAllowed.filter((a) => project.assigned_agents!.includes(a))
+            : planAllowed;
+          const allowed = teamAllowed.length >= 2 ? teamAllowed : planAllowed;
+
           const selection = await selectAgents({
             question: userMessage,
             project,
             locale: targetLocale,
-            allowed: (PLANS[rateLimit.plan].agentsAvailable as readonly string[]).filter(
-              (a) => a !== "CEO"
-            ) as DebateAgentRole[],
+            allowed,
           });
 
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);

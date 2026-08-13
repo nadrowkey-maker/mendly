@@ -22,6 +22,9 @@ export interface Project {
   accent_color: string | null;
   emoji: string | null;
   vision: string | null;
+  /** Persistent specialist team assigned once by Mendly at project creation. */
+  assigned_agents: string[] | null;
+  team_rationale: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -36,4 +39,6 @@ export interface CreateProjectInput {
   accent_color?: string;
   emoji?: string;
   vision?: string;
+  /** Used to phrase the team-assignment rationale in the founder's language. */
+  locale?: "fr" | "en";
 }

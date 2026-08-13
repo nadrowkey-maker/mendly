@@ -613,6 +613,7 @@
     "debateRecharge": "Free includes one team debate a week. Your next one unlocks {when}. Want unlimited debates? Go Starter.",
     "shareVerdict": "Share verdict",
     "welcomeBody": "I'm your CEO. I already know the basics of {projectName}. Tell me what's on your mind.",
+    "welcomeBodyMENDLY": "I already know the basics of {projectName}. Bring me a decision — I'll push back where it doesn't hold up.",
     "welcomeBodyCEO": "I'm your CEO. I already know the basics of {projectName}. Tell me what's on your mind — strategy, priorities, decisions, I'm here to challenge and clarify.",
     "welcomeBodyCTO": "I'm your CTO. For {projectName}, we talk stack, architecture, and technical decisions. No over-engineering, just concrete. What are we looking at?",
     "welcomeBodyCMO": "I'm your CMO. For {projectName}, we talk audience, positioning, channels, conversion. First things first: who exactly is your ideal customer?",
@@ -635,6 +636,7 @@
     "boardroom": "Boardroom",
     "boardroomTooltip": "Boardroom debate — a deeper round for critical decisions (Pro)",
     "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate",
+    "teamRoomNav": "Team room",
     "myDeliverables": "My deliverables",
     "composerPlaceholder": "Ask your {agent}…",
     "attach": "Attach a file",
@@ -671,6 +673,12 @@
     "inviteDismiss": "Later",
     "agentJoined": "{agent} joined the conversation",
     "loading": "Loading…"
+  },
+  "teamRoom": {
+    "eyebrow": "TEAM ROOM",
+    "title": "The team assigned to {projectName}",
+    "emptyTitle": "No debate yet.",
+    "emptyHint": "Ask this team a question below to open the first one."
   },
   "account": {
     "ariaLabel": "Account menu",
@@ -813,7 +821,8 @@
     "signOut": "Sign out",
     "collapse": "Collapse",
     "expand": "Expand",
-    "agentLocked": "Upgrade your plan to unlock this agent"
+    "agentLocked": "Upgrade your plan to unlock this agent",
+    "teamRoomLabel": "Team room"
   },
   "projectMenu": {
     "ariaLabel": "Project options",

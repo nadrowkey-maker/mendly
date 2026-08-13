@@ -613,6 +613,7 @@
     "debateRecharge": "Le gratuit inclut un débat d'équipe par semaine. Le prochain se débloque {when}. Envie de débats illimités ? Passe en Starter.",
     "shareVerdict": "Partager le verdict",
     "welcomeBody": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Dis-moi ce qui t'occupe.",
+    "welcomeBodyMENDLY": "Je connais déjà les bases de {projectName}. Amène-moi une décision — je pousse là où ça ne tient pas.",
     "welcomeBodyCEO": "Je suis ton CEO. Je connais déjà les bases de {projectName}. Balance-moi ce qui t'occupe — stratégie, priorités, décisions, je suis là pour challenger et clarifier.",
     "welcomeBodyCTO": "Je suis ton CTO. Pour {projectName}, on parle stack, architecture, et décisions techniques. Pas de sur-ingénierie, du concret. Qu'est-ce qu'on regarde ?",
     "welcomeBodyCMO": "Je suis ton CMO. Pour {projectName}, on parle audience, positionnement, canaux, conversion. Avant tout : c'est qui exactement ton client idéal ?",
@@ -635,6 +636,7 @@
     "boardroom": "Boardroom",
     "boardroomTooltip": "Débat boardroom — un tour plus poussé pour les décisions critiques (Pro)",
     "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents",
+    "teamRoomNav": "Salle de réunion",
     "myDeliverables": "Mes livrables",
     "composerPlaceholder": "Demande à ton {agent}…",
     "attach": "Joindre un fichier",
@@ -671,6 +673,12 @@
     "inviteDismiss": "Plus tard",
     "agentJoined": "{agent} a rejoint la conversation",
     "loading": "Chargement…"
+  },
+  "teamRoom": {
+    "eyebrow": "SALLE DE RÉUNION",
+    "title": "L'équipe assignée à {projectName}",
+    "emptyTitle": "Pas encore de débat.",
+    "emptyHint": "Pose une question à cette équipe ci-dessous pour ouvrir le premier."
   },
   "account": {
     "ariaLabel": "Menu compte",
@@ -813,7 +821,8 @@
     "signOut": "Déconnexion",
     "collapse": "Réduire",
     "expand": "Étendre",
-    "agentLocked": "Passe à un plan supérieur pour débloquer cet agent"
+    "agentLocked": "Passe à un plan supérieur pour débloquer cet agent",
+    "teamRoomLabel": "Salle de réunion"
   },
   "projectMenu": {
     "ariaLabel": "Options du projet",

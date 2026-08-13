@@ -25,6 +25,7 @@ const AGENT_LABELS: Record<string, string> = {
   CDO: "CDO",
   DEV: "DEV",
   CCO: "CCO",
+  MENDLY: "MENDLY",
 };
 
 const VALID_INVITE_AGENTS = new Set<string>(["CTO", "CMO", "CPO", "CFO", "CDO", "DEV", "CCO"]);

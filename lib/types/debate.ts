@@ -1,6 +1,8 @@
 import type { AgentRole } from "./conversation";
 
-export type DebateAgentRole = Exclude<AgentRole, "CEO">;
+// MENDLY is a single-entity chat role, not a debate specialist — it never
+// enters the multi-agent debate pool.
+export type DebateAgentRole = Exclude<AgentRole, "CEO" | "MENDLY">;
 
 export type VoteVerdict = "agree" | "reluctant" | "disagree";
 

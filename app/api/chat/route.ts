@@ -8,6 +8,7 @@ import { buildCfoSystemPrompt } from "@/lib/ai/agents/cfo";
 import { buildCdoSystemPrompt } from "@/lib/ai/agents/cdo";
 import { buildDevSystemPrompt } from "@/lib/ai/agents/dev";
 import { buildCcoSystemPrompt } from "@/lib/ai/agents/cco";
+import { buildMendlySystemPrompt } from "@/lib/ai/agents/mendly";
 import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
@@ -35,6 +36,8 @@ function getSystemPrompt(
   locale: "fr" | "en"
 ) {
   switch (agentRole) {
+    case "MENDLY":
+      return buildMendlySystemPrompt(project, locale);
     case "CTO":
       return buildCtoSystemPrompt(project, locale);
     case "CMO":
@@ -163,10 +166,12 @@ export async function POST(req: NextRequest) {
       project as Project,
       targetLocale
     );
-    let systemPrompt = withAgentCore(
-      withFounderContext(baseSystemPrompt, profile, targetLocale),
-      targetLocale
-    );
+    const withFounder = withFounderContext(baseSystemPrompt, profile, targetLocale);
+    // MENDLY carries its own operating principles and never hands off to a
+    // colleague — the shared multi-agent core (with its <invite> mechanic)
+    // would contradict its single-entity identity.
+    let systemPrompt =
+      agentRole === "MENDLY" ? withFounder : withAgentCore(withFounder, targetLocale);
     const vision = (project as Project).vision;
     if (vision) {
       systemPrompt +=
