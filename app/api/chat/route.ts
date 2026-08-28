@@ -12,6 +12,8 @@ import { buildMendlySystemPrompt } from "@/lib/ai/agents/mendly";
 import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
+import { buildProjectMemoryBlock } from "@/lib/ai/project-memory";
+import type { MemoryEvent } from "@/lib/types/tracking";
 import { withAgentCore } from "@/lib/ai/prompts/core-principles";
 import { viabilityVerdictModule, overwhelmedModule } from "@/lib/ai/prompts/special-modes";
 import type { Project } from "@/lib/types/project";
@@ -122,7 +124,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch project + history + founder profile in parallel
-    const [projectRes, historyRes, profileRes, actionsRes] = await Promise.all([
+    const [projectRes, historyRes, profileRes, actionsRes, memoryRes] = await Promise.all([
       supabase.from("projects").select("*").eq("id", projectId).single(),
       supabase
         .from("messages")
@@ -141,6 +143,12 @@ export async function POST(req: NextRequest) {
         .eq("status", "todo")
         .order("created_at", { ascending: false })
         .limit(8),
+      supabase
+        .from("memory_events")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false })
+        .limit(40),
     ]);
 
     const { data: project, error: projectErr } = projectRes;
@@ -189,6 +197,15 @@ export async function POST(req: NextRequest) {
           ? `\n\n# Actions en cours (décidées lors de sessions précédentes)\nLe fondateur a ces actions non terminées :\n${list}\n\nSi c'est pertinent pour la conversation, reviens dessus naturellement ("la dernière fois on avait décidé X — où tu en es ?"). JAMAIS de reproche : cherche la cause (pas le temps ? trop ambitieux ? bloqué ?) et propose une version plus réaliste. On repart de là, pas de zéro.`
           : `\n\n# Open actions (decided in previous sessions)\nThe founder has these unfinished actions:\n${list}\n\nWhen relevant to the conversation, revisit them naturally ("last time we decided X — where are you with it?"). NEVER blame: find the cause (no time? too ambitious? blocked?) and offer a more realistic version. Pick up from there, not from zero.`;
     }
+
+    // Point 3 — la mémoire réelle du projet. Les actions ouvertes ci-dessus
+    // disent ce qui reste à faire ; ceci dit ce qui a déjà été tranché, craint
+    // et accompli. Injecté pour tous les rôles, pas seulement MENDLY : la
+    // mémoire appartient au projet, pas à la persona qui parle.
+    systemPrompt += buildProjectMemoryBlock(
+      (memoryRes.data ?? []) as MemoryEvent[],
+      targetLocale
+    );
 
     if (mode === "viability") systemPrompt += viabilityVerdictModule(targetLocale);
     else if (mode === "overwhelmed") systemPrompt += overwhelmedModule(targetLocale);
