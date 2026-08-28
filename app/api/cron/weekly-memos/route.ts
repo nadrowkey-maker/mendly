@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
             .join("\n\n");
 
           // Durable project state for the recap (decisions made, open actions).
-          const [actionsRes, decisionsRes] = await Promise.all([
+          const [actionsRes, decisionsRes, teamWorkRes] = await Promise.all([
             supabase.from("actions").select("content").eq("project_id", project.id).eq("status", "todo").limit(10),
             supabase
               .from("memory_events")
@@ -84,18 +84,30 @@ export async function GET(req: NextRequest) {
               .eq("project_id", project.id)
               .gte("created_at", sevenDaysAgo.toISOString())
               .limit(10),
+            supabase
+              .from("debates")
+              .select("question, verdict")
+              .eq("project_id", project.id)
+              .eq("origin", "autonomous")
+              .gte("created_at", sevenDaysAgo.toISOString())
+              .limit(3),
           ]);
           const actionsStr =
             (actionsRes.data ?? []).map((a) => `- ${a.content}`).join("\n") || "(aucune action en cours)";
           const decisionsStr =
             (decisionsRes.data ?? []).map((d) => `- [${d.kind}] ${d.title}`).join("\n") ||
             "(aucune décision enregistrée)";
+          // Point 2 — ce que l'équipe a produit seule pendant la semaine.
+          const teamWorkStr = (teamWorkRes.data ?? [])
+            .map((d) => `- ${d.question}\n  -> ${(d.verdict ?? "").slice(0, 400)}`)
+            .join("\n\n");
 
           const prompt = buildWeeklyMemoPrompt({
             project,
             transcript,
             decisions: decisionsStr,
             actions: actionsStr,
+            teamWork: teamWorkStr || undefined,
             isPro,
           });
 

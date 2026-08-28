@@ -66,20 +66,42 @@ export async function GET(req: NextRequest) {
 
         const actionsHtml = openActions.map((a) => `<li style="margin-bottom:6px;">${a.content}</li>`).join("");
 
+        // Point 2 — ce que l'équipe a produit PENDANT l'absence. La relance ne
+        // parlait que de l'inactivité du fondateur ; elle peut désormais lui
+        // dire ce qui l'attend, ce qui change un rappel en raison de revenir.
+        const { data: teamWork } = await supabase
+          .from("debates")
+          .select("question")
+          .eq("user_id", sub.user_id)
+          .eq("origin", "autonomous")
+          .gte("created_at", lastMsg.created_at)
+          .is("seen_at", null)
+          .order("created_at", { ascending: false })
+          .limit(3);
+
+        const sessions = teamWork ?? [];
+        const teamWorkHtml = sessions.length
+          ? `<p style="line-height:1.7;">Pendant ce temps, on a continué à bosser sur ton projet :</p>
+               <ul style="line-height:1.7;color:#111;">${sessions
+                 .map((d) => `<li style="margin-bottom:6px;">${d.question}</li>`)
+                 .join("")}</ul>`
+          : "";
+
         await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
           headers: { "Content-Type": "application/json", "api-key": process.env.BREVO_API_KEY! },
           body: JSON.stringify({
             sender: { email: "nadroleboss@gmail.com", name: "Mendly" },
             to: [{ email }],
-            subject: "Ton équipe pense à toi",
+            subject: sessions.length ? "On a avancé pendant ton absence" : "Ton équipe pense à toi",
             htmlContent: `
               <div style="max-width:600px;margin:0 auto;font-family:sans-serif;color:#333;padding:24px;">
                 <h1 style="font-size:20px;">Ça fait quelques jours — qu'est-ce qui bloque ?</h1>
                 <p style="line-height:1.7;">Pas de reproche. On voulait juste reprendre là où on s'était arrêtés. Tu avais ces actions en cours :</p>
                 <ul style="line-height:1.7;color:#111;">${actionsHtml}</ul>
+                ${teamWorkHtml}
                 <p style="line-height:1.7;">Si l'une d'elles est trop lourde, on la découpe ensemble en quelque chose de réaliste.</p>
-                <a href="https://mendly-cre3.vercel.app/fr/dashboard"
+                <a href="https://www.mendlyai.io/fr/dashboard"
                    style="display:inline-block;margin-top:16px;padding:12px 24px;background:#0A0A0A;color:white;text-decoration:none;border-radius:999px;font-weight:bold;">
                   Reprendre avec mon équipe →
                 </a>
