@@ -48,6 +48,8 @@ export interface DebateRecord {
   verdict: string | null;
   agents: string[];
   created_at: string;
+  origin?: "founder" | "autonomous";
+  seen_at?: string | null;
 }
 
 /** Result of checking whether the user can launch a debate right now. */

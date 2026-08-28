@@ -678,7 +678,10 @@
     "eyebrow": "TEAM ROOM",
     "title": "The team assigned to {projectName}",
     "emptyTitle": "No debate yet.",
-    "emptyHint": "Ask this team a question below to open the first one."
+    "emptyHint": "Ask this team a question below to open the first one.",
+    "autonomousEyebrow": "WHILE YOU WERE AWAY",
+    "autonomousTitle": "What the team worked on without you",
+    "autonomousTitleNew": "{count, plural, =1 {One session while you were away} other {# sessions while you were away}}"
   },
   "account": {
     "ariaLabel": "Account menu",

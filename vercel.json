@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/team-sessions",
+      "schedule": "0 7 * * *"
+    },
+    {
       "path": "/api/cron/weekly-memos",
       "schedule": "0 8 * * 1"
     },

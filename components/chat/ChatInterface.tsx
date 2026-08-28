@@ -8,6 +8,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
 import { TeamRoomHeader, TeamRoomEmptyState } from "./TeamRoomView";
+import { AutonomousSessions } from "./AutonomousSessions";
 import { AISpeakingAura } from "./AISpeakingAura";
 import { AIAura } from "@/components/ui/AIAura";
 import { GenerateMemoButton } from "./GenerateMemoButton";
@@ -957,6 +958,7 @@ export function ChatInterface({
             {teamRoomActive ? (
               <>
                 <TeamRoomHeader project={project} />
+                <AutonomousSessions projectId={project.id} />
                 {(() => {
                   const debateMessages = activeMessages.filter(
                     (m) => m.role === "assistant" && m.agentRole === "DEBATE"

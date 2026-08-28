@@ -678,7 +678,10 @@
     "eyebrow": "SALLE DE RÉUNION",
     "title": "L'équipe assignée à {projectName}",
     "emptyTitle": "Pas encore de débat.",
-    "emptyHint": "Pose une question à cette équipe ci-dessous pour ouvrir le premier."
+    "emptyHint": "Pose une question à cette équipe ci-dessous pour ouvrir le premier.",
+    "autonomousEyebrow": "PENDANT TON ABSENCE",
+    "autonomousTitle": "Ce que l'équipe a travaillé sans toi",
+    "autonomousTitleNew": "{count, plural, =1 {Une session pendant ton absence} other {# sessions pendant ton absence}}"
   },
   "account": {
     "ariaLabel": "Menu compte",

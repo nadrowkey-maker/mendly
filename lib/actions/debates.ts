@@ -90,3 +90,63 @@ export async function getDebateAccess(): Promise<DebateAccess> {
     lastDebateAt: last.created_at,
   };
 }
+
+/**
+ * Sessions autonomes d'un projet : ce que l'equipe a produit sans le fondateur.
+ * Les plus recentes d'abord, non lues en premier lieu d'interet.
+ */
+export async function listAutonomousSessions(
+  projectId: string
+): Promise<DebateRecord[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("debates")
+    .select("*")
+    .eq("project_id", projectId)
+    .eq("user_id", user.id)
+    .eq("origin", "autonomous")
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error("listAutonomousSessions error:", error);
+    return [];
+  }
+  return (data ?? []) as DebateRecord[];
+}
+
+/**
+ * Marque les sessions autonomes comme lues.
+ *
+ * Sans cet appel, le cron d'equipe s'arreterait definitivement apres sa
+ * premiere session : sa regle "jamais de nouvelle session tant que la
+ * precedente n'a pas ete lue" resterait bloquee a jamais.
+ */
+export async function markAutonomousSessionsSeen(
+  projectId: string
+): Promise<{ success: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false };
+
+  const { error } = await supabase
+    .from("debates")
+    .update({ seen_at: new Date().toISOString() })
+    .eq("project_id", projectId)
+    .eq("user_id", user.id)
+    .eq("origin", "autonomous")
+    .is("seen_at", null);
+
+  if (error) {
+    console.error("markAutonomousSessionsSeen error:", error);
+    return { success: false };
+  }
+  return { success: true };
+}
