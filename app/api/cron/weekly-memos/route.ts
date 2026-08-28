@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { geminiFlash } from "@/lib/ai/gemini";
+import { buildWeeklyMemoPrompt } from "@/lib/ai/prompts/mendly-memo";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -90,43 +91,13 @@ export async function GET(req: NextRequest) {
             (decisionsRes.data ?? []).map((d) => `- [${d.kind}] ${d.title}`).join("\n") ||
             "(aucune décision enregistrée)";
 
-          const prompt = isPro
-            ? `Tu es le CEO de ${project.name}. Rédige le memo hebdomadaire ENRICHI du fondateur — version "vraie réunion de direction" (350 mots max). Formulation NON datée ("voici tes priorités pour la semaine", jamais "aujourd'hui").
-
-CONVERSATIONS DE LA SEMAINE :
-${transcript}
-
-DÉCISIONS RÉCENTES :
-${decisionsStr}
-
-ACTIONS EN COURS :
-${actionsStr}
-
-STRUCTURE :
-1. **Bilan de la semaine** (2-3 phrases, honnête)
-2. **Analyse des risques** (2 risques + comment les mitiger)
-3. **Recommandations proactives** (2 angles que le fondateur ne voit peut-être pas)
-4. **Tes 3 priorités pour la semaine** (bullets exécutables)
-5. **Suivi des actions** : reviens sur les actions en cours, sans reproche ; si bloqué, propose une version plus réaliste.
-
-Direct, dense, sans remplissage. Tutoie.`
-            : `Tu es le CEO de ${project.name}. Rédige un memo hebdomadaire BASIQUE pour le fondateur (180 mots max). Formulation NON datée ("voici où on en est", jamais "aujourd'hui").
-
-CONVERSATIONS DE LA SEMAINE :
-${transcript}
-
-DÉCISIONS RÉCENTES :
-${decisionsStr}
-
-ACTIONS EN COURS :
-${actionsStr}
-
-STRUCTURE :
-1. **Décisions prises cette semaine** (1-2 phrases)
-2. **Actions en cours / ce qui reste à faire** (bullets)
-3. **Tes priorités pour la semaine** (3 max)
-
-Punchy, direct, exécutable. Pas de blabla. Tutoie.`;
+          const prompt = buildWeeklyMemoPrompt({
+            project,
+            transcript,
+            decisions: decisionsStr,
+            actions: actionsStr,
+            isPro,
+          });
 
           let memoContent = "";
           try {

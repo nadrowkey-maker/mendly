@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import { geminiFlash } from "@/lib/ai/gemini";
-import { buildCeoMemoPrompt } from "@/lib/ai/prompts/ceo-memo";
+import { buildMendlyMemoPrompt } from "@/lib/ai/prompts/mendly-memo";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
 import { generateMemoPdf } from "@/lib/pdf/memo";
 import type { Project } from "@/lib/types/project";
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
     // Generate the memo content
     const targetLocale = locale === "en" ? "en" : "fr";
-    const basePrompt = buildCeoMemoPrompt(
+    const basePrompt = buildMendlyMemoPrompt(
       project as Project,
       conversationContext,
       targetLocale
@@ -134,7 +134,7 @@ const memoMarkdown = result.response.text();
 
     // Upload to Supabase Storage
     const timestamp = now.toISOString().replace(/[:.]/g, "-");
-    const fileName = `${user.id}/${projectId}/ceo-memo-${timestamp}.pdf`;
+    const fileName = `${user.id}/${projectId}/mendly-memo-${timestamp}.pdf`;
 
     const { error: uploadError } = await supabase.storage
       .from("deliverables")
