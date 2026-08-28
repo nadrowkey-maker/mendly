@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
     const { data: decisions } = await supabase
       .from("memory_events")
-      .select("id, user_id, project_id, title, content")
+      .select("id, user_id, project_id, title, detail")
       .eq("kind", "decision")
       .gte("created_at", from.toISOString())
       .lte("created_at", to.toISOString())
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 
     for (const dec of decisions ?? []) {
       if (!proIds.has(dec.user_id)) continue;
-      const label = (dec.title ?? dec.content ?? "décision").slice(0, 60);
+      const label = (dec.title ?? dec.detail ?? "décision").slice(0, 60);
 
       // Dedup: skip if a post-mortem already exists for this decision.
       const { data: existing } = await supabase
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
       const { data: project } = await supabase.from("projects").select("name").eq("id", dec.project_id).single();
 
-      const prompt = `Il y a 30 jours, cette décision a été prise pour le projet "${project?.name ?? ""}" : "${dec.title ?? dec.content}".
+      const prompt = `Il y a 30 jours, cette décision a été prise pour le projet "${project?.name ?? ""}" : "${dec.title ?? dec.detail}".
 Rédige un POST-MORTEM court (150 mots max) : ce qui a probablement bien marché, ce qui était risqué, et UN ajustement concret à faire maintenant. Honnête, sans reproche, tutoie.`;
 
       let content = "";
@@ -86,7 +86,7 @@ Rédige un POST-MORTEM court (150 mots max) : ce qui a probablement bien marché
         project_id: dec.project_id,
         kind: "milestone",
         title: `Post-mortem: ${label}`,
-        content,
+        detail: content,
       });
       processed += 1;
     }

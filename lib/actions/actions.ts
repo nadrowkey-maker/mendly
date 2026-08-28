@@ -147,7 +147,7 @@ export async function getProjectBriefings(): Promise<Record<string, ProjectBrief
   const [decisionsRes, actionsRes] = await Promise.all([
     supabase
       .from("memory_events")
-      .select("project_id, content, created_at")
+      .select("project_id, title, created_at")
       .eq("user_id", user.id)
       .eq("kind", "decision")
       .order("created_at", { ascending: false }),
@@ -160,9 +160,9 @@ export async function getProjectBriefings(): Promise<Record<string, ProjectBrief
   ]);
 
   const out: Record<string, ProjectBriefing> = {};
-  for (const row of (decisionsRes.data ?? []) as { project_id: string; content: string }[]) {
+  for (const row of (decisionsRes.data ?? []) as { project_id: string; title: string }[]) {
     if (!out[row.project_id]?.lastDecision) {
-      out[row.project_id] = { ...out[row.project_id], lastDecision: row.content };
+      out[row.project_id] = { ...out[row.project_id], lastDecision: row.title };
     }
   }
   for (const row of (actionsRes.data ?? []) as { project_id: string; content: string }[]) {
