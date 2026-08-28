@@ -1,56 +1,98 @@
 # MENDLY — Claude Instructions
 
-You are helping build Mendly, a landing page for an AI SaaS product that gives solo founders a virtual team of 8 AI executives (CEO, CTO, CMO, CPO, CDO, CFO, DEV, CCO).
+You are helping build Mendly, an AI SaaS product for solo founders.
+
+**Mendly is ONE entity, not a team of 8 agents.** The 8-executive product was
+replaced in August 2026 (`lib/ai/agents/mendly.ts`). Mendly carries every angle
+a leadership team would have — finance, growth, tech, product, strategy, data,
+execution, communication — but speaks as a single being. It never says "my
+team", "the agents" or "the CFO thinks". Its signature mechanic is exposing its
+own internal contradiction rather than smoothing it over.
+
+A per-project team of specialists still exists, but only inside the **Salle de
+réunion** (`lib/ai/team/assign-team.ts`), where it can be convened for a debate
+— and it works autonomously on a schedule (`app/api/cron/team-sessions`).
+
+Any copy or UI that presents Mendly as a team of eight is obsolete.
 
 ## CRITICAL CONTEXT
 
 - **Audience**: Indie hackers / solo founders (tech-savvy, pro, no-bullshit)
-- **Positioning**: Not "AI that does" — "A TEAM that collaborates"
-- **Differentiation**: We compete against ChatGPT/Lovable/Bolt by being a structured team experience
+- **Positioning**: Not "AI that assists" — a counsel that CONTRADICTS you. Mendly
+  is the one voice that dares tell a solo founder they are wrong.
+- **Differentiation**: ChatGPT agrees with you. Mendly argues, exposes its own
+  internal contradiction, and decides — and it keeps working while you are away.
 - **Tone**: Confident, direct, a bit editorial. Never corporate. Never fluffy.
 - **Languages**: EN (default) + FR (full parity, not just translation — tutoiement in French)
 
 ## DESIGN PRINCIPLES
 
-### Visual direction: "Cosmic Tech"
-- Deep space black background (`#05030E`)
-- Violet/cyan accents (`#8B5CF6`, `#06B6D4`, `#A78BFA`, `#F0ABFC`)
-- Subtle aurora gradients that breathe
-- Noise texture overlay (2-3% opacity) for depth
-- Grid background with radial mask
-- Generous whitespace — spacing IS design
-- Never decorative, always meaningful
+### Visual direction: "Contrôle Mission"
+
+Dark technological, glassmorphism, the feel of a mission control console.
+Reference: the VEXEL landing page. **The category alone is not the point** —
+"dark with glows" is also what every generated AI landing looks like. What
+separates this system from that is a small number of execution rules, and they
+are non-negotiable:
+
+1. **The accent NEVER touches running text.** Azure lives in light, halos,
+   graphics and data. Headings stay white. Coloured headline text is the single
+   most recognisable tell of a generated page.
+2. **The ground is `#000000`.** Not a violet-black, not charcoal. A tinted black
+   dates the page on its own.
+3. **One accent hue only.** The multi-accent gradient (violet + cyan + fuchsia)
+   is the number-one marker of the AI template. The previous charter mandated
+   four accents — that was the problem, not the solution.
+4. **Generative graphics are computed, never faked.** Particle structures are
+   real-time canvas/WebGL. A CSS gradient imitating one is spotted instantly.
+5. **No emoji in UI chrome.** Markers are typographic: a rule, a mono label.
+
+The amber signal is the one exception to rule 3, and it is reserved for a single
+use: the moment Mendly contradicts itself. Used anywhere else it stops meaning
+anything.
 
 ### Typography
-- Display/Headlines: **Geist** (Vercel's font, via `next/font`)
-- Body: **Geist**
-- Monospace/technical: **Geist Mono**
-- Editorial accents (manifesto, promise sections only): **Fraunces** italic
+- Display + body: **Manrope** via `next/font` — weight **200** for large
+  display, 400/500 for text. The weight contrast does the work of a second
+  family; that thin-and-huge headline is central to the look.
+- Technical/telemetry: **JetBrains Mono** — counters, timestamps, labels.
+- Headlines are sentence case, tight tracking (`-0.03em` to `-0.038em`), and end
+  with a full stop. The punctuation closes the sentence and gives it poise.
+- Geist is banned: Vercel's font has become the AI-startup uniform.
 
 ### Color tokens (use these CSS vars, never hardcode)
 ```css
---bg-primary: #05030E      /* space black */
---bg-secondary: #0A0820    /* slightly lifted */
---surface: #14102A         /* cards */
---accent-primary: #8B5CF6  /* violet */
---accent-glow: #A78BFA     /* lighter violet */
---accent-hot: #06B6D4      /* cyan */
---accent-warm: #F0ABFC     /* fuchsia highlight */
---text-primary: #F5F3FF
---text-muted: #A1A1AA
---text-dim: #71717A
---border: rgba(139, 92, 246, 0.15)
+--bg-base: #000000          /* absolute black, the ground */
+--bg-raised: #06080B        /* sections, panels */
+--bg-overlay: #0B0F14       /* menus, popovers */
+--glass: rgba(255,255,255,0.045)
+--glass-line: rgba(255,255,255,0.09)
+--glass-hi: rgba(255,255,255,0.17)   /* top edge highlight */
+--accent-primary: #3AA8FF   /* azure — the only accent */
+--accent-glow: #8FD4FF
+--accent-halo: rgba(58,168,255,0.28)
+--signal: #FFB454           /* internal contradiction ONLY */
+--text-primary: #FFFFFF
+--text-secondary: #9AA4AE
+--text-muted: #5D666F
 ```
 
 ### Signature effects
-1. **Aurora background** — animated violet/cyan gradient
-2. **Magnetic buttons** — slightly follow mouse
-3. **3D tilt on cards** — subtle rotateX/Y on hover
-4. **Smooth scroll** via Lenis
-5. **Scroll-triggered animations** via Framer Motion / GSAP
-6. **Text generate effect** on hero headlines
-7. **Meteors / shooting stars** on sections with impact
-8. **Glow pulses** on primary CTAs
+1. **The entity** — one fixed full-screen particle field that morphs between
+   states as you scroll (torus, sphere, wave, helix). The same points
+   reorganise; nothing appears or disappears.
+2. **Liquid glass** — `blur(20px) saturate(140%)`, a 9% white border, and a
+   luminous hairline on the **top edge**. That hairline is what separates Apple
+   glass from a plain translucent panel; without it the surface reads cheap.
+3. **The pill + pellet button** — a circular badge holding an arrow, inside the
+   pill, always inverting the button's own background. This is the detail people
+   recognise before they read the logo.
+4. **3D-tilted product console** — `perspective` + `rotateX(9deg)`, real UI
+   inside, never an abstract illustration.
+5. **Scroll-triggered reveals** via Framer Motion, restrained.
+
+Banned, they belong to the old charter: aurora gradients, meteors, shooting
+stars, glow pulses on CTAs, noise texture, magnetic buttons.
 
 ## CODE RULES (non-negotiable)
 
@@ -87,7 +129,7 @@ components/
   layout/        → Nav, Footer
 lib/
   utils.ts       → cn, helpers
-  agents.ts      → the 8 agents data
+  ai/agents/mendly.ts → the single entity (agents.ts = legacy 8-agent data)
   constants.ts   → shared constants
 
 ## INTERACTION RULES
@@ -103,12 +145,13 @@ lib/
 - **FIRST**: Read `@21ST-COMPONENTS-MENDLY.md` to check if there's a pre-approved component for the section/feature you're building.
 - If yes, use that component's URL via `/ui` or `npx shadcn@latest add <url>`.
 - If no pre-approved component fits, use `/ui` to search for alternatives, but prioritize the approved list.
-- **Always customize** the generated component to match Mendly's Cosmic Tech palette (never leave `bg-blue-500`, always use `bg-[var(--accent-primary)]`).
+- **Always customize** the generated component to match Mendly's "Contrôle Mission" system (never leave `bg-blue-500`, always use `bg-[var(--accent-primary)]`, and never introduce a second accent hue).
 - **Always respect section ambiance**: each section has its own visual mood (see `21ST-COMPONENTS-MENDLY.md`).
 - Install via `npx shadcn@latest add <component-url>` when prompted.
 
 ### When writing copy
-- **ALWAYS read `@COPYWRITING-MENDLY.md`** for the approved copywriting (humanly readable reference)
+- ⚠️ **`COPYWRITING-MENDLY.md` is OBSOLETE.** It still sells the 8-agent product
+  and the old landing. Do not copy from it until it has been rewritten.
 - **ALWAYS use `useTranslations('namespace')` from next-intl** — NEVER hardcode strings
 - All translation keys are already defined in `messages/en.json` and `messages/fr.json` (253 keys, 13 namespaces)
 - Namespaces: `nav`, `hero`, `problem`, `promise`, `howItWorks`, `team`, `action`, `deliverables`, `comparison`, `pricing`, `trust`, `finalCta`, `footer`

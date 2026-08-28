@@ -1,58 +1,81 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
+/* Polices chargées via next/font dans app/[locale]/layout.tsx — Manrope + JetBrains Mono. */
 @import "tailwindcss";
 
 /* ============================================================
-   MENDLY DESIGN SYSTEM — "Quiet Aurora"
-   A calm, premium, ultra-rounded dark product surface.
-   Reference feel: Google Gemini app + ChatGPT — not sci-fi.
-   The only loud thing is the AI itself: when an agent speaks,
-   a soft multicolor aurora breathes. Everything else is quiet.
+   MENDLY DESIGN SYSTEM — "Contrôle Mission"
+   Noir absolu, verre liquide, une seule couleur d'accent.
+
+   Trois règles non négociables, ce sont elles qui séparent ce
+   système du design IA générique :
+   1. L'accent ne touche JAMAIS le texte courant. L'azur vit dans
+      la lumière, les halos, les données. Les titres restent blancs.
+   2. Le fond est #000000. Pas un noir violacé, pas un charbon.
+   3. Une seule teinte d'accent. Le multi-accent dégradé (violet +
+      cyan + fuchsia) est le marqueur numéro un du template IA.
+
+   Le signal ambre est la seule exception, et il est réservé à un
+   usage unique : le moment où Mendly se contredit lui-même. Employé
+   ailleurs, il ne veut plus rien dire.
    ============================================================ */
 
 :root {
-  /* ---- Canvas & elevation (neutral, slightly warm dark) ---- */
-  --bg-base: #0a0a0c;          /* page canvas */
-  --bg-raised: #101013;        /* sections / panels */
-  --bg-overlay: #161619;       /* menus, popovers */
-  --bg-primary: #0a0a0c;       /* legacy alias */
-  --bg-secondary: #101013;     /* legacy alias */
+  /* ---- Canvas & elevation ---- */
+  --bg-base: #000000;          /* page canvas — noir absolu */
+  --bg-raised: #06080b;        /* sections / panels */
+  --bg-overlay: #0b0f14;       /* menus, popovers */
+  --bg-primary: #000000;       /* legacy alias */
+  --bg-secondary: #06080b;     /* legacy alias */
 
-  /* Solid app surfaces (sidebars, cards) — give the "app" depth */
-  --surface-1: #121214;
-  --surface-2: #17171b;
-  --surface-3: #1d1d22;
-  --surface: rgba(255, 255, 255, 0.035);          /* legacy translucent */
-  --surface-elevated: rgba(255, 255, 255, 0.055);
-  --surface-hover: rgba(255, 255, 255, 0.08);
+  /* Solid app surfaces (sidebars, cards) */
+  --surface-1: #06080b;
+  --surface-2: #0b0f14;
+  --surface-3: #12171e;
+  --surface: rgba(255, 255, 255, 0.045);          /* legacy translucent */
+  --surface-elevated: rgba(255, 255, 255, 0.065);
+  --surface-hover: rgba(255, 255, 255, 0.09);
+
+  /* ---- Verre liquide ----
+     Le liseré haut (--glass-hi) est ce qui distingue le verre Apple
+     d'un simple fond translucide : la lumière qui accroche l'arête. */
+  --glass: rgba(255, 255, 255, 0.045);
+  --glass-line: rgba(255, 255, 255, 0.09);
+  --glass-hi: rgba(255, 255, 255, 0.17);
+  --glass-blur: blur(20px) saturate(140%);
 
   /* ---- Hairline borders ---- */
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.11);
-  --border-emphasis: rgba(255, 255, 255, 0.18);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-emphasis: rgba(255, 255, 255, 0.22);
 
   /* ---- Text ---- */
-  --text-primary: #f7f7f8;
-  --text-secondary: rgba(247, 247, 248, 0.72);
-  --text-muted: rgba(247, 247, 248, 0.46);
-  --text-dim: rgba(247, 247, 248, 0.26);
+  --text-primary: #ffffff;
+  --text-secondary: #9aa4ae;
+  --text-muted: #5d666f;
+  --text-dim: rgba(255, 255, 255, 0.24);
 
-  /* ---- Aurora palette — the AI signature (soft, never neon) ---- */
-  --aurora-violet: #a78bfa;
-  --aurora-blue:   #5b9dff;
-  --aurora-teal:   #34d8b4;
-  --aurora-pink:   #f472b6;
-  --aurora-amber:  #fbbf24;
+  /* ---- Alias historiques, ramenés sur l'azur ----
+     Conservés pour ne pas casser les composants existants, mais
+     collapsés sur une seule famille : plus aucun multi-accent. */
+  --aurora-violet: #3aa8ff;
+  --aurora-blue:   #8fd4ff;
+  --aurora-teal:   #3aa8ff;
+  --aurora-pink:   #8fd4ff;
+  --aurora-amber:  #ffb454;
 
-  /* Primary accent (single Apple blue) */
-  --accent-primary: #0071e3;
-  --accent-glow: #4a9eff;
-  --accent-hot: #0a84ff;
-  --accent-warm: #5ac8fa;
-  --accent-deep: #0071e3;
+  /* Accent unique */
+  --accent-primary: #3aa8ff;
+  --accent-glow: #8fd4ff;
+  --accent-hot: #3aa8ff;
+  --accent-warm: #8fd4ff;
+  --accent-deep: #0b3a63;
+  --accent-halo: rgba(58, 168, 255, 0.28);
+
+  /* ---- Signal — contradiction interne UNIQUEMENT ---- */
+  --signal: #ffb454;
 
   /* ---- Status ---- */
-  --success: #34d8b4;
-  --warning: #fbbf24;
+  --success: #3aa8ff;
+  --warning: #ffb454;
   --danger: #f87171;
 
   /* ---- Shadows (soft, deep, premium) ---- */
@@ -60,7 +83,7 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
   --shadow-md: 0 12px 36px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 28px 70px rgba(0, 0, 0, 0.6);
-  --shadow-aurora: 0 18px 60px -12px rgba(0, 113, 227, 0.35);
+  --shadow-aurora: 0 18px 60px -12px rgba(58, 168, 255, 0.35);
 
   /* ---- Radius — very rounded, Gemini/ChatGPT feel ---- */
   --radius-xs: 10px;
@@ -104,7 +127,7 @@ html {
 }
 
 body {
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
     "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   letter-spacing: -0.011em;
@@ -118,7 +141,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
     "Helvetica Neue", Arial, sans-serif;
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -135,13 +158,13 @@ h2 { letter-spacing: -0.035em; }
 p { text-wrap: pretty; }
 
 code, pre, .font-mono, [class*="font-mono"] {
-  font-family: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-family: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
   font-feature-settings: "ss01", "cv01";
 }
 
 /* Editorial accent (manifesto / promise) — no italic serif, stays in-system */
 .font-fraunces {
-  font-family: "Geist", sans-serif;
+  font-family: var(--font-sans), sans-serif;
   font-weight: 600;
   letter-spacing: -0.03em;
 }
@@ -160,16 +183,16 @@ em { font-style: normal; font-weight: 600; color: var(--text-primary); }
 }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); background-clip: padding-box; }
 
-::selection { background: rgba(167, 139, 250, 0.28); color: #fff; }
+::selection { background: rgba(58, 168, 255, 0.30); color: #fff; }
 
 :focus-visible {
-  outline: 2px solid rgba(167, 139, 250, 0.65);
+  outline: 2px solid rgba(143, 212, 255, 0.75);
   outline-offset: 2px;
   border-radius: 10px;
 }
 button:focus, a:focus, input:focus, textarea:focus { outline: none; }
 button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
-  outline: 2px solid rgba(167, 139, 250, 0.65);
+  outline: 2px solid rgba(143, 212, 255, 0.75);
   outline-offset: 2px;
 }
 
