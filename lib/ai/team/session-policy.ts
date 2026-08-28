@@ -19,14 +19,14 @@ import type { PlanTier } from "@/lib/stripe/plans";
 export const CADENCE_DAYS: Record<PlanTier, number> = {
   // Le gratuit y a droit : "ton équipe a bossé sans toi" est le moment de
   // conversion le plus fort du produit. Le supprimer aux gratuits supprime
-  // l'envie d'payer. Mais espacé, pour que le coût reste borné.
+  // l'envie de payer. Mais espacé, pour que le coût reste borné.
   free: 14,
   starter: 7,
   pro: 3,
 };
 
 /** Une action non terminée depuis ce délai compte comme un signal d'enlisement. */
-const STALLED_ACTION_DAYS = 5;
+export const STALLED_ACTION_DAYS = 5;
 
 /** En deçà, le projet vient d'être créé : rien à débattre encore. */
 const MIN_PROJECT_AGE_DAYS = 2;

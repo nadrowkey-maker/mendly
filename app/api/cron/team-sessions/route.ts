@@ -18,7 +18,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import { runHeadlessDebate } from "@/lib/ai/debate/run-headless";
-import { decideSession, generateSessionTopic } from "@/lib/ai/team/session-policy";
+import {
+  decideSession,
+  generateSessionTopic,
+  STALLED_ACTION_DAYS,
+} from "@/lib/ai/team/session-policy";
 import { selectMemoryForContext, relativeAge } from "@/lib/ai/project-memory";
 import type { MemoryEvent } from "@/lib/types/tracking";
 import type { Project } from "@/lib/types/project";
@@ -34,8 +38,7 @@ export const maxDuration = 300;
  */
 const MAX_SESSIONS_PER_RUN = 20;
 
-/** Fenêtre de recherche des actions enlisées et des messages récents. */
-const STALLED_DAYS = 5;
+/** Fenêtre au-delà de laquelle un projet est considéré comme encore vivant. */
 const ALIVE_WINDOW_DAYS = 14;
 
 function getAdminSupabase() {
@@ -91,7 +94,7 @@ export async function GET(req: NextRequest) {
         const project = raw;
         const plan: PlanTier = planOf.get(project.user_id) ?? "free";
 
-        const stalledBefore = new Date(now.getTime() - STALLED_DAYS * 86_400_000).toISOString();
+        const stalledBefore = new Date(now.getTime() - STALLED_ACTION_DAYS * 86_400_000).toISOString();
         const aliveAfter = new Date(now.getTime() - ALIVE_WINDOW_DAYS * 86_400_000).toISOString();
 
         const [lastSessionRes, unseenRes, memoryRes, actionsRes, stalledRes, messagesRes] =
