@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { buildCeoSystemPrompt } from "@/lib/ai/agents/ceo";
 import { buildCtoSystemPrompt } from "@/lib/ai/agents/cto";
@@ -13,6 +13,7 @@ import { streamGeminiResponse, toGeminiHistory } from "@/lib/ai/gemini";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
 import { buildProjectMemoryBlock } from "@/lib/ai/project-memory";
+import { shouldHarvest, harvestConversationDecision } from "@/lib/ai/harvest-conversation";
 import type { MemoryEvent } from "@/lib/types/tracking";
 import { withAgentCore } from "@/lib/ai/prompts/core-principles";
 import { viabilityVerdictModule, overwhelmedModule } from "@/lib/ai/prompts/special-modes";
@@ -253,6 +254,28 @@ export async function POST(req: NextRequest) {
             .from("conversations")
             .update({ updated_at: new Date().toISOString() })
             .eq("id", conversationId);
+
+          // Point 4a — les décisions prises en conversation simple, hors débat,
+          // ne laissaient aucune trace. after() exécute l'extraction une fois la
+          // réponse envoyée : le fondateur ne l'attend jamais.
+          const assistantReplies =
+            ((history ?? []) as { role: string }[]).filter((m) => m.role === "assistant")
+              .length + 1;
+          if (shouldHarvest(assistantReplies)) {
+            const transcript = [
+              ...((history ?? []) as { role: string; content: string }[]),
+              { role: "user", content: userMessage },
+              { role: "assistant", content: fullResponse },
+            ];
+            after(() =>
+              harvestConversationDecision({
+                projectId,
+                userId: user.id,
+                transcript,
+                locale: targetLocale,
+              })
+            );
+          }
 
           controller.close();
         } catch (err) {
