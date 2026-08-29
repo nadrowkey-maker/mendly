@@ -19,7 +19,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
         initial={reduced ? false : { opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex-1 pt-16"
+        className="flex-1 pt-24"
       >
         {children}
       </motion.main>

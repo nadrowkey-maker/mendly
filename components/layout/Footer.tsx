@@ -25,16 +25,13 @@ export function Footer() {
         { label: t("col1Link1"), href: "/#methode" },
         { label: t("col1Link2"), href: "/#salle" },
         { label: t("col1Link3"), href: "/#tarifs" },
-        { label: t("col1Link4"), href: "/blog" },
       ],
     },
     {
       title: t("col2Title"),
       links: [
         { label: t("col2Link1"), href: "/manifesto" },
-        { label: t("col2Link2"), href: "/blog" },
-        { label: t("col2Link3"), href: "/careers" },
-        { label: t("col2Link4"), href: "/contact" },
+        { label: t("col2Link2"), href: "/contact" },
       ],
     },
     {
@@ -42,8 +39,7 @@ export function Footer() {
       links: [
         { label: t("col3Link1"), href: "/help" },
         { label: t("col3Link2"), href: "/security" },
-        { label: t("col3Link3"), href: "/api-docs" },
-        { label: t("col3Link4"), href: "/status" },
+        { label: t("col3Link3"), href: "/status" },
       ],
     },
     {
