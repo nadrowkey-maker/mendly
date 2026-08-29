@@ -1009,6 +1009,22 @@
     "nav": {
       "method": "Méthode",
       "room": "Salle de réunion"
+    },
+    "contradiction": {
+      "label": "Le problème",
+      "title": "Tout le monde te dit oui.",
+      "sub": "Tu poses la même question aux deux. L'un te conforte, l'autre te contredit. Un seul des deux te fait avancer.",
+      "questionLabel": "La question",
+      "question": "Je lance l'offre payante ce mois-ci ?",
+      "assistantLabel": "Un assistant",
+      "assistantBody": "Excellente initiative ! Lancer ton offre payante maintenant peut capitaliser sur ton momentum actuel. Voici cinq étapes pour réussir ton lancement : définir ton positionnement prix, préparer ta page de vente, prévenir ta liste…",
+      "assistantVerdict": "Il est d'accord. Il l'aurait été avec l'inverse aussi.",
+      "mendlyLabel": "Mendly",
+      "tensionLabel": "Contradiction interne",
+      "tension": "Le produit est prêt. Ton canal d'acquisition, non.",
+      "mendlyBody": "Sur quoi tu te bases pour dire que le momentum existe ? Tu as 40 inscrits et aucune rétention mesurée. Lancer maintenant, c'est convertir une audience que tu n'as pas encore — et brûler ta seule fenêtre de lancement pour l'apprendre.",
+      "verdictLabel": "Ma position :",
+      "verdictBody": "repousse de trois semaines, mesure la rétention à J+14, et lance avec un chiffre en main."
     }
   }
 }

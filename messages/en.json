@@ -1009,6 +1009,22 @@
     "nav": {
       "method": "How it works",
       "room": "Meeting room"
+    },
+    "contradiction": {
+      "label": "The problem",
+      "title": "Everyone tells you yes.",
+      "sub": "You ask both the same question. One reassures you, the other argues back. Only one of them moves you forward.",
+      "questionLabel": "The question",
+      "question": "Should I launch the paid plan this month?",
+      "assistantLabel": "An assistant",
+      "assistantBody": "Great initiative! Launching your paid offer now can capitalise on your current momentum. Here are five steps for a successful launch: define your price positioning, prepare your sales page, warm up your list…",
+      "assistantVerdict": "It agrees. It would have agreed with the opposite too.",
+      "mendlyLabel": "Mendly",
+      "tensionLabel": "Internal contradiction",
+      "tension": "The product is ready. Your acquisition channel is not.",
+      "mendlyBody": "What are you basing that momentum on? You have 40 signups and no measured retention. Launching now means converting an audience you do not have yet — and burning your only launch window to find that out.",
+      "verdictLabel": "My call:",
+      "verdictBody": "push it three weeks, measure retention at day 14, and launch with a number in hand."
     }
   }
 }

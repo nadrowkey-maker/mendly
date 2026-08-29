@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Nav } from "@/components/layout/Nav";
 import { EntityField } from "@/components/3d/EntityField";
 import { HeroMission } from "@/components/sections/HeroMission";
+import { Contradiction } from "@/components/sections/Contradiction";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { routing } from "@/i18n/routing";
@@ -51,6 +52,7 @@ export default function HomePage() {
         <Nav />
         <main>
           <HeroMission />
+          <Contradiction />
         </main>
         <Footer />
       </div>
