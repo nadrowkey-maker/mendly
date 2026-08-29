@@ -950,5 +950,61 @@
     "deleteConfirmWord": "SUPPRIMER",
     "confirmDelete": "Supprimer définitivement",
     "deleting": "Suppression…"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Ton conseil de direction",
+      "titleLine2": "ne dort jamais.",
+      "sub": "Mendly conteste ton plan pendant qu'il est encore temps de le changer. Et il continue de travailler quand tu n'es pas là.",
+      "ctaPrimary": "Ouvrir un projet",
+      "ctaSecondary": "Lire le manifeste"
+    },
+    "console": {
+      "search": "Rechercher une décision, un mémo…",
+      "user": "Flavien",
+      "sideProject": "PROJET",
+      "sideTeam": "ÉQUIPE",
+      "side": {
+        "overview": "Vue d'ensemble",
+        "sessions": "Sessions",
+        "memory": "Mémoire",
+        "deliverables": "Livrables",
+        "room": "Salle de réunion"
+      },
+      "badge": "SESSION AUTONOME · 03:12",
+      "metric": {
+        "decisions": {
+          "label": "Décisions",
+          "value": "14",
+          "hint": "+3 cette semaine"
+        },
+        "stalled": {
+          "label": "Actions ouvertes",
+          "value": "2",
+          "hint": "enlisées depuis 11 j"
+        },
+        "sessions": {
+          "label": "Sessions",
+          "value": "6",
+          "hint": "sans intervention"
+        },
+        "next": {
+          "label": "Prochaine",
+          "value": "18h",
+          "hint": "signal détecté"
+        }
+      },
+      "chartTitle": "Activité du conseil",
+      "legendSessions": "Sessions",
+      "legendTensions": "Contradictions",
+      "tensionLabel": "Contradiction interne",
+      "tensionBody": "Le prix tient face au marché. Le canal d'acquisition, non.",
+      "verdictLabel": "Ma position :",
+      "verdictBody": "garde le prix, coupe le canal payant ce mois-ci, et mesure la rétention avant d'y remettre un euro."
+    },
+    "meta": {
+      "title": "Mendly — le conseil qui te contredit",
+      "description": "Mendly n'est pas un assistant qui acquiesce. C'est le conseil de direction qui conteste ton plan, expose ses propres contradictions, et continue de travailler quand tu n'es pas là."
+    }
   }
 }

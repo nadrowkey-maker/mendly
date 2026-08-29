@@ -950,5 +950,61 @@
     "deleteConfirmWord": "DELETE",
     "confirmDelete": "Delete permanently",
     "deleting": "Deleting…"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Your board of directors",
+      "titleLine2": "never sleeps.",
+      "sub": "Mendly argues with your plan while there is still time to change it. And it keeps working when you are not there.",
+      "ctaPrimary": "Open a project",
+      "ctaSecondary": "Read the manifesto"
+    },
+    "console": {
+      "search": "Search a decision, a memo…",
+      "user": "Flavien",
+      "sideProject": "PROJECT",
+      "sideTeam": "TEAM",
+      "side": {
+        "overview": "Overview",
+        "sessions": "Sessions",
+        "memory": "Memory",
+        "deliverables": "Deliverables",
+        "room": "Meeting room"
+      },
+      "badge": "AUTONOMOUS SESSION · 03:12",
+      "metric": {
+        "decisions": {
+          "label": "Decisions",
+          "value": "14",
+          "hint": "+3 this week"
+        },
+        "stalled": {
+          "label": "Open actions",
+          "value": "2",
+          "hint": "stalled for 11 days"
+        },
+        "sessions": {
+          "label": "Sessions",
+          "value": "6",
+          "hint": "unprompted"
+        },
+        "next": {
+          "label": "Next",
+          "value": "6pm",
+          "hint": "signal detected"
+        }
+      },
+      "chartTitle": "Board activity",
+      "legendSessions": "Sessions",
+      "legendTensions": "Contradictions",
+      "tensionLabel": "Internal contradiction",
+      "tensionBody": "The price holds against the market. The acquisition channel does not.",
+      "verdictLabel": "My call:",
+      "verdictBody": "keep the price, cut the paid channel this month, and measure retention before putting another euro in."
+    },
+    "meta": {
+      "title": "Mendly — the counsel that argues back",
+      "description": "Mendly is not an assistant that agrees with you. It is the board that challenges your plan, exposes its own contradictions, and keeps working while you are away."
+    }
   }
 }
