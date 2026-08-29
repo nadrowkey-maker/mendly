@@ -6,6 +6,7 @@ import { HeroMission } from "@/components/sections/HeroMission";
 import { Contradiction } from "@/components/sections/Contradiction";
 import { NightWatch } from "@/components/sections/NightWatch";
 import { PricingSection } from "@/components/sections/Pricing";
+import { Closing } from "@/components/sections/Closing";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { routing } from "@/i18n/routing";
@@ -57,6 +58,7 @@ export default function HomePage() {
           <Contradiction />
           <NightWatch />
           <PricingSection />
+          <Closing />
         </main>
         <Footer />
       </div>

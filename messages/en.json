@@ -7,10 +7,10 @@
     "cta": "Sign up free"
   },
   "footer": {
-    "tagline": "The team you couldn't afford.",
+    "tagline": "The counsel that dares tell you no.",
     "col1Title": "PRODUCT",
     "col1Link1": "How it works",
-    "col1Link2": "Team",
+    "col1Link2": "Meeting room",
     "col1Link3": "Pricing",
     "col1Link4": "Changelog",
     "col2Title": "COMPANY",
@@ -835,6 +835,14 @@
         "cta": "Choose Pro"
       },
       "footnote": "No commitment, cancel anytime. The free plan stays free — it does not expire."
+    },
+    "closing": {
+      "label": "Get started",
+      "title": "The next decision — are you making it alone?",
+      "sub": "Open a project, describe it in two sentences. Mendly argues back within the minute — and keeps working after you leave.",
+      "ctaPrimary": "Open a project",
+      "ctaSecondary": "Read the manifesto",
+      "footnote": "Free · no credit card"
     }
   }
 }

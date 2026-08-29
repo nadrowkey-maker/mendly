@@ -7,10 +7,10 @@
     "cta": "S'inscrire gratuitement"
   },
   "footer": {
-    "tagline": "L'équipe que tu ne pouvais pas te payer.",
+    "tagline": "Le conseil qui ose te dire non.",
     "col1Title": "PRODUIT",
     "col1Link1": "Fonctionnement",
-    "col1Link2": "Équipe",
+    "col1Link2": "Salle de réunion",
     "col1Link3": "Tarifs",
     "col1Link4": "Changelog",
     "col2Title": "ENTREPRISE",
@@ -835,6 +835,14 @@
         "cta": "Choisir Pro"
       },
       "footnote": "Sans engagement, résiliable à tout moment. Le plan gratuit reste gratuit — il n'expire pas."
+    },
+    "closing": {
+      "label": "Commencer",
+      "title": "La prochaine décision, tu la prends seul ?",
+      "sub": "Ouvre un projet, décris-le en deux phrases. Mendly te contredit dans la minute — et continue de travailler après que tu sois parti.",
+      "ctaPrimary": "Ouvrir un projet",
+      "ctaSecondary": "Lire le manifeste",
+      "footnote": "Gratuit · sans carte bancaire"
     }
   }
 }
