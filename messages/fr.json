@@ -904,5 +904,16 @@
     "incidentCta": "Signaler un incident",
     "honestyTitle": "Pourquoi pas de supervision automatique",
     "honestyBody": "Mendly est un produit jeune, opéré par deux personnes. Mettre en place une supervision continue et une page d'état alimentée automatiquement viendra — l'annoncer avant de l'avoir serait exactement le genre de promesse creuse que ce produit combat."
+  },
+  "intake": {
+    "opening": "Alors, sur quoi tu bosses ?\n\nDécris-le comme tu l'expliquerais à quelqu'un dans un couloir — pas de pitch, je préfère la version brute.",
+    "placeholder": "Écris ta réponse…",
+    "send": "Envoyer",
+    "thinking": "Mendly réfléchit",
+    "error": "Quelque chose a coincé. Réessaie.",
+    "recapTitle": "Ce que j'ai compris",
+    "createCta": "Ouvrir ce projet",
+    "creating": "Je constitue ton équipe",
+    "switchToForm": "Remplir un formulaire à la place"
   }
 }

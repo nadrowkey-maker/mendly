@@ -904,5 +904,16 @@
     "incidentCta": "Report an incident",
     "honestyTitle": "Why there is no automated monitoring",
     "honestyBody": "Mendly is a young product run by two people. Continuous monitoring and an automatically fed status page will come — announcing it before having it would be exactly the kind of hollow promise this product exists to fight."
+  },
+  "intake": {
+    "opening": "So, what are you working on?\n\nDescribe it the way you would to someone in a hallway — no pitch, I would rather have the raw version.",
+    "placeholder": "Type your answer…",
+    "send": "Send",
+    "thinking": "Mendly is thinking",
+    "error": "Something went wrong. Try again.",
+    "recapTitle": "What I understood",
+    "createCta": "Open this project",
+    "creating": "Assembling your team",
+    "switchToForm": "Fill in a form instead"
   }
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import { ProjectIntake } from "@/components/dashboard/ProjectIntake";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { createProject } from "@/lib/actions/projects";
 import { PremiumButton } from "@/components/ui/PremiumButton";
-import { useSearchParams } from "next/navigation";
 import type {
   ProjectSector,
   ProjectStage,
@@ -22,17 +22,15 @@ export default function NewProjectPage() {
   const t = useTranslations("newProject");
   const locale = useLocale();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const nameRef = useRef<HTMLInputElement>(null);
 
+  // L'entretien est la porte d'entrée par défaut : c'est le premier contact
+  // avec le produit, et Mendly doit s'y démontrer plutôt que faire remplir des
+  // champs. Le formulaire reste à un clic pour qui crée son troisième projet.
+  const [mode, setMode] = useState<"intake" | "form">("intake");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  useEffect(() => {
-    const desc = searchParams.get("desc");
-    if (desc) setDescription(decodeURIComponent(desc));
-    nameRef.current?.focus();
-  }, [searchParams]);
   const [sector, setSector] = useState<ProjectSector>("tech");
   const [stage, setStage] = useState<ProjectStage>("idea");
   const [priority, setPriority] = useState<ProjectPriority>("strategy");
@@ -77,6 +75,16 @@ export default function NewProjectPage() {
     // Redirect to dashboard after creation
     router.push("/dashboard");
   };
+
+  if (mode === "intake") {
+    return (
+      <main className="relative min-h-screen bg-black px-6 py-12 md:px-12">
+        <div className="relative z-10 mx-auto max-w-2xl">
+          <ProjectIntake onSwitchToForm={() => setMode("form")} />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen px-6 md:px-12 py-12 bg-(--bg-primary)">
