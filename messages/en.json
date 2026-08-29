@@ -423,7 +423,13 @@
     "inviteCta": "Invite {agent}",
     "inviteDismiss": "Later",
     "agentJoined": "{agent} joined the conversation",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "console": {
+      "decisions": "decisions",
+      "actions": "open actions",
+      "sessions": "sessions",
+      "unseen": "{count, plural, =1 {1 session while you were away} other {# sessions while you were away}}"
+    }
   },
   "teamRoom": {
     "eyebrow": "TEAM ROOM",

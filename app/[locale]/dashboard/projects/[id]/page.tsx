@@ -6,6 +6,7 @@ import {
 } from "@/lib/actions/conversations";
 import { listProjects } from "@/lib/actions/projects";
 import { getLastAgentActivity } from "@/lib/actions/agent-activity";
+import { getProjectStats } from "@/lib/actions/project-stats";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getUserSubscription } from "@/lib/actions/subscription";
@@ -42,12 +43,13 @@ export default async function ProjectChatPage({ params }: PageProps) {
     throw new Error("Could not create conversation");
   }
 
-  const [messages, allProjects, usage, subscription, lastAgentActivity] = await Promise.all([
+  const [messages, allProjects, usage, subscription, lastAgentActivity, projectStats] = await Promise.all([
     listMessages(conversation.id),
     listProjects(),
     checkRateLimit(user.id),
     getUserSubscription(),
     getLastAgentActivity(id),
+    getProjectStats(id),
   ]);
 
   return (
@@ -62,6 +64,7 @@ export default async function ProjectChatPage({ params }: PageProps) {
       userEmail={user.email ?? null}
       allProjects={allProjects}
       lastAgentActivity={lastAgentActivity}
+      projectStats={projectStats}
     />
   );
 }

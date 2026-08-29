@@ -14,6 +14,8 @@ import { AIAura } from "@/components/ui/AIAura";
 import { GenerateMemoButton } from "./GenerateMemoButton";
 import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
 import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
+import { ProjectConsoleStrip } from "@/components/chat/ProjectConsoleStrip";
+import type { ProjectStats } from "@/lib/actions/project-stats";
 import {
   getOrCreateConversation,
   listMessages,
@@ -37,6 +39,7 @@ interface ChatInterfaceProps {
   userEmail: string | null;
   allProjects: Project[];
   lastAgentActivity: Record<string, string>;
+  projectStats: ProjectStats;
 }
 
 interface DisplayMessage {
@@ -131,6 +134,7 @@ export function ChatInterface({
   userEmail,
   allProjects,
   lastAgentActivity,
+  projectStats,
 }: ChatInterfaceProps) {
   const t = useTranslations("chat");
 
@@ -952,6 +956,8 @@ export function ChatInterface({
             <GenerateMemoButton projectId={project.id} userPlan={userPlan} />
           )}
         </header>
+
+        <ProjectConsoleStrip stats={projectStats} onOpenTeamRoom={handleTeamRoomOpen} />
 
         <div className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8 py-8">
           <div className="max-w-3xl mx-auto space-y-6">

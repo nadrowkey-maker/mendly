@@ -423,7 +423,13 @@
     "inviteCta": "Inviter {agent}",
     "inviteDismiss": "Plus tard",
     "agentJoined": "{agent} a rejoint la conversation",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "console": {
+      "decisions": "décisions",
+      "actions": "actions ouvertes",
+      "sessions": "sessions",
+      "unseen": "{count, plural, =1 {1 session pendant ton absence} other {# sessions pendant ton absence}}"
+    }
   },
   "teamRoom": {
     "eyebrow": "SALLE DE RÉUNION",
