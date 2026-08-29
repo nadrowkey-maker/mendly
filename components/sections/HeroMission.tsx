@@ -19,7 +19,7 @@ export function HeroMission() {
   const t = useTranslations("landing.hero");
 
   return (
-    <section className="relative px-5 pt-16 md:px-8 md:pt-24" data-entity-shape="0">
+    <section className="relative px-5 pt-32 md:px-8 md:pt-40" data-entity-shape="0">
       <div className="mx-auto max-w-5xl text-center">
         <motion.h1
           initial={{ opacity: 0, y: 24 }}

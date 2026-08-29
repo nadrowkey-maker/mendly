@@ -1005,6 +1005,10 @@
     "meta": {
       "title": "Mendly — le conseil qui te contredit",
       "description": "Mendly n'est pas un assistant qui acquiesce. C'est le conseil de direction qui conteste ton plan, expose ses propres contradictions, et continue de travailler quand tu n'es pas là."
+    },
+    "nav": {
+      "method": "Méthode",
+      "room": "Salle de réunion"
     }
   }
 }
