@@ -116,10 +116,11 @@ function buildSprite(): HTMLCanvasElement {
     const grad = g.createRadialGradient(half, half, 0, half, half, half);
     // Cœur presque blanc, halo azur : c'est ce dégradé qui fait lire un point
     // comme une lumière plutôt que comme une pastille de couleur.
-    grad.addColorStop(0, "rgba(255,255,255,0.95)");
-    grad.addColorStop(0.18, "rgba(190,230,255,0.62)");
-    grad.addColorStop(0.45, "rgba(90,180,255,0.22)");
-    grad.addColorStop(1, "rgba(58,168,255,0)");
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.12, "rgba(225,245,255,0.95)");
+    grad.addColorStop(0.3, "rgba(120,205,255,0.55)");
+    grad.addColorStop(0.6, "rgba(40,150,255,0.18)");
+    grad.addColorStop(1, "rgba(20,120,255,0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, SPRITE, SPRITE);
   }
@@ -204,14 +205,34 @@ export function EntityField() {
       const span = 1 - STAGGER;
 
       ctx.clearRect(0, 0, width, height);
+
+      // Halo ambiant : chez la référence, le noir n'occupe que le haut et les
+      // bords — tout le reste baigne dans un bleu profond. Sans cette nappe,
+      // les particules brillent sur du vide et l'ensemble reste maigre.
+      const halo = ctx.createRadialGradient(
+        width * 0.5,
+        height * 0.66,
+        0,
+        width * 0.5,
+        height * 0.66,
+        Math.max(width, height) * 0.78
+      );
+      halo.addColorStop(0, "rgba(12,72,140,0.55)");
+      halo.addColorStop(0.45, "rgba(8,44,92,0.34)");
+      halo.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, width, height);
+
       // Mélange additif : là où les points se superposent, la lumière
       // s'accumule. C'est ce qui donne les zones incandescentes de la référence
       // au lieu d'un aplat uniforme.
       ctx.globalCompositeOperation = "lighter";
 
       const cx = width * 0.5;
-      const cy = height * 0.47;
-      const scale = Math.min(width, height) * 0.46;
+      const cy = height * 0.56;
+      // Bien plus grande que l'écran : la structure doit déborder des deux côtés,
+      // comme sur la référence, et non flotter au centre comme un objet posé.
+      const scale = Math.max(width, height) * 0.62;
       const ax = -0.55 + Math.sin(time * 0.15) * 0.08;
       const ay = time * 0.1;
       const ca = Math.cos(ax);
@@ -242,17 +263,20 @@ export function EntityField() {
 
         const persp = 2.7 / (2.7 + z2);
         const depth = (z2 + 1.6) / 3.2;
-        const alpha = 0.5 - depth * 0.42;
-        if (alpha <= 0.015) continue;
+        const alpha = 0.95 - depth * 0.62;
+        if (alpha <= 0.02) continue;
 
-        const s = Math.max(1.5, 5.2 * persp);
+        // Traits courts, pas points ronds : le halo est étiré verticalement,
+        // ce qui reproduit la trame de tirets de la référence.
+        const w = Math.max(1.2, 3.4 * persp);
+        const h = w * 2.6;
         ctx.globalAlpha = alpha;
         ctx.drawImage(
           sprite,
-          cx + x1 * scale * persp - s / 2,
-          cy + y1 * scale * persp - s / 2,
-          s,
-          s
+          cx + x1 * scale * persp - w / 2,
+          cy + y1 * scale * persp - h / 2,
+          w,
+          h
         );
       }
 
@@ -284,10 +308,16 @@ export function EntityField() {
   return (
     <>
       <canvas ref={canvasRef} aria-hidden="true" className="fixed inset-0 z-0 h-full w-full" />
-      {/* Voile : garde le texte lisible par-dessus l'entité sans l'éteindre. */}
+      {/*
+        Voile de lisibilité, pondéré vers le HAUT et non vers les bords.
+        L'ancienne version assombrissait le pourtour à 86 %, ce qui éteignait
+        précisément les zones où la lumière doit déborder. Ici le noir protège
+        la barre de navigation et le titre, puis s'efface : la structure garde
+        son éclat sur les côtés et en bas, comme sur la référence.
+      */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(140%_80%_at_50%_30%,transparent_0%,rgba(0,0,0,0.45)_55%,rgba(0,0,0,0.86)_100%)]"
+        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.55)_22%,rgba(0,0,0,0.12)_48%,rgba(0,0,0,0.35)_100%)]"
       />
     </>
   );
