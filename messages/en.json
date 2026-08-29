@@ -286,7 +286,26 @@
     "lastDecision": "Last call:",
     "nextAction": "Next:",
     "allClear": "All clear — pick a project and keep moving.",
-    "settings": "Settings"
+    "settings": "Settings",
+    "stats": {
+      "eyebrow": "Command post",
+      "projects": {
+        "label": "Projects",
+        "hint": "active"
+      },
+      "decisions": {
+        "label": "Decisions",
+        "hint": "in memory"
+      },
+      "actions": {
+        "label": "Open actions",
+        "hint": "to pick up"
+      },
+      "sessions": {
+        "label": "Sessions",
+        "hint": "unread"
+      }
+    }
   },
   "newProject": {
     "back": "Back to dashboard",

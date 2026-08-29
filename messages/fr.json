@@ -286,7 +286,26 @@
     "lastDecision": "Dernière décision :",
     "nextAction": "Prochaine action :",
     "allClear": "Tout est clair — choisis un projet et avance.",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "stats": {
+      "eyebrow": "Poste de commande",
+      "projects": {
+        "label": "Projets",
+        "hint": "en cours"
+      },
+      "decisions": {
+        "label": "Décisions",
+        "hint": "en mémoire"
+      },
+      "actions": {
+        "label": "Actions ouvertes",
+        "hint": "à reprendre"
+      },
+      "sessions": {
+        "label": "Sessions",
+        "hint": "non lues"
+      }
+    }
   },
   "newProject": {
     "back": "Retour au dashboard",
