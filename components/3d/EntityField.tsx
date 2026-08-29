@@ -10,9 +10,13 @@ import { useEffect, useRef } from "react";
  * transforme. C'est ce qui la fait lire comme un être plutôt que comme une
  * suite d'illustrations.
  *
- * Calculée en canvas, jamais imitée en CSS : un dégradé qui essaie de rendre
- * ça se repère immédiatement, et c'est précisément le marqueur du template IA
- * que le produit doit fuir.
+ * RENDU EN DEUX PASSES
+ * Un halo dessiné particule par particule ne produit pas une lueur : il produit
+ * des points flous, isolés les uns des autres. La lumière de la référence vient
+ * d'un bloom global — on dessine d'abord tous les points nets sur un tampon
+ * réduit, on étale ce tampon au flou, puis on le recompose en additif sous les
+ * points nets. Les zones denses s'embrasent, les zones clairsemées restent
+ * discrètes, et le coût reste celui d'un seul flou par image.
  *
  * Pour changer d'état, une section pose `data-entity-shape="2"` sur elle-même.
  */
@@ -25,106 +29,87 @@ const STAGGER = 0.45;
 /** Avancement du fondu par image. Plus bas = transformation plus longue. */
 const BLEND_SPEED = 0.0075;
 
-/** Taille du lutin lumineux pré-rendu, en pixels. */
-const SPRITE = 24;
+/** Rangées de la trame. Beaucoup de points par rangée = tirets continus. */
+const RINGS = 96;
+
+/** Le tampon de bloom est rendu à cette fraction de la résolution écran. */
+const BLOOM_SCALE = 0.32;
 
 type Vec = Float32Array;
 
-/** Densité adaptée à l'écran : un mobile ne doit pas calculer autant qu'un 27". */
+/**
+ * Densité. Bien plus haute qu'avant : c'était la cause première du rendu
+ * clairsemé. La référence tire son aspect de rangées SERRÉES, pas de points
+ * lumineux isolés. Les points sont dessinés en fillRect, assez bon marché pour
+ * en assumer des dizaines de milliers.
+ */
 function particleCount(width: number): number {
-  if (width < 640) return 1800;
-  if (width < 1280) return 3000;
-  return 4200;
+  if (width < 640) return 6000;
+  if (width < 1280) return 11000;
+  return 17000;
 }
 
 function buildShapes(count: number): Vec[] {
   const buf: Vec[] = [];
   for (let s = 0; s < SHAPES; s++) buf.push(new Float32Array(count * 3));
 
-  const rings = 60;
-  const per = Math.ceil(count / rings);
+  const per = Math.ceil(count / RINGS);
   const PHI = Math.PI * (1 + Math.sqrt(5));
 
   for (let i = 0; i < count; i++) {
     const o = i * 3;
     const ri = Math.floor(i / per);
     const pi = i % per;
-    const u = (ri / rings) * Math.PI * 2;
+    const u = (ri / RINGS) * Math.PI * 2;
     const v = (pi / per) * Math.PI * 2;
 
-    // Répartition en spirale d'or : une sphère sans pôles surchargés.
-    const ga = Math.acos(1 - (2 * (i + 0.5)) / count);
-    const gb = PHI * i;
+    // 0 — sphère en rangées de latitude (état du hero).
+    // Construite anneau par anneau, et non en spirale d'or : ce sont ces
+    // rangées visibles qui donnent la trame de la référence.
+    const lat = (ri / (RINGS - 1)) * Math.PI;
+    const sinLat = Math.sin(lat);
+    buf[0][o] = sinLat * Math.cos(v) * 1.25;
+    buf[0][o + 1] = Math.cos(lat) * 1.25;
+    buf[0][o + 2] = sinLat * Math.sin(v) * 1.25;
 
-    // 0 — tore (hero)
-    const R = 1.0;
-    const r0 = 0.4;
-    buf[0][o] = (R + r0 * Math.cos(v)) * Math.cos(u);
-    buf[0][o + 1] = (R + r0 * Math.cos(v)) * Math.sin(u);
-    buf[0][o + 2] = r0 * Math.sin(v);
-
-    // 1 — sphère
-    buf[1][o] = Math.sin(ga) * Math.cos(gb) * 1.15;
-    buf[1][o + 1] = Math.sin(ga) * Math.sin(gb) * 1.15;
-    buf[1][o + 2] = Math.cos(ga) * 1.15;
+    // 1 — tore
+    const R = 0.95;
+    const r0 = 0.42;
+    buf[1][o] = (R + r0 * Math.cos(v)) * Math.cos(u);
+    buf[1][o + 1] = (R + r0 * Math.cos(v)) * Math.sin(u);
+    buf[1][o + 2] = r0 * Math.sin(v);
 
     // 2 — nappe ondulante
-    const gx = (pi / per - 0.5) * 2.9;
-    const gy = (ri / rings - 0.5) * 2.9;
+    const gx = (pi / per - 0.5) * 3.1;
+    const gy = (ri / RINGS - 0.5) * 3.1;
     buf[2][o] = gx;
     buf[2][o + 1] = gy;
-    buf[2][o + 2] = Math.sin(gx * 2.2) * Math.cos(gy * 2.0) * 0.34;
+    buf[2][o + 2] = Math.sin(gx * 2.2) * Math.cos(gy * 2.0) * 0.36;
 
     // 3 — double hélice
     const hp = i / count;
-    const ha = hp * Math.PI * 2 * 5.5;
+    const ha = hp * Math.PI * 2 * 6;
     const side = i % 2 ? 1 : -1;
-    buf[3][o] = Math.cos(ha) * 0.55 * side;
-    buf[3][o + 1] = (hp - 0.5) * 2.7;
-    buf[3][o + 2] = Math.sin(ha) * 0.55 * side;
+    buf[3][o] = Math.cos(ha) * 0.6 * side;
+    buf[3][o + 1] = (hp - 0.5) * 2.8;
+    buf[3][o + 2] = Math.sin(ha) * 0.6 * side;
 
     // 4 — anneaux concentriques
-    const band = ri % 5;
-    const rad = 0.35 + band * 0.22;
+    const band = ri % 6;
+    const rad = 0.32 + band * 0.2;
     buf[4][o] = Math.cos(v) * rad;
     buf[4][o + 1] = Math.sin(v) * rad;
-    buf[4][o + 2] = (ri / rings - 0.5) * 0.5;
+    buf[4][o + 2] = (ri / RINGS - 0.5) * 0.55;
 
     // 5 — nuage contracté
-    const rr = 0.35 + ((i % 97) / 97) * 0.85;
+    const ga = Math.acos(1 - (2 * (i + 0.5)) / count);
+    const gb = PHI * i;
+    const rr = 0.4 + ((i % 89) / 89) * 0.8;
     buf[5][o] = Math.sin(ga) * Math.cos(gb) * rr;
     buf[5][o + 1] = Math.sin(ga) * Math.sin(gb) * rr;
     buf[5][o + 2] = Math.cos(ga) * rr;
   }
   return buf;
-}
-
-/**
- * Le lutin lumineux, dessiné une seule fois.
- *
- * Un halo radial recalculé pour chacune des milliers de particules à chaque
- * image écroulerait la fréquence d'affichage. On le rend une fois hors écran,
- * puis on ne fait que le recopier.
- */
-function buildSprite(): HTMLCanvasElement {
-  const c = document.createElement("canvas");
-  c.width = SPRITE;
-  c.height = SPRITE;
-  const g = c.getContext("2d");
-  if (g) {
-    const half = SPRITE / 2;
-    const grad = g.createRadialGradient(half, half, 0, half, half, half);
-    // Cœur presque blanc, halo azur : c'est ce dégradé qui fait lire un point
-    // comme une lumière plutôt que comme une pastille de couleur.
-    grad.addColorStop(0, "rgba(255,255,255,1)");
-    grad.addColorStop(0.12, "rgba(225,245,255,0.95)");
-    grad.addColorStop(0.3, "rgba(120,205,255,0.55)");
-    grad.addColorStop(0.6, "rgba(40,150,255,0.18)");
-    grad.addColorStop(1, "rgba(20,120,255,0)");
-    g.fillStyle = grad;
-    g.fillRect(0, 0, SPRITE, SPRITE);
-  }
-  return c;
 }
 
 /** Smootherstep : dérivées nulles aux deux bouts, donc aucun à-coup perceptible. */
@@ -142,14 +127,15 @@ export function EntityField() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const bloom = document.createElement("canvas");
+    const bctx = bloom.getContext("2d");
+    if (!bctx) return;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const sprite = buildSprite();
 
     let count = particleCount(window.innerWidth);
     let shapes = buildShapes(count);
-    let cur = new Float32Array(count * 3);
-    cur.set(shapes[0]);
 
     let width = 0;
     let height = 0;
@@ -166,12 +152,13 @@ export function EntityField() {
       canvas.height = Math.floor(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+      bloom.width = Math.max(1, Math.floor(width * BLOOM_SCALE));
+      bloom.height = Math.max(1, Math.floor(height * BLOOM_SCALE));
+
       const next = particleCount(width);
       if (next !== count) {
         count = next;
         shapes = buildShapes(count);
-        cur = new Float32Array(count * 3);
-        cur.set(shapes[target]);
         blend = 1;
         from = target;
       }
@@ -204,83 +191,82 @@ export function EntityField() {
       const b = shapes[target];
       const span = 1 - STAGGER;
 
-      ctx.clearRect(0, 0, width, height);
-
-      // Halo ambiant : chez la référence, le noir n'occupe que le haut et les
-      // bords — tout le reste baigne dans un bleu profond. Sans cette nappe,
-      // les particules brillent sur du vide et l'ensemble reste maigre.
-      const halo = ctx.createRadialGradient(
-        width * 0.5,
-        height * 0.66,
-        0,
-        width * 0.5,
-        height * 0.66,
-        Math.max(width, height) * 0.78
-      );
-      halo.addColorStop(0, "rgba(12,72,140,0.55)");
-      halo.addColorStop(0.45, "rgba(8,44,92,0.34)");
-      halo.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = halo;
-      ctx.fillRect(0, 0, width, height);
-
-      // Mélange additif : là où les points se superposent, la lumière
-      // s'accumule. C'est ce qui donne les zones incandescentes de la référence
-      // au lieu d'un aplat uniforme.
-      ctx.globalCompositeOperation = "lighter";
-
+      // Cadrage : la structure entière doit tenir à l'écran. Trop agrandie, on
+      // se retrouve à l'intérieur et il ne reste que des points épars.
       const cx = width * 0.5;
-      const cy = height * 0.56;
-      // Bien plus grande que l'écran : la structure doit déborder des deux côtés,
-      // comme sur la référence, et non flotter au centre comme un objet posé.
-      const scale = Math.max(width, height) * 0.62;
-      const ax = -0.55 + Math.sin(time * 0.15) * 0.08;
+      const cy = height * 0.5;
+      const scale = Math.min(width, height) * 0.44;
+
+      const ax = -0.5 + Math.sin(time * 0.15) * 0.07;
       const ay = time * 0.1;
       const ca = Math.cos(ax);
       const sa = Math.sin(ax);
       const cb = Math.cos(ay);
       const sb = Math.sin(ay);
 
+      ctx.clearRect(0, 0, width, height);
+      bctx.clearRect(0, 0, bloom.width, bloom.height);
+      bctx.globalCompositeOperation = "lighter";
+      ctx.globalCompositeOperation = "lighter";
+
       for (let i = 0; i < count; i++) {
         const o = i * 3;
 
         // Chaque particule démarre un peu après la précédente : la
-        // transformation se propage en vague à travers la structure plutôt que
-        // de basculer d'un bloc. C'est ça qui rend le changement doux, bien
-        // plus qu'un simple ralentissement.
+        // transformation se propage en vague au lieu de basculer d'un bloc.
         const e = smootherstep((blend - (i / count) * STAGGER) / span);
 
         const x = a[o] + (b[o] - a[o]) * e;
         const y = a[o + 1] + (b[o + 1] - a[o + 1]) * e;
         const z = a[o + 2] + (b[o + 2] - a[o + 2]) * e;
-        cur[o] = x;
-        cur[o + 1] = y;
-        cur[o + 2] = z;
 
         const y1 = y * ca - z * sa;
         const z1 = y * sa + z * ca;
         const x1 = x * cb - z1 * sb;
         const z2 = x * sb + z1 * cb;
 
-        const persp = 2.7 / (2.7 + z2);
-        const depth = (z2 + 1.6) / 3.2;
-        const alpha = 0.95 - depth * 0.62;
-        if (alpha <= 0.02) continue;
+        const persp = 2.8 / (2.8 + z2);
+        const depth = (z2 + 1.5) / 3;
+        const alpha = 0.7 - depth * 0.52;
+        if (alpha <= 0.03) continue;
 
-        // Traits courts, pas points ronds : le halo est étiré verticalement,
-        // ce qui reproduit la trame de tirets de la référence.
-        const w = Math.max(1.2, 3.4 * persp);
-        const h = w * 2.6;
+        const px = cx + x1 * scale * persp;
+        const py = cy + y1 * scale * persp;
+        if (px < -20 || px > width + 20 || py < -20 || py > height + 20) continue;
+
+        // Tirets courts : la trame de la référence, pas un semis de pastilles.
+        const w = Math.max(0.8, 1.35 * persp);
+        const h = w * 2.4;
+
         ctx.globalAlpha = alpha;
-        ctx.drawImage(
-          sprite,
-          cx + x1 * scale * persp - w / 2,
-          cy + y1 * scale * persp - h / 2,
-          w,
-          h
+        ctx.fillStyle = "#dff2ff";
+        ctx.fillRect(px, py, w, h);
+
+        // Le même point, en plus gros, sur le tampon de bloom : c'est lui qui
+        // portera la lueur une fois flouté.
+        bctx.globalAlpha = alpha * 0.5;
+        bctx.fillStyle = "#3f9fe6";
+        bctx.fillRect(
+          px * BLOOM_SCALE,
+          py * BLOOM_SCALE,
+          w * BLOOM_SCALE * 1.5,
+          h * BLOOM_SCALE * 1.5
         );
       }
 
+      // Recomposition : le tampon réduit est étalé au flou puis rajouté en
+      // additif. Les rangées serrées s'embrasent, les zones vides restent noires.
+      ctx.filter = "blur(10px)";
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(bloom, 0, 0, width, height);
+      // Passe large très atténuée : elle porte l'ambiance, pas la lumière.
+      // Au-delà, elle noie la page et rend le texte illisible.
+      ctx.filter = "blur(34px)";
+      ctx.globalAlpha = 0.3;
+      ctx.drawImage(bloom, 0, 0, width, height);
+      ctx.filter = "none";
       ctx.globalAlpha = 1;
+
       ctx.globalCompositeOperation = "source-over";
       if (!reduce) time += 0.005;
     };
@@ -309,15 +295,13 @@ export function EntityField() {
     <>
       <canvas ref={canvasRef} aria-hidden="true" className="fixed inset-0 z-0 h-full w-full" />
       {/*
-        Voile de lisibilité, pondéré vers le HAUT et non vers les bords.
-        L'ancienne version assombrissait le pourtour à 86 %, ce qui éteignait
-        précisément les zones où la lumière doit déborder. Ici le noir protège
-        la barre de navigation et le titre, puis s'efface : la structure garde
-        son éclat sur les côtés et en bas, comme sur la référence.
+        Voile de lisibilité, pondéré vers le haut : le noir protège la barre de
+        navigation et le titre, puis s'efface pour laisser la structure rayonner
+        sur les côtés et en bas.
       */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.55)_22%,rgba(0,0,0,0.12)_48%,rgba(0,0,0,0.35)_100%)]"
+        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.74)_18%,rgba(0,0,0,0.66)_45%,rgba(0,0,0,0.78)_100%)]"
       />
     </>
   );
