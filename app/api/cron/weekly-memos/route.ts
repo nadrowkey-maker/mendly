@@ -137,19 +137,19 @@ export async function GET(req: NextRequest) {
                 "api-key": process.env.BREVO_API_KEY!,
               },
               body: JSON.stringify({
-                sender: { email: "nadroleboss@gmail.com", name: "Mendly" },
+                sender: { email: process.env.BREVO_SENDER_EMAIL ?? "contact@mendlyai.io", name: process.env.BREVO_SENDER_NAME ?? "Mendly" },
                 to: [{ email: userData.user.email }],
                 subject: `Ton memo hebdo · ${project.name}`,
                 htmlContent: `
                   <div style="max-width:600px;margin:0 auto;font-family:sans-serif;color:#333;padding:24px;">
-                    <h1 style="font-size:18px;color:#7C3AED;">Memo Hebdomadaire</h1>
+                    <h1 style="font-size:18px;color:#3AA8FF;">Memo Hebdomadaire</h1>
                     <h2 style="font-size:22px;margin-top:8px;">${project.name}</h2>
                     <div style="margin-top:24px;line-height:1.7;white-space:pre-wrap;">${memoContent.replace(/\n/g, "<br>")}</div>
-                    <a href="https://mendly-cre3.vercel.app/fr/dashboard/projects/${project.id}"
+                    <a href="https://www.mendlyai.io/fr/dashboard/projects/${project.id}"
                        style="display:inline-block;margin-top:24px;padding:12px 24px;background:#0A0A0A;color:white;text-decoration:none;border-radius:999px;font-weight:bold;">
                       Voir le projet →
                     </a>
-                    <p style="margin-top:32px;font-size:11px;color:#999;">Envoyé chaque lundi par ton CEO IA · Mendly</p>
+                    <p style="margin-top:32px;font-size:11px;color:#999;">Envoyé chaque lundi par Mendly</p>
                   </div>
                 `,
               }),

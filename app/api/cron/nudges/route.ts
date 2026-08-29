@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
           method: "POST",
           headers: { "Content-Type": "application/json", "api-key": process.env.BREVO_API_KEY! },
           body: JSON.stringify({
-            sender: { email: "nadroleboss@gmail.com", name: "Mendly" },
+            sender: { email: process.env.BREVO_SENDER_EMAIL ?? "contact@mendlyai.io", name: process.env.BREVO_SENDER_NAME ?? "Mendly" },
             to: [{ email }],
             subject: sessions.length ? "On a avancé pendant ton absence" : "Ton équipe pense à toi",
             htmlContent: `

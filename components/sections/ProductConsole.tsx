@@ -66,12 +66,14 @@ export function ProductConsole() {
           <div className="hidden flex-1 rounded-full border border-(--glass-line) bg-white/5 px-3 py-1 text-xs text-(--text-muted) sm:block sm:max-w-64">
             {t("search")}
           </div>
-          <div className="flex items-center gap-2">
-            <span className="hidden text-xs text-(--text-secondary) sm:inline">{t("user")}</span>
-            <span className="grid size-7 place-items-center rounded-full bg-gradient-to-br from-(--accent-primary) to-[#1B4F8A] text-[10px] font-bold text-[#001322]">
-              FG
-            </span>
-          </div>
+          {/* Aucun nom réel dans la démonstration : la maquette illustre le
+              produit, elle n'expose pas l'identité de qui que ce soit. */}
+          <span
+            aria-hidden="true"
+            className="grid size-7 place-items-center rounded-full bg-gradient-to-br from-(--accent-primary) to-[#1B4F8A] text-[10px] font-bold text-[#001322]"
+          >
+            M
+          </span>
         </div>
 
         <div className="grid md:grid-cols-[168px_1fr]">

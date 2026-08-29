@@ -195,9 +195,9 @@
     "hostingTitle": "Hosting",
     "hostingBody": "Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. https://vercel.com",
     "directorTitle": "Publication director",
-    "directorBody": "Flavien Gaude",
+    "directorBody": "The site publisher, identified above.",
     "creditsTitle": "Credits",
-    "creditsBody": "Design and development: Flavien Gaude. Design assets: 21st.dev components under license. Fonts: Geist (Vercel), Fraunces (Google Fonts), JetBrains Mono.",
+    "creditsBody": "Design and development done in-house. Interface components: 21st.dev under licence. Fonts: Manrope and JetBrains Mono (Google Fonts).",
     "ipTitle": "Intellectual property",
     "ipBody": "The entire site (text, images, logos, Mendly brand) is protected by copyright. Any reproduction, in whole or in part, without written authorization is prohibited.",
     "contactTitle": "Contact",
@@ -718,7 +718,6 @@
     },
     "console": {
       "search": "Search a decision, a memo…",
-      "user": "Flavien",
       "sideProject": "PROJECT",
       "sideTeam": "TEAM",
       "side": {

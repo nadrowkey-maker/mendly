@@ -1,5 +1,10 @@
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
-const SENDER = { email: "hello@mendly.co", name: "Mendly" };
+// Expéditeur piloté par l’environnement : l’adresse doit être un expéditeur
+// validé chez Brevo, et elle change selon le domaine utilisé.
+const SENDER = {
+  email: process.env.BREVO_SENDER_EMAIL ?? "contact@mendlyai.io",
+  name: process.env.BREVO_SENDER_NAME ?? "Mendly",
+};
 
 export interface EmailRecipient {
   email: string;
