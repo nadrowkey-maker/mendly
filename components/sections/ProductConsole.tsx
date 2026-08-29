@@ -120,7 +120,7 @@ export function ProductConsole() {
           {/* Corps */}
           <div className="px-4 py-4 md:px-5">
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-              <span className="text-lg font-medium tracking-tight text-white">Kmoov</span>
+              <span className="text-lg font-medium tracking-tight text-white">Project 1</span>
               <span className="rounded-full border border-(--accent-primary)/35 bg-(--accent-primary)/8 px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] text-(--accent-glow)">
                 {t("badge")}
               </span>

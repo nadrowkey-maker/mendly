@@ -386,7 +386,7 @@
     "shortcutWithDebate": "Entrée pour envoyer · ⚡ pour lancer un débat à 3 agents",
     "teamRoomNav": "Salle de réunion",
     "myDeliverables": "Mes livrables",
-    "composerPlaceholder": "Demande à ton {agent}…",
+    "composerPlaceholder": "Expose ta décision…",
     "attach": "Joindre un fichier",
     "attachFile": "Document",
     "attachImage": "Image",
@@ -579,7 +579,9 @@
     "collapse": "Réduire",
     "expand": "Étendre",
     "agentLocked": "Passe à un plan supérieur pour débloquer cet agent",
-    "teamRoomLabel": "Salle de réunion"
+    "teamRoomLabel": "Salle de réunion",
+    "projectSection": "PROJET",
+    "conversationLabel": "Conversation"
   },
   "projectMenu": {
     "ariaLabel": "Options du projet",

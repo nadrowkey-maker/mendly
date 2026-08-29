@@ -386,7 +386,7 @@
     "shortcutWithDebate": "Enter to send · ⚡ to trigger a 3-agent debate",
     "teamRoomNav": "Team room",
     "myDeliverables": "My deliverables",
-    "composerPlaceholder": "Ask your {agent}…",
+    "composerPlaceholder": "Lay out your decision…",
     "attach": "Attach a file",
     "attachFile": "Document",
     "attachImage": "Image",
@@ -579,7 +579,9 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "agentLocked": "Upgrade your plan to unlock this agent",
-    "teamRoomLabel": "Team room"
+    "teamRoomLabel": "Team room",
+    "projectSection": "PROJECT",
+    "conversationLabel": "Conversation"
   },
   "projectMenu": {
     "ariaLabel": "Project options",

@@ -38,7 +38,6 @@ interface ChatInterfaceProps {
   userPlan: string;
   userEmail: string | null;
   allProjects: Project[];
-  lastAgentActivity: Record<string, string>;
   projectStats: ProjectStats;
 }
 
@@ -133,7 +132,6 @@ export function ChatInterface({
   userPlan,
   userEmail,
   allProjects,
-  lastAgentActivity,
   projectStats,
 }: ChatInterfaceProps) {
   const t = useTranslations("chat");
@@ -141,7 +139,7 @@ export function ChatInterface({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-  const [activeAgent, setActiveAgent] = useState<AgentRole>("CEO");
+  const [activeAgent, setActiveAgent] = useState<AgentRole>("MENDLY");
   const [switchingAgent, setSwitchingAgent] = useState(false);
   const [teamRoomActive, setTeamRoomActive] = useState(false);
   const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
@@ -849,7 +847,6 @@ export function ChatInterface({
           usageLimit={initialUsageLimit}
           userPlan={userPlan}
           userEmail={userEmail}
-          lastAgentActivity={lastAgentActivity}
           teamRoomActive={teamRoomActive}
           onTeamRoomClick={handleTeamRoomOpen}
         />
@@ -878,7 +875,6 @@ export function ChatInterface({
               usageLimit={initialUsageLimit}
               userPlan={userPlan}
               userEmail={userEmail}
-              lastAgentActivity={lastAgentActivity}
               teamRoomActive={teamRoomActive}
               onTeamRoomClick={() => {
                 handleTeamRoomOpen();

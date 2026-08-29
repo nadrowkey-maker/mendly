@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,11 +14,9 @@ import {
   FileStack,
   Brain,
   Settings,
-  Lock,
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { PLANS, type PlanTier } from "@/lib/stripe/plans";
 import type { Project } from "@/lib/types/project";
 import type { AgentRole } from "@/lib/types/conversation";
 
@@ -33,26 +31,8 @@ interface Props {
   usageUsed: number;
   usageLimit: number;
   userPlan: string;
-  userEmail: string | null;
-  lastAgentActivity?: Record<string, string>;
-  teamRoomActive?: boolean;
+  userEmail: string | null;  teamRoomActive?: boolean;
   onTeamRoomClick?: () => void;
-}
-
-function relTime(iso: string, locale: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return locale === "fr" ? "à l'instant" : "now";
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  const d = Math.floor(h / 24);
-  if (d === 1) return locale === "fr" ? "hier" : "1d";
-  if (d < 7) return `${d}${locale === "fr" ? "j" : "d"}`;
-  return new Date(iso).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US", {
-    day: "numeric",
-    month: "short",
-  });
 }
 
 const AGENTS: { role: AgentRole; label: string; description: string; color: string }[] = [
@@ -78,14 +58,10 @@ export function ProjectSidebar({
   usageUsed,
   usageLimit,
   userPlan,
-  userEmail,
-  lastAgentActivity,
-  teamRoomActive = false,
+  userEmail,  teamRoomActive = false,
   onTeamRoomClick,
 }: Props) {
-  const t = useTranslations("sidebar");
-  const locale = useLocale();
-  const [accountOpen, setAccountOpen] = useState(false);
+  const t = useTranslations("sidebar");  const [accountOpen, setAccountOpen] = useState(false);
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -201,136 +177,90 @@ export function ProjectSidebar({
           </div>
         </div>
 
-        {/* Team room */}
-        {activeProjectId && onTeamRoomClick && (
-          <div className="mb-4">
-            <button
-              onClick={onTeamRoomClick}
-              disabled={agentBusy}
-              className={[
-                "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer",
-                agentBusy ? "opacity-60" : "",
-              ].join(" ")}
-              style={teamRoomActive ? { background: "var(--accent-glow)12" } : {}}
-            >
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200"
-                style={{
-                  background: teamRoomActive ? "var(--accent-glow)28" : "rgba(255,255,255,0.05)",
-                  border: `1px solid ${teamRoomActive ? "var(--accent-glow)50" : "rgba(255,255,255,0.07)"}`,
-                  color: teamRoomActive ? "var(--accent-glow)" : "rgba(255,255,255,0.30)",
-                }}
-              >
-                <Users className="w-3.5 h-3.5" />
-              </div>
-              <span
-                className="flex-1 text-left font-mono text-[11px] font-semibold tracking-wider transition-colors duration-200"
-                style={{ color: teamRoomActive ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.40)" }}
-              >
-                {t("teamRoomLabel")}
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Agents */}
+        {/* Navigation du projet — un seul interlocuteur au quotidien, Mendly.
+            Les sept spécialistes n'existent plus comme interlocuteurs séparés :
+            ils ne se réunissent que dans la salle de réunion et pendant les
+            sessions autonomes. Présenter neuf voix dont une qui se dit unique
+            était la contradiction que l'interface traînait depuis la refonte. */}
         {activeProjectId && (
           <div>
             <p className="text-[9px] font-mono tracking-[0.22em] text-white/22 uppercase px-2 mb-2">
-              {t("agentsTitle")}
+              {t("projectSection")}
             </p>
             <div className="space-y-0.5">
-              {AGENTS.map((a) => {
-                const safePlan = (userPlan in PLANS ? userPlan : "free") as PlanTier;
-                const allowed = (PLANS[safePlan].agentsAvailable as readonly string[]).includes(a.role);
-                const isActive = a.role === activeAgent;
-                const ts = lastAgentActivity?.[a.role];
-                const recent = ts ? Date.now() - new Date(ts).getTime() < 86_400_000 : false;
-                return (
-                  <button
-                    key={a.role}
-                    onClick={() => allowed && onAgentChange(a.role)}
-                    disabled={agentBusy || !allowed}
-                    title={!allowed ? t("agentLocked") : a.label}
-                    className={[
-                      "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer",
-                      !allowed ? "opacity-30 cursor-not-allowed" : "",
-                      agentBusy && !isActive ? "opacity-60" : "",
-                    ].join(" ")}
-                    style={isActive ? { background: `${a.color}12` } : {}}
+              <button
+                onClick={() => onAgentChange("MENDLY")}
+                disabled={agentBusy}
+                className={[
+                  "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer",
+                  agentBusy ? "opacity-60" : "",
+                ].join(" ")}
+                style={!teamRoomActive ? { background: "rgba(58,168,255,0.10)" } : {}}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-mono font-bold"
+                  style={{
+                    background: !teamRoomActive ? "rgba(58,168,255,0.22)" : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${!teamRoomActive ? "rgba(58,168,255,0.45)" : "rgba(255,255,255,0.07)"}`,
+                    color: !teamRoomActive ? "var(--accent-glow)" : "rgba(255,255,255,0.30)",
+                  }}
+                >
+                  M
+                </div>
+                <span
+                  className="flex-1 text-left transition-colors duration-200"
+                  style={{ color: !teamRoomActive ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.40)" }}
+                >
+                  {t("conversationLabel")}
+                </span>
+              </button>
+
+              {onTeamRoomClick && (
+                <button
+                  onClick={onTeamRoomClick}
+                  disabled={agentBusy}
+                  className={[
+                    "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer",
+                    agentBusy ? "opacity-60" : "",
+                  ].join(" ")}
+                  style={teamRoomActive ? { background: "rgba(58,168,255,0.10)" } : {}}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{
+                      background: teamRoomActive ? "rgba(58,168,255,0.22)" : "rgba(255,255,255,0.05)",
+                      border: `1px solid ${teamRoomActive ? "rgba(58,168,255,0.45)" : "rgba(255,255,255,0.07)"}`,
+                      color: teamRoomActive ? "var(--accent-glow)" : "rgba(255,255,255,0.30)",
+                    }}
                   >
-                    {/* Colored avatar */}
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[9px] font-mono font-bold shrink-0 transition-all duration-200"
-                      style={{
-                        background: isActive ? `${a.color}28` : "rgba(255,255,255,0.05)",
-                        border: `1px solid ${isActive ? a.color + "50" : "rgba(255,255,255,0.07)"}`,
-                        color: isActive ? a.color : "rgba(255,255,255,0.30)",
-                      }}
-                    >
-                      {a.label}
-                    </div>
+                    <Users className="w-3.5 h-3.5" />
+                  </div>
+                  <span
+                    className="flex-1 text-left transition-colors duration-200"
+                    style={{ color: teamRoomActive ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.40)" }}
+                  >
+                    {t("teamRoomLabel")}
+                  </span>
+                </button>
+              )}
 
-                    <span
-                      className="flex-1 text-left font-mono text-[11px] font-semibold tracking-wider transition-colors duration-200"
-                      style={{ color: isActive ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.40)" }}
-                    >
-                      {a.label}
-                    </span>
-
-                    {!allowed ? (
-                      <Lock className="w-3 h-3 shrink-0 text-white/18" />
-                    ) : ts ? (
-                      <span className="flex items-center gap-1.5 shrink-0">
-                        {recent && (
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span
-                              className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
-                              style={{ background: a.color }}
-                            />
-                            <span
-                              className="relative inline-flex h-1.5 w-1.5 rounded-full"
-                              style={{ background: a.color }}
-                            />
-                          </span>
-                        )}
-                        <span className="text-[9px] font-mono text-white/25">{relTime(ts, locale)}</span>
-                      </span>
-                    ) : (
-                      <span
-                        className="text-[9px] font-mono uppercase tracking-widest shrink-0 transition-colors duration-200"
-                        style={{ color: isActive ? `${a.color}90` : "rgba(255,255,255,0.16)" }}
-                      >
-                        {a.description}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Tools */}
-        {activeProjectId && (
-          <div>
-            <p className="text-[9px] font-mono tracking-[0.22em] text-white/22 uppercase px-2 mb-2">
-              {t("toolsTitle")}
-            </p>
-            <div className="space-y-0.5">
-              <Link
-                href={`/dashboard/projects/${activeProjectId}/deliverables`}
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] text-white/38 hover:bg-white/4 hover:text-white/65 transition-colors"
-              >
-                <FileStack className="w-3.5 h-3.5 shrink-0" />
-                {t("deliverables")}
-              </Link>
               <Link
                 href={`/dashboard/projects/${activeProjectId}/memory`}
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] text-white/38 hover:bg-white/4 hover:text-white/65 transition-colors"
+                className="flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] text-white/38 hover:bg-white/4 hover:text-white/65 transition-colors"
               >
-                <Brain className="w-3.5 h-3.5 shrink-0" />
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-white/7 bg-white/5">
+                  <Brain className="w-3.5 h-3.5" />
+                </span>
                 {t("memory")}
+              </Link>
+              <Link
+                href={`/dashboard/projects/${activeProjectId}/deliverables`}
+                className="flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] text-white/38 hover:bg-white/4 hover:text-white/65 transition-colors"
+              >
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-white/7 bg-white/5">
+                  <FileStack className="w-3.5 h-3.5" />
+                </span>
+                {t("deliverables")}
               </Link>
             </div>
           </div>
