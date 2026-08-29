@@ -17,21 +17,35 @@ import { useEffect, useRef } from "react";
  * Pour changer d'état, une section pose `data-entity-shape="2"` sur elle-même.
  */
 
-/** Nombre de points. Assez pour que la structure se lise, assez peu pour tenir 60 fps. */
-const COUNT = 4200;
 const SHAPES = 6;
+
+/** Fraction du cycle consacrée à l'étalement des départs entre particules. */
+const STAGGER = 0.45;
+
+/** Avancement du fondu par image. Plus bas = transformation plus longue. */
+const BLEND_SPEED = 0.0075;
+
+/** Taille du lutin lumineux pré-rendu, en pixels. */
+const SPRITE = 24;
 
 type Vec = Float32Array;
 
-function buildShapes(): Vec[] {
+/** Densité adaptée à l'écran : un mobile ne doit pas calculer autant qu'un 27". */
+function particleCount(width: number): number {
+  if (width < 640) return 1800;
+  if (width < 1280) return 3000;
+  return 4200;
+}
+
+function buildShapes(count: number): Vec[] {
   const buf: Vec[] = [];
-  for (let s = 0; s < SHAPES; s++) buf.push(new Float32Array(COUNT * 3));
+  for (let s = 0; s < SHAPES; s++) buf.push(new Float32Array(count * 3));
 
   const rings = 60;
-  const per = Math.ceil(COUNT / rings);
+  const per = Math.ceil(count / rings);
   const PHI = Math.PI * (1 + Math.sqrt(5));
 
-  for (let i = 0; i < COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     const o = i * 3;
     const ri = Math.floor(i / per);
     const pi = i % per;
@@ -39,7 +53,7 @@ function buildShapes(): Vec[] {
     const v = (pi / per) * Math.PI * 2;
 
     // Répartition en spirale d'or : une sphère sans pôles surchargés.
-    const ga = Math.acos(1 - (2 * (i + 0.5)) / COUNT);
+    const ga = Math.acos(1 - (2 * (i + 0.5)) / count);
     const gb = PHI * i;
 
     // 0 — tore (hero)
@@ -62,7 +76,7 @@ function buildShapes(): Vec[] {
     buf[2][o + 2] = Math.sin(gx * 2.2) * Math.cos(gy * 2.0) * 0.34;
 
     // 3 — double hélice
-    const hp = i / COUNT;
+    const hp = i / count;
     const ha = hp * Math.PI * 2 * 5.5;
     const side = i % 2 ? 1 : -1;
     buf[3][o] = Math.cos(ha) * 0.55 * side;
@@ -85,6 +99,39 @@ function buildShapes(): Vec[] {
   return buf;
 }
 
+/**
+ * Le lutin lumineux, dessiné une seule fois.
+ *
+ * Un halo radial recalculé pour chacune des milliers de particules à chaque
+ * image écroulerait la fréquence d'affichage. On le rend une fois hors écran,
+ * puis on ne fait que le recopier.
+ */
+function buildSprite(): HTMLCanvasElement {
+  const c = document.createElement("canvas");
+  c.width = SPRITE;
+  c.height = SPRITE;
+  const g = c.getContext("2d");
+  if (g) {
+    const half = SPRITE / 2;
+    const grad = g.createRadialGradient(half, half, 0, half, half, half);
+    // Cœur presque blanc, halo azur : c'est ce dégradé qui fait lire un point
+    // comme une lumière plutôt que comme une pastille de couleur.
+    grad.addColorStop(0, "rgba(255,255,255,0.95)");
+    grad.addColorStop(0.18, "rgba(190,230,255,0.62)");
+    grad.addColorStop(0.45, "rgba(90,180,255,0.22)");
+    grad.addColorStop(1, "rgba(58,168,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, SPRITE, SPRITE);
+  }
+  return c;
+}
+
+/** Smootherstep : dérivées nulles aux deux bouts, donc aucun à-coup perceptible. */
+function smootherstep(x: number): number {
+  const t = x < 0 ? 0 : x > 1 ? 1 : x;
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
 export function EntityField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -96,8 +143,11 @@ export function EntityField() {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const shapes = buildShapes();
-    const cur = new Float32Array(COUNT * 3);
+    const sprite = buildSprite();
+
+    let count = particleCount(window.innerWidth);
+    let shapes = buildShapes(count);
+    let cur = new Float32Array(count * 3);
     cur.set(shapes[0]);
 
     let width = 0;
@@ -114,6 +164,16 @@ export function EntityField() {
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const next = particleCount(width);
+      if (next !== count) {
+        count = next;
+        shapes = buildShapes(count);
+        cur = new Float32Array(count * 3);
+        cur.set(shapes[target]);
+        blend = 1;
+        from = target;
+      }
     };
 
     const pickShape = () => {
@@ -137,16 +197,18 @@ export function EntityField() {
     };
 
     const frame = () => {
-      if (blend < 1) blend = Math.min(1, blend + 0.022);
-      // Ease in-out : la transformation part et arrive doucement, sinon elle
-      // ressemble à un saut plutôt qu'à un mouvement.
-      const e = blend < 0.5 ? 2 * blend * blend : 1 - Math.pow(-2 * blend + 2, 2) / 2;
+      if (blend < 1) blend = Math.min(1, blend + BLEND_SPEED);
 
       const a = shapes[from];
       const b = shapes[target];
-      for (let k = 0; k < COUNT * 3; k++) cur[k] = a[k] + (b[k] - a[k]) * e;
+      const span = 1 - STAGGER;
 
       ctx.clearRect(0, 0, width, height);
+      // Mélange additif : là où les points se superposent, la lumière
+      // s'accumule. C'est ce qui donne les zones incandescentes de la référence
+      // au lieu d'un aplat uniforme.
+      ctx.globalCompositeOperation = "lighter";
+
       const cx = width * 0.5;
       const cy = height * 0.47;
       const scale = Math.min(width, height) * 0.46;
@@ -157,23 +219,45 @@ export function EntityField() {
       const cb = Math.cos(ay);
       const sb = Math.sin(ay);
 
-      for (let i = 0; i < COUNT; i++) {
+      for (let i = 0; i < count; i++) {
         const o = i * 3;
-        const x = cur[o];
-        const y = cur[o + 1];
-        const z = cur[o + 2];
+
+        // Chaque particule démarre un peu après la précédente : la
+        // transformation se propage en vague à travers la structure plutôt que
+        // de basculer d'un bloc. C'est ça qui rend le changement doux, bien
+        // plus qu'un simple ralentissement.
+        const e = smootherstep((blend - (i / count) * STAGGER) / span);
+
+        const x = a[o] + (b[o] - a[o]) * e;
+        const y = a[o + 1] + (b[o + 1] - a[o + 1]) * e;
+        const z = a[o + 2] + (b[o + 2] - a[o + 2]) * e;
+        cur[o] = x;
+        cur[o + 1] = y;
+        cur[o + 2] = z;
+
         const y1 = y * ca - z * sa;
         const z1 = y * sa + z * ca;
         const x1 = x * cb - z1 * sb;
         const z2 = x * sb + z1 * cb;
+
         const persp = 2.7 / (2.7 + z2);
         const depth = (z2 + 1.6) / 3.2;
-        const alpha = 0.82 - depth * 0.7;
-        if (alpha <= 0.02) continue;
-        const size = Math.max(0.5, 1.6 * persp);
-        ctx.fillStyle = `rgba(130, 205, 255, ${alpha.toFixed(3)})`;
-        ctx.fillRect(cx + x1 * scale * persp, cy + y1 * scale * persp, size, size * 2.1);
+        const alpha = 0.5 - depth * 0.42;
+        if (alpha <= 0.015) continue;
+
+        const s = Math.max(1.5, 5.2 * persp);
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(
+          sprite,
+          cx + x1 * scale * persp - s / 2,
+          cy + y1 * scale * persp - s / 2,
+          s,
+          s
+        );
       }
+
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
       if (!reduce) time += 0.005;
     };
 
