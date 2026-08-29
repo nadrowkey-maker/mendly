@@ -227,7 +227,7 @@ export function EntityField() {
 
         const persp = 2.8 / (2.8 + z2);
         const depth = (z2 + 1.5) / 3;
-        const alpha = 0.7 - depth * 0.52;
+        const alpha = 0.92 - depth * 0.6;
         if (alpha <= 0.03) continue;
 
         const px = cx + x1 * scale * persp;
@@ -239,30 +239,31 @@ export function EntityField() {
         const h = w * 2.4;
 
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#dff2ff";
+        ctx.fillStyle = "#eaf7ff";
         ctx.fillRect(px, py, w, h);
 
         // Le même point, en plus gros, sur le tampon de bloom : c'est lui qui
         // portera la lueur une fois flouté.
-        bctx.globalAlpha = alpha * 0.5;
-        bctx.fillStyle = "#3f9fe6";
+        bctx.globalAlpha = alpha * 0.8;
+        bctx.fillStyle = "#5cc8ff";
         bctx.fillRect(
           px * BLOOM_SCALE,
           py * BLOOM_SCALE,
-          w * BLOOM_SCALE * 1.5,
-          h * BLOOM_SCALE * 1.5
+          Math.max(1, w * BLOOM_SCALE * 2),
+          Math.max(1.4, h * BLOOM_SCALE * 2)
         );
       }
 
       // Recomposition : le tampon réduit est étalé au flou puis rajouté en
       // additif. Les rangées serrées s'embrasent, les zones vides restent noires.
-      ctx.filter = "blur(10px)";
-      ctx.globalAlpha = 0.85;
+      ctx.filter = "blur(9px)";
+      ctx.globalAlpha = 1;
       ctx.drawImage(bloom, 0, 0, width, height);
-      // Passe large très atténuée : elle porte l'ambiance, pas la lumière.
-      // Au-delà, elle noie la page et rend le texte illisible.
-      ctx.filter = "blur(34px)";
-      ctx.globalAlpha = 0.3;
+      // Passe large : elle porte l'ambiance. Assez présente pour que la
+      // structure baigne dans sa propre lueur, assez retenue pour ne pas
+      // recouvrir le texte des sections.
+      ctx.filter = "blur(40px)";
+      ctx.globalAlpha = 0.5;
       ctx.drawImage(bloom, 0, 0, width, height);
       ctx.filter = "none";
       ctx.globalAlpha = 1;
@@ -301,7 +302,7 @@ export function EntityField() {
       */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.74)_18%,rgba(0,0,0,0.66)_45%,rgba(0,0,0,0.78)_100%)]"
+        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.5)_16%,rgba(0,0,0,0.34)_45%,rgba(0,0,0,0.6)_100%)]"
       />
     </>
   );
