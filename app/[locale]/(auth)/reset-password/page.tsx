@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter, Link } from "@/i18n/routing";
-import { motion } from "framer-motion";
+import { Link } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/client";
-import { PremiumButton } from "@/components/ui/PremiumButton";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthField } from "@/components/auth/AuthField";
+import { AuthSubmit } from "@/components/auth/AuthSubmit";
 
 export default function ResetPasswordPage() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const supabase = createClient();
 
   const [password, setPassword] = useState("");
@@ -19,8 +19,10 @@ export default function ResetPasswordPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase fires PASSWORD_RECOVERY once the URL token is consumed
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    // Supabase émet PASSWORD_RECOVERY une fois le jeton de l'URL consommé.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
     return () => subscription.unsubscribe();
@@ -42,7 +44,6 @@ export default function ResetPasswordPage() {
     }
 
     setStatus("loading");
-
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
@@ -52,117 +53,82 @@ export default function ResetPasswordPage() {
     }
 
     setStatus("success");
-    setTimeout(() => router.push("/dashboard"), 2000);
   };
 
-  return (
-    <main className="relative min-h-screen flex items-center justify-center px-6 py-24 bg-(--bg-primary)">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)",
-        }}
-      />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-md"
+  if (status === "success") {
+    return (
+      <AuthShell
+        title={t("resetPasswordSuccessTitle")}
+        subtitle={t("resetPasswordSuccessBody")}
+        backLabel={t("backHome")}
+        footer={
+          <Link
+            href="/login"
+            className="font-semibold text-white underline decoration-(--glass-hi) underline-offset-4 transition-colors hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
+          >
+            {t("loginLink")}
+          </Link>
+        }
       >
-        {status === "success" ? (
-          <div className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-8 text-center space-y-4">
-            <div className="text-5xl mb-2" role="img" aria-label="Success">✅</div>
-            <h2 className="text-2xl font-bold text-white">{t("resetPasswordSuccessTitle")}</h2>
-            <p className="text-(--text-muted) text-sm">{t("resetPasswordSuccessBody")}</p>
-          </div>
-        ) : !ready ? (
-          <div className="text-center text-(--text-muted) text-sm">{t("resetPasswordWaiting")}</div>
-        ) : (
-          <>
-            <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                {t("resetPasswordTitle")}
-              </h1>
-              <p className="text-(--text-muted) text-sm">{t("resetPasswordSubtitle")}</p>
-            </div>
+        <p className="text-center text-sm text-(--text-secondary)">
+          {t("resetPasswordSuccessBody")}
+        </p>
+      </AuthShell>
+    );
+  }
 
-            <form
-              onSubmit={handleSubmit}
-              className="rounded-3xl border border-(--border-strong) bg-(--surface)/60 backdrop-blur-xl p-6 md:p-8 space-y-5"
-            >
-              {status === "error" && errorMsg && (
-                <div
-                  role="alert"
-                  className="px-4 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm"
-                >
-                  {errorMsg}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
-                >
-                  {t("resetPasswordNewLabel")}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  disabled={status === "loading"}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="confirm"
-                  className="text-xs font-mono tracking-widest text-(--text-dim) uppercase"
-                >
-                  {t("resetPasswordConfirmLabel")}
-                </label>
-                <input
-                  id="confirm"
-                  type="password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  required
-                  minLength={6}
-                  disabled={status === "loading"}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-(--border) bg-(--bg-primary)/50 text-white placeholder-(--text-dim) focus:outline-none focus:border-(--accent-glow) focus:ring-2 focus:ring-(--accent-glow)/20 transition-all disabled:opacity-50"
-                />
-              </div>
-
-              <PremiumButton
-                variant="primary"
-                size="lg"
-                type="submit"
-                disabled={status === "loading"}
-                className="w-full"
-              >
-                {status === "loading" ? t("resetPasswordLoading") : t("resetPasswordCta")}
-              </PremiumButton>
-            </form>
-
-            <p className="mt-6 text-center">
-              <Link
-                href="/login"
-                className="text-xs text-(--text-dim) hover:text-(--text-muted) transition-colors"
-              >
-                ← {t("loginLink")}
-              </Link>
-            </p>
-          </>
+  return (
+    <AuthShell
+      title={t("resetPasswordTitle")}
+      subtitle={t("resetPasswordSubtitle")}
+      backLabel={t("backHome")}
+    >
+      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t("resetPasswordTitle")}>
+        {!ready && (
+          <p className="rounded-xl border border-(--glass-line) bg-white/3 px-4 py-3 text-sm text-(--text-secondary)">
+            {t("resetPasswordWaiting")}
+          </p>
         )}
-      </motion.div>
-    </main>
+
+        {status === "error" && errorMsg && (
+          <div
+            role="alert"
+            className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          >
+            {errorMsg}
+          </div>
+        )}
+
+        <AuthField
+          id="password"
+          label={t("resetPasswordNewLabel")}
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="••••••••"
+          required
+          minLength={6}
+          disabled={status === "loading"}
+          autoComplete="new-password"
+        />
+
+        <AuthField
+          id="confirm"
+          label={t("resetPasswordConfirmLabel")}
+          type="password"
+          value={confirm}
+          onChange={setConfirm}
+          placeholder="••••••••"
+          required
+          minLength={6}
+          disabled={status === "loading"}
+          autoComplete="new-password"
+        />
+
+        <AuthSubmit loading={status === "loading"}>
+          {status === "loading" ? t("resetPasswordLoading") : t("resetPasswordCta")}
+        </AuthSubmit>
+      </form>
+    </AuthShell>
   );
 }

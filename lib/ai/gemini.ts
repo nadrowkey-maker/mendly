@@ -1,15 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not set in environment variables");
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai";
 
 /**
- * Centralized model id. To upgrade the whole agent team to a more powerful
- * Gemini, just set GEMINI_MODEL in the environment (e.g. a newer flash/pro id).
- * Nothing else in the codebase needs to change.
+ * Centralized model id. To upgrade the whole product to a more capable Gemini,
+ * just set GEMINI_MODEL in the environment. Nothing else in the codebase needs
+ * to change.
  */
 export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
@@ -19,16 +13,43 @@ const GENERATION_CONFIG = {
   maxOutputTokens: 2048,
 } as const;
 
-/** Default team model (driven by GEMINI_MODEL). */
-export const geminiFlash = genAI.getGenerativeModel({
-  model: GEMINI_MODEL,
-  generationConfig: GENERATION_CONFIG,
-});
+/**
+ * Le client est construit à la première utilisation réelle, pas au chargement
+ * du module.
+ *
+ * Avant, l'absence de GEMINI_API_KEY levait une erreur à l'import : n'importe
+ * quelle page qui importait, même indirectement, un fichier touchant à l'IA
+ * tombait en 500 — le tableau de bord par exemple, qui ne demande pourtant
+ * jamais rien au modèle au chargement. Une clé manquante doit casser les appels
+ * à l'IA, pas des écrans qui n'en font pas.
+ */
+let cachedClient: GoogleGenerativeAI | null = null;
+
+function client(): GoogleGenerativeAI {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not set in environment variables");
+  }
+  cachedClient ??= new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  return cachedClient;
+}
 
 /** Build a model instance for a specific id (e.g. per-tier upgrades later). */
-export function getGeminiModel(modelId: string = GEMINI_MODEL) {
-  return genAI.getGenerativeModel({ model: modelId, generationConfig: GENERATION_CONFIG });
+export function getGeminiModel(modelId: string = GEMINI_MODEL): GenerativeModel {
+  return client().getGenerativeModel({ model: modelId, generationConfig: GENERATION_CONFIG });
 }
+
+/**
+ * Modèle par défaut. Exposé via un proxy pour garder la forme d'appel
+ * historique (`geminiFlash.generateContent(...)`) tout en repoussant la
+ * construction du client au premier accès.
+ */
+export const geminiFlash: GenerativeModel = new Proxy({} as GenerativeModel, {
+  get(_target, prop, receiver) {
+    const model = getGeminiModel();
+    const value = Reflect.get(model, prop, receiver);
+    return typeof value === "function" ? value.bind(model) : value;
+  },
+});
 
 export interface ChatMessage {
   role: "user" | "model";

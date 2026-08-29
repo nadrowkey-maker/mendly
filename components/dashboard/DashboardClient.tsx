@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { Sparkles, Circle, ListChecks, MessageSquareDashed } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -34,18 +34,9 @@ export function DashboardClient({
   briefings,
 }: DashboardClientProps) {
   const t = useTranslations("dashboard");
-  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [editing, setEditing] = useState<Project | null>(null);
   const [, startTransition] = useTransition();
-
-  useEffect(() => {
-    const pending = localStorage.getItem("mendly:pending_question");
-    if (pending) {
-      localStorage.removeItem("mendly:pending_question");
-      router.push(`/dashboard/new?desc=${encodeURIComponent(pending)}`);
-    }
-  }, [router]);
 
   const handleSignOut = async () => {
     const supabase = createClient();
