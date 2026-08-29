@@ -4,6 +4,7 @@ import { Nav } from "@/components/layout/Nav";
 import { EntityField } from "@/components/3d/EntityField";
 import { HeroMission } from "@/components/sections/HeroMission";
 import { Contradiction } from "@/components/sections/Contradiction";
+import { NightWatch } from "@/components/sections/NightWatch";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { routing } from "@/i18n/routing";
@@ -53,6 +54,7 @@ export default function HomePage() {
         <main>
           <HeroMission />
           <Contradiction />
+          <NightWatch />
         </main>
         <Footer />
       </div>

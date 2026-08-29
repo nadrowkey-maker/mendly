@@ -1025,6 +1025,42 @@
       "mendlyBody": "What are you basing that momentum on? You have 40 signups and no measured retention. Launching now means converting an audience you do not have yet — and burning your only launch window to find that out.",
       "verdictLabel": "My call:",
       "verdictBody": "push it three weeks, measure retention at day 14, and launch with a number in hand."
+    },
+    "night": {
+      "label": "Autonomous work",
+      "title": "While you sleep.",
+      "sub": "The team assigned to your project meets without you triggering anything. You find the write-up when you wake up.",
+      "logTitle": "Night log",
+      "log": {
+        "signal": {
+          "time": "03:04",
+          "text": "Signal detected — an action has been stalled for eleven days."
+        },
+        "convened": {
+          "time": "03:07",
+          "text": "Team convened: finance, growth, engineering."
+        },
+        "debate": {
+          "time": "03:09",
+          "text": "The debate opens on the acquisition channel."
+        },
+        "verdict": {
+          "time": "03:12",
+          "text": "Verdict delivered. The session is waiting for you."
+        },
+        "founder": {
+          "time": "08:41",
+          "text": "You open the room. A three-minute read."
+        }
+      },
+      "sessionLabel": "Autonomous session",
+      "sessionAgents": "3 SPECIALISTS",
+      "sessionTopic": "Should the paid channel be cut before retention has been measured?",
+      "tensionLabel": "Internal contradiction",
+      "tension": "Cutting now saves budget. And loses the only usable stream of data.",
+      "verdictLabel": "My call:",
+      "verdictBody": "keep the channel two more weeks, but cut the budget by three. You keep the signal, you stop the bleeding.",
+      "restraint": "The team only meets when something actually happened. No session to fill the calendar, no write-up that says nothing."
     }
   }
 }

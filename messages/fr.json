@@ -1025,6 +1025,42 @@
       "mendlyBody": "Sur quoi tu te bases pour dire que le momentum existe ? Tu as 40 inscrits et aucune rétention mesurée. Lancer maintenant, c'est convertir une audience que tu n'as pas encore — et brûler ta seule fenêtre de lancement pour l'apprendre.",
       "verdictLabel": "Ma position :",
       "verdictBody": "repousse de trois semaines, mesure la rétention à J+14, et lance avec un chiffre en main."
+    },
+    "night": {
+      "label": "Le travail autonome",
+      "title": "Pendant que tu dors.",
+      "sub": "L'équipe assignée à ton projet se réunit sans que tu déclenches quoi que ce soit. Tu retrouves le compte rendu au réveil.",
+      "logTitle": "Journal de la nuit",
+      "log": {
+        "signal": {
+          "time": "03:04",
+          "text": "Signal détecté — une action est enlisée depuis onze jours."
+        },
+        "convened": {
+          "time": "03:07",
+          "text": "Équipe convoquée : finance, croissance, technique."
+        },
+        "debate": {
+          "time": "03:09",
+          "text": "Le débat s'ouvre sur le canal d'acquisition."
+        },
+        "verdict": {
+          "time": "03:12",
+          "text": "Verdict rendu. La session t'attend."
+        },
+        "founder": {
+          "time": "08:41",
+          "text": "Tu ouvres la salle. Trois minutes de lecture."
+        }
+      },
+      "sessionLabel": "Session autonome",
+      "sessionAgents": "3 SPÉCIALISTES",
+      "sessionTopic": "Faut-il couper le canal payant avant d'avoir mesuré la rétention ?",
+      "tensionLabel": "Contradiction interne",
+      "tension": "Couper maintenant fait gagner du budget. Et perdre le seul flux de données exploitable.",
+      "verdictLabel": "Ma position :",
+      "verdictBody": "garde le canal deux semaines de plus, mais divise le budget par trois. Tu conserves le signal, tu arrêtes l'hémorragie.",
+      "restraint": "L'équipe ne se réunit que s'il s'est passé quelque chose. Pas de session pour meubler, pas de compte rendu qui ne dit rien."
     }
   }
 }
