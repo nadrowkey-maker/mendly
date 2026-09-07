@@ -1,11 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { PLANS, DEBATE_RECHARGE_DAYS } from "@/lib/stripe/plans";
+import { PLANS } from "@/lib/stripe/plans";
 import { getUserPlan } from "@/lib/actions/subscription";
 import type { DebateRecord, DebateAccess } from "@/lib/types/tracking";
 
-/** Record a launched debate (history + sliding-recharge tracking). */
+/** Enregistre un débat lancé par le fondateur (origin vaut "founder" par défaut). */
 export async function recordDebate(input: {
   projectId: string;
   conversationId?: string | null;
@@ -64,7 +64,7 @@ export async function getLastDebate(): Promise<DebateRecord | null> {
 
 /**
  * Whether the user can launch a debate now.
- * Paid plans: unlimited. Free: one debate per sliding 7-day window.
+ * Payant : illimité. Gratuit : UN seul débat, à vie.
  */
 export async function getDebateAccess(): Promise<DebateAccess> {
   const plan = await getUserPlan();
@@ -74,20 +74,38 @@ export async function getDebateAccess(): Promise<DebateAccess> {
     return { canLaunch: true, cadence, nextAvailableAt: null, lastDebateAt: null };
   }
 
-  const last = await getLastDebate();
-  if (!last) {
-    return { canLaunch: true, cadence, nextAvailableAt: null, lastDebateAt: null };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { canLaunch: false, cadence, nextAvailableAt: null, lastDebateAt: null };
   }
 
-  const lastMs = new Date(last.created_at).getTime();
-  const nextMs = lastMs + DEBATE_RECHARGE_DAYS * 24 * 60 * 60 * 1000;
-  const canLaunch = Date.now() >= nextMs;
+  /*
+   * Le quota ne compte QUE les débats lancés par le fondateur.
+   *
+   * getLastDebate() ne filtrait pas l'origine : une session autonome produite
+   * par le cron pendant la nuit consommait le quota du fondateur, qui se
+   * retrouvait bloqué sans avoir rien lancé. Le cadeau devenait une punition.
+   */
+  const { data, count } = await supabase
+    .from("debates")
+    .select("created_at", { count: "exact" })
+    .eq("user_id", user.id)
+    .eq("origin", "founder")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const used = count ?? 0;
+  const last = (data ?? [])[0] as { created_at: string } | undefined;
 
   return {
-    canLaunch,
+    canLaunch: used === 0,
     cadence,
-    nextAvailableAt: canLaunch ? null : new Date(nextMs).toISOString(),
-    lastDebateAt: last.created_at,
+    // Le quota gratuit ne se recharge pas : il n'y a pas de prochaine échéance.
+    nextAvailableAt: null,
+    lastDebateAt: last?.created_at ?? null,
   };
 }
 

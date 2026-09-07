@@ -3,19 +3,15 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Zap, ArrowUp, X, Image, FileText, Gavel } from "lucide-react";
+import { Plus, ArrowUp, X, Image, FileText } from "lucide-react";
 import type { FileAttachment } from "@/lib/ai/gemini";
 
 interface Props {
   value: string;
   onChange: (v: string) => void;
   onSubmit: () => void;
-  onDebate?: () => void;
-  onBoardroom?: () => void;
-  isPro?: boolean;
   busy: boolean;
   isDebating: boolean;
-  canDebate: boolean;
   agentLabel: string;
   selectedFile?: FileAttachment | null;
   onFileChange?: (f: FileAttachment | null) => void;
@@ -35,12 +31,8 @@ export function ChatComposer({
   value,
   onChange,
   onSubmit,
-  onDebate,
-  onBoardroom,
-  isPro,
   busy,
   isDebating,
-  canDebate,
   agentLabel,
   selectedFile,
   onFileChange,
@@ -233,44 +225,6 @@ export function ChatComposer({
             />
 
             <div className="flex items-center gap-1.5 shrink-0">
-              {canDebate && (
-                <button
-                  type="button"
-                  onClick={onDebate}
-                  disabled={busy || !value.trim()}
-                  title={t("debateTooltip")}
-                  className={[
-                    "h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer",
-                    isDebating
-                      ? "bg-(--accent-glow) text-(--bg-primary)"
-                      : "border border-(--border-strong) text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50",
-                  ].join(" ")}
-                >
-                  <Zap
-                    className={[
-                      "w-3.5 h-3.5",
-                      isDebating ? "animate-pulse" : "",
-                    ].join(" ")}
-                  />
-                  <span className="hidden md:inline">
-                    {isDebating ? t("debating") : t("debate")}
-                  </span>
-                </button>
-              )}
-
-              {canDebate && isPro && onBoardroom && (
-                <button
-                  type="button"
-                  onClick={onBoardroom}
-                  disabled={busy || !value.trim()}
-                  title={t("boardroomTooltip")}
-                  className="h-9 px-3 rounded-full hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer border border-(--border-strong) text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50"
-                >
-                  <Gavel className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">{t("boardroom")}</span>
-                </button>
-              )}
-
               <button
                 type="button"
                 onClick={onSubmit}
@@ -292,7 +246,7 @@ export function ChatComposer({
         </div>
 
         <p className="text-[10px] text-(--text-dim) text-center mt-3 font-mono">
-          {canDebate ? t("shortcutWithDebate") : t("shortcut")}
+          {t("shortcut")}
         </p>
       </div>
     </div>

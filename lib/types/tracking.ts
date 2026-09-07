@@ -55,9 +55,9 @@ export interface DebateRecord {
 /** Result of checking whether the user can launch a debate right now. */
 export interface DebateAccess {
   canLaunch: boolean;
-  /** "weekly" (free, sliding 7-day) or "unlimited" (paid). */
-  cadence: "weekly" | "unlimited";
-  /** When the next debate unlocks (free plan only), else null. */
+  /** "once" (free, a single debate ever) or "unlimited" (paid). */
+  cadence: "once" | "unlimited";
+  /** Toujours null désormais : le quota gratuit ne se recharge pas. */
   nextAvailableAt: string | null;
   lastDebateAt: string | null;
 }

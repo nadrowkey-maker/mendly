@@ -1,7 +1,10 @@
 export type PlanTier = "free" | "starter" | "pro";
 
-/** Days for the free plan's sliding debate recharge (1 debate / 7 days). */
-export const DEBATE_RECHARGE_DAYS = 7;
+/**
+ * Le plan gratuit ouvre droit à UN débat en salle de réunion, une seule fois.
+ * C'est une dégustation, pas un rythme de croisière : un débat par semaine à
+ * vie coûte des appels modèle en continu sans jamais créer de raison de payer.
+ */
 
 export const PLANS = {
   free: {
@@ -10,10 +13,10 @@ export const PLANS = {
     dailyMessageLimit: 10,
     projectLimit: 1,
     agentsAvailable: ["CEO", "CTO", "CMO", "MENDLY"] as const,
-    // Free gets one real team debate per sliding 7-day window (enforced in the
-    // debate route via getDebateAccess()). Debates only use the 3 free agents.
+    // Un seul débat en salle de réunion, à vie. Le fondateur voit ce que ça
+    // donne, puis choisit.
     debateEnabled: true,
-    debates: "weekly" as const,
+    debates: "once" as const,
     // Specialists (non-CEO) Mendly can assign to a project's permanent team.
     teamSize: 2,
   },

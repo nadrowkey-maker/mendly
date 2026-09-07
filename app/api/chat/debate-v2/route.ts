@@ -103,13 +103,12 @@ async function streamAgent(prompt: string): Promise<{ stream: AsyncIterable<{ te
 
 export async function POST(req: NextRequest) {
   try {
-    const { conversationId, projectId, userMessage, locale, boardroom } =
+    const { conversationId, projectId, userMessage, locale } =
       (await req.json()) as {
         conversationId: string;
         projectId: string;
         userMessage: string;
-        locale?: string;
-        boardroom?: boolean;
+        locale?: string;
       };
 
     if (!conversationId || !projectId || !userMessage) {
@@ -144,9 +143,7 @@ export async function POST(req: NextRequest) {
         JSON.stringify({ error: "debate_recharge", nextAvailableAt: access.nextAvailableAt }),
         { status: 403, headers: { "Content-Type": "application/json" } }
       );
-    }
-    // Bloc 6.3.5 — "boardroom" mode: a deeper debate for critical decisions, Pro only.
-    const isBoardroom = boardroom === true && rateLimit.plan === "pro";
+    }
     void track("debate_launched", { plan: rateLimit.plan });
 
     const { data: projectData, error: projectErr } = await supabase
@@ -208,7 +205,7 @@ export async function POST(req: NextRequest) {
           write(`[[META]]${JSON.stringify(selection)}[[/META]]`);
 
           const thread: { agent: DebateAgentRole; content: string }[] = [];
-          const numPasses = (selection.agents.length <= 2 ? 3 : 2) + (isBoardroom ? 1 : 0);
+          const numPasses = selection.agents.length <= 2 ? 3 : 2;
           let activeAgents = [...selection.agents];
           let whisperCount = 0;
 
@@ -302,16 +299,10 @@ export async function POST(req: NextRequest) {
             thread,
             locale: targetLocale,
           });
-          const finalCeoPrompt = isBoardroom
-            ? ceoPrompt +
-              (targetLocale === "fr"
-                ? "\n\n# MODE BOARDROOM (décision critique)\nRigueur maximale : chiffre les enjeux, nomme explicitement le pire scénario et le plan B, pèse le coût de l'inaction, et tranche sans ambiguïté."
-                : "\n\n# BOARDROOM MODE (critical decision)\nMaximum rigor: quantify the stakes, explicitly name the worst case and the plan B, weigh the cost of inaction, and make an unambiguous call.")
-            : ceoPrompt;
 
           let ceoContent = "";
           try {
-            const ceoResult = await streamAgent(finalCeoPrompt);
+            const ceoResult = await streamAgent(ceoPrompt);
             for await (const chunk of ceoResult.stream) {
               if (cancelled) break;
               const text = chunk.text();

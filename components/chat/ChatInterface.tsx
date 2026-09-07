@@ -25,8 +25,6 @@ import type { Message, AgentRole } from "@/lib/types/conversation";
 import type { Project } from "@/lib/types/project";
 import type { FileAttachment } from "@/lib/ai/gemini";
 import type { DebateState, DebateAgentRole, AgentSelection, ConsensusVote, VoteVerdict } from "@/lib/types/debate";
-import { PLANS } from "@/lib/stripe/plans";
-import type { PlanTier } from "@/lib/stripe/plans";
 
 interface ChatInterfaceProps {
   project: Project;
@@ -359,7 +357,7 @@ export function ChatInterface({
     }
   };
 
-  const handleDebate = async (boardroom = false) => {
+  const handleDebate = async () => {
     const trimmed = input.trim();
     if (!trimmed || busy || !activeConversationId) return;
 
@@ -392,7 +390,6 @@ export function ChatInterface({
           projectId: project.id,
           userMessage: trimmed,
           locale,
-          boardroom,
         }),
         signal: ac.signal,
       });
@@ -1082,13 +1079,9 @@ export function ChatInterface({
           <ChatComposer
             value={input}
             onChange={setInput}
-            onSubmit={teamRoomActive ? () => handleDebate(false) : handleSubmit}
-            onDebate={teamRoomActive ? undefined : () => handleDebate(false)}
-            onBoardroom={() => handleDebate(true)}
-            isPro={userPlan === "pro"}
+            onSubmit={teamRoomActive ? handleDebate : handleSubmit}
             busy={busy}
             isDebating={isDebating}
-            canDebate={!teamRoomActive && PLANS[userPlan as PlanTier]?.debateEnabled === true}
             agentLabel={teamRoomActive ? t("teamRoomNav") : AGENT_LABELS[activeAgent]}
             selectedFile={selectedFile}
             onFileChange={setSelectedFile}
