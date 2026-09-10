@@ -744,3 +744,56 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
 
 /* Utility: balance + clamp helpers */
 .text-balance { text-wrap: balance; }
+
+/* ============================================================
+   PAPIER — la couche claire (landing, marketing, auth)
+
+   Le produit vit dans le sombre, la vitrine dans le clair. Ce
+   n'est pas une inversion gratuite : la landing doit se lire au
+   soleil sur un téléphone, l'atelier se regarde des heures
+   d'affilée. Les deux besoins n'ont pas la même réponse.
+
+   Le blanc n'est pas #FFFFFF mais un blanc chaud légèrement
+   cassé. Un blanc pur sous un titre noir crée un contraste
+   d'écran de veille ; deux points de chaleur suffisent à faire
+   basculer la page du côté du papier.
+   ============================================================ */
+:root {
+  --paper: #fbfaf8;            /* fond de page clair, blanc chaud */
+  --paper-raised: #f3f1ed;     /* cartes, encarts, panneaux */
+  --paper-sunken: #eceae5;     /* zones creusées, accordéon ouvert */
+  --paper-line: rgba(14, 14, 15, 0.09);
+  --paper-line-soft: rgba(14, 14, 15, 0.055);
+
+  --ink: #0e0e0f;              /* le noir du texte, jamais #000 */
+  --ink-soft: #55555b;         /* sous-titres, corps secondaire */
+  --ink-muted: #8b8b92;        /* légendes, étiquettes */
+  --ink-faint: rgba(14, 14, 15, 0.28);
+
+  /* ---- Atelier : panneaux encastrés ----
+     Le fond de l'application n'est plus le noir absolu : c'est
+     un gris très sombre sur lequel les panneaux, EUX, sont plus
+     clairs et détachés par une marge. C'est la marge qui fait
+     lire "panneau posé" plutôt que "colonne collée au bord". */
+  --shell: #0a0a0b;            /* le sol de l'atelier */
+  --panel: #161617;            /* les panneaux posés dessus */
+  --panel-raised: #1e1e20;     /* survol, élément actif */
+  --panel-line: rgba(255, 255, 255, 0.07);
+}
+
+/* Une section claire : bascule le texte, pas le fond des enfants. */
+.paper {
+  background: var(--paper);
+  color: var(--ink);
+}
+.paper ::selection { background: rgba(58, 168, 255, 0.22); color: var(--ink); }
+
+/* Le titre display de la vitrine — fin, grand, resserré.
+   Le poids 200 sur 72px n'est pas la même fonte que le poids 200
+   sur 16px : à cette taille la finesse devient de l'aplomb. */
+.display {
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  text-wrap: balance;
+}

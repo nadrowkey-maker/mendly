@@ -1,32 +1,28 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Nav } from "@/components/layout/Nav";
-import { EntityField } from "@/components/3d/EntityField";
-import { HeroMission } from "@/components/sections/HeroMission";
-import { Contradiction } from "@/components/sections/Contradiction";
-import { NightWatch } from "@/components/sections/NightWatch";
-import { PricingSection } from "@/components/sections/Pricing";
-import { Closing } from "@/components/sections/Closing";
-import { Footer } from "@/components/layout/Footer";
-import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { PaperNav } from "@/components/home/PaperNav";
+import { Hero } from "@/components/home/Hero";
+import { Proof } from "@/components/home/Proof";
+import { Showcase } from "@/components/home/Showcase";
+import { Features } from "@/components/home/Features";
+import { GetStarted } from "@/components/home/GetStarted";
+import { PaperPricing } from "@/components/home/PaperPricing";
+import { Faq } from "@/components/home/Faq";
+import { Closing } from "@/components/home/Closing";
+import { PaperFooter } from "@/components/home/PaperFooter";
 import { routing } from "@/i18n/routing";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-/**
- * La page d'accueil n'avait AUCUNE métadonnée : ni titre, ni description, ni
- * Open Graph. Les pages secondaires en avaient, la principale non — donc le
- * lien partagé ne montrait rien et le référencement travaillait à vide.
- */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "landing.meta" });
+  const t = await getTranslations({ locale, namespace: "home.meta" });
   const title = t("title");
   const description = t("description");
 
@@ -39,29 +35,48 @@ export async function generateMetadata({
 }
 
 /**
- * Landing — reconstruction "Contrôle Mission", page blanche.
+ * La page d'accueil.
  *
- * Les dix sections précédentes vendaient l'équipe de 8 agents, un produit qui
- * n'existe plus. Elles sont retirées d'un bloc plutôt que retouchées : le
- * discours doit être réécrit, pas repeint. Les sections reviennent une par une,
- * chacune posant `data-entity-shape` pour piloter l'état de l'entité de fond.
+ * Elle est claire alors que le produit est sombre, et c'est délibéré. La
+ * vitrine se consulte une fois, souvent au téléphone et parfois dehors :
+ * elle doit se lire au soleil. L'atelier se regarde des heures d'affilée
+ * devant un écran : il doit fatiguer le moins possible. Les deux contraintes
+ * n'ont pas la même réponse, et vouloir une seule charte pour les deux revient
+ * à mal servir l'une des deux.
+ *
+ * Le champ de particules a disparu d'ici. Il tenait le rôle de fond animé,
+ * et deux dispositifs génératifs sur la même page se disputaient l'attention
+ * sans que ni l'un ni l'autre ne gagne. Le ruban et les dégradés granuleux le
+ * remplacent : même principe — calculé, jamais un fichier récupéré ailleurs —
+ * mais posés là où ils servent le propos plutôt qu'en fond permanent.
  */
 export default function HomePage() {
   return (
-    <>
-      <SmoothScroll />
-      <EntityField />
-      <div className="relative z-10">
-        <Nav />
-        <main>
-          <HeroMission />
-          <Contradiction />
-          <NightWatch />
-          <PricingSection />
-          <Closing />
-        </main>
-        <Footer />
-      </div>
-    </>
+    <div className="paper min-h-screen">
+      <PaperNav />
+      <main>
+        <Hero />
+        <div className="mt-4 md:mt-8">
+          <Proof />
+        </div>
+        <div className="mt-24 md:mt-32">
+          <Showcase />
+        </div>
+        <div className="mt-32 md:mt-44">
+          <Features />
+        </div>
+        <div className="mt-28 md:mt-40">
+          <GetStarted />
+        </div>
+        <div className="mt-28 md:mt-40">
+          <PaperPricing />
+        </div>
+        <div className="mt-28 md:mt-36">
+          <Faq />
+        </div>
+        <Closing />
+      </main>
+      <PaperFooter />
+    </div>
   );
 }

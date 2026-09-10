@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ChevronRight, PanelLeft, ShieldQuestion, LifeBuoy, Users } from "lucide-react";
+import { ShieldQuestion, LifeBuoy, Users, MessageSquare, Brain, FileStack, FolderClosed } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
@@ -13,7 +13,9 @@ import { AISpeakingAura } from "./AISpeakingAura";
 import { AIAura } from "@/components/ui/AIAura";
 import { GenerateMemoButton } from "./GenerateMemoButton";
 import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
-import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
+import { AppShell } from "@/components/app/AppShell";
+import { AppHeader } from "@/components/app/AppHeader";
+import type { NavGroup } from "@/components/app/nav-types";
 import { ProjectConsoleStrip } from "@/components/chat/ProjectConsoleStrip";
 import { parseReply } from "@/lib/ai/room-suggestion";
 import type { ProjectStats } from "@/lib/actions/project-stats";
@@ -70,17 +72,6 @@ const AGENT_LABELS: Record<AgentRole, string> = {
   MENDLY: "MENDLY",
 };
 
-const AGENT_COLORS: Record<AgentRole, string> = {
-  CEO: "#0071e3",
-  CTO: "#06B6D4",
-  CMO: "#F0ABFC",
-  CPO: "#34D399",
-  CFO: "#FBBF24",
-  CDO: "#60A5FA",
-  DEV: "#94A3B8",
-  CCO: "#FB923C",
-  MENDLY: "#8B5CF6",
-};
 
 function toDisplayMessages(messages: Message[]): DisplayMessage[] {
   return messages.map((m) => ({
@@ -136,9 +127,8 @@ export function ChatInterface({
   projectStats,
 }: ChatInterfaceProps) {
   const t = useTranslations("chat");
+  const tSide = useTranslations("sidebar");
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [activeAgent, setActiveAgent] = useState<AgentRole>("MENDLY");
   const [switchingAgent, setSwitchingAgent] = useState(false);
@@ -843,131 +833,80 @@ export function ChatInterface({
     }
   };
 
+  /*
+   * La navigation du projet ouvert.
+   *
+   * Elle ne liste plus neuf agents : Mendly est le seul interlocuteur du
+   * quotidien, et les spécialistes ne se réunissent que dans la salle. Le
+   * groupe « projets » reste, pour passer d'un projet à l'autre sans repasser
+   * par le tableau de bord.
+   */
+  const navGroups: NavGroup[] = [
+    {
+      label: tSide("groupProject"),
+      items: [
+        {
+          label: tSide("conversation"),
+          icon: MessageSquare,
+          onClick: () => handleAgentSwitch("MENDLY"),
+          active: !teamRoomActive,
+          disabled: busy,
+        },
+        {
+          label: tSide("teamRoomLabel"),
+          icon: Users,
+          onClick: () => handleTeamRoomOpen(),
+          active: teamRoomActive,
+          disabled: busy,
+        },
+        {
+          label: tSide("memory"),
+          icon: Brain,
+          href: `/dashboard/projects/${project.id}/memory`,
+        },
+        {
+          label: tSide("deliverables"),
+          icon: FileStack,
+          href: `/dashboard/projects/${project.id}/deliverables`,
+        },
+      ],
+    },
+    {
+      label: tSide("groupProjects"),
+      action: { label: tSide("newProject"), href: "/dashboard/new" },
+      items: allProjects.map((p) => ({
+        label: p.name,
+        icon: FolderClosed,
+        href: `/dashboard/projects/${p.id}`,
+        active: p.id === project.id,
+      })),
+    },
+  ];
+
   return (
     <>
     {showIntro && (
       <TeamIntroSequence projectId={project.id} onDone={() => setShowIntro(false)} />
     )}
-    <div className="flex h-screen bg-(--bg-primary) overflow-hidden">
-      {/* Desktop sidebar */}
-      <div className="hidden md:flex">
-        <ProjectSidebar
-          projects={allProjects}
-          activeProjectId={project.id}
-          activeAgent={activeAgent}
-          onAgentChange={handleAgentSwitch}
-          agentBusy={busy}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
-          usageUsed={usageUsed}
-          usageLimit={initialUsageLimit}
-          userPlan={userPlan}
-          userEmail={userEmail}
-          teamRoomActive={teamRoomActive}
-          onTeamRoomClick={() => handleTeamRoomOpen()}
-        />
-      </div>
-
-      {/* Mobile sidebar overlay */}
-      {mobileSidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setMobileSidebarOpen(false)}
-          />
-          <div className="relative z-10 h-full">
-            <ProjectSidebar
-              projects={allProjects}
-              activeProjectId={project.id}
-              activeAgent={activeAgent}
-              onAgentChange={(agent) => {
-                handleAgentSwitch(agent);
-                setMobileSidebarOpen(false);
-              }}
-              agentBusy={busy}
-              collapsed={false}
-              onToggleCollapse={() => setMobileSidebarOpen(false)}
-              usageUsed={usageUsed}
-              usageLimit={initialUsageLimit}
-              userPlan={userPlan}
-              userEmail={userEmail}
-              teamRoomActive={teamRoomActive}
-              onTeamRoomClick={() => {
-                handleTeamRoomOpen();
-                setMobileSidebarOpen(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      <main className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
-        <AISpeakingAura active={busy} />
-        <header
-          className="h-14 border-b flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 backdrop-blur-xl"
-          style={{
-            borderBottomColor: `${AGENT_COLORS[activeAgent]}25`,
-            background: `linear-gradient(to bottom, ${AGENT_COLORS[activeAgent]}06, rgba(8,8,8,0.85))`,
-          }}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Mobile: open sidebar */}
-            <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors cursor-pointer"
-              aria-label={t("expandSidebar")}
-            >
-              <PanelLeft className="w-4 h-4" />
-            </button>
-            {/* Desktop: expand when collapsed */}
-            {sidebarCollapsed && (
-              <button
-                onClick={() => setSidebarCollapsed(false)}
-                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 transition-colors cursor-pointer"
-                title={t("expandSidebar")}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-            {/* Active agent badge + project name, or team room badge */}
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={
-                  teamRoomActive
-                    ? {
-                        background: "var(--accent-glow)22",
-                        border: "1px solid var(--accent-glow)45",
-                        color: "var(--accent-glow)",
-                      }
-                    : {
-                        background: `${AGENT_COLORS[activeAgent]}22`,
-                        border: `1px solid ${AGENT_COLORS[activeAgent]}45`,
-                        color: AGENT_COLORS[activeAgent],
-                      }
-                }
-              >
-                {teamRoomActive ? (
-                  <Users className="w-3.5 h-3.5" />
-                ) : (
-                  <span className="text-[9px] font-mono font-bold">{AGENT_LABELS[activeAgent]}</span>
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-mono tracking-[0.2em] text-white/28 uppercase">
-                  {project.name}
-                </p>
-                <p className="text-sm font-semibold text-white/90 truncate">
-                  {teamRoomActive ? t("teamRoomNav") : AGENT_LABELS[activeAgent]}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {!teamRoomActive && activeAgent === "CEO" && (
+    <AppShell
+      groups={navGroups}
+      usageUsed={usageUsed}
+      usageLimit={initialUsageLimit}
+      userPlan={userPlan}
+      userEmail={userEmail}
+      contextLabel={project.name}
+      flush
+    >
+      <AISpeakingAura active={busy} />
+      <AppHeader
+        title={teamRoomActive ? t("teamRoomNav") : tSide("conversation")}
+        subtitle={project.name}
+        actions={
+          !teamRoomActive && activeAgent === "CEO" ? (
             <GenerateMemoButton projectId={project.id} userPlan={userPlan} />
-          )}
-        </header>
+          ) : undefined
+        }
+      />
 
         <ProjectConsoleStrip stats={projectStats} onOpenTeamRoom={() => handleTeamRoomOpen()} />
 
@@ -1122,8 +1061,7 @@ export function ChatInterface({
             onFileChange={setSelectedFile}
           />
         </div>
-      </main>
-    </div>
+    </AppShell>
     </>
   );
 }

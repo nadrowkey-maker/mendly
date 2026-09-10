@@ -27,7 +27,7 @@
     "col4Link4": "Refund policy",
     "col4Link5": "Legal notices",
     "bottomLine1": "© 2026 Mendly. All rights reserved.",
-    "bottomLine2": "Designed and developed in France 🇫🇷"
+    "bottomLine2": "Designed and developed in France"
   },
   "comingSoon": {
     "eyebrow": "COMING SOON",
@@ -163,7 +163,7 @@
     "title": "Terms of Service",
     "lastUpdated": "Last updated: May 2, 2026",
     "s1Title": "1. Service overview",
-    "s1Body": "Mendly is a SaaS platform providing a team of 8 AI specialists (CEO, CTO, CMO, CPO, CDO, CFO, Lead Dev, CCO) to assist solo founders in launching and scaling their projects.",
+    "s1Body": "Mendly is a SaaS platform for independent founders. It provides access to an AI-powered board of directors: it carries several angles of decision-making — finance, growth, engineering, product, strategy, data, execution, communication — and addresses the user as a single voice. Each project also has a meeting room, in which a team of specialists assigned to that project can be convened to debate a question, as well as autonomous working sessions triggered without user intervention. The number of projects, the cadence of autonomous sessions and access to the meeting room depend on the subscribed plan.",
     "s2Title": "2. Acceptance of terms",
     "s2Body": "By using this site or creating an account, you accept these terms. If you don't agree, don't use the service.",
     "s3Title": "3. Account creation & plans",
@@ -217,12 +217,12 @@
   },
   "auth": {
     "loginTitle": "Welcome back.",
-    "loginSubtitle": "Sign in to access your team.",
+    "loginSubtitle": "Pick up where Mendly left off.",
     "loginCta": "Sign in",
     "loginLoading": "Signing in…",
     "loginLink": "Sign in",
-    "signupTitle": "Build your team.",
-    "signupSubtitle": "Seconds away from your 8 AI specialists.",
+    "signupTitle": "Open your counsel.",
+    "signupSubtitle": "Two minutes, and someone finally starts pushing back.",
     "signupCta": "Create my account",
     "signupLoading": "Creating…",
     "signupLink": "Create an account",
@@ -274,7 +274,7 @@
     "openActionsTitle": "Open actions",
     "whispersLabel": "Whispers waiting",
     "whispersCenterTitle": "Whispers",
-    "whispersCenterSub": "What your agents told you off the record — across every project.",
+    "whispersCenterSub": "What Mendly flagged without being asked — across every project.",
     "whispersMarkAll": "Mark all as read",
     "whispersEmpty": "No whispers yet",
     "whispersEmptyBody": "When an agent shares something off the record during a debate, it lands here.",
@@ -308,9 +308,9 @@
     "back": "Back to dashboard",
     "eyebrow": "NEW PROJECT",
     "milestoneReached": "Milestone reached",
-    "milestoneCelebrate": "Your team is proud of you.",
+    "milestoneCelebrate": "One step done. The next one is waiting.",
     "title": "Create your project.",
-    "subtitle": "A few details so your agents can help you effectively.",
+    "subtitle": "Two sentences is enough. Mendly will ask you the rest.",
     "nameLabel": "Project name",
     "namePlaceholder": "Ex: FitnessApp Korea",
     "descriptionLabel": "Description",
@@ -562,7 +562,7 @@
     "deliverables": "Deliverables",
     "memory": "Memory",
     "usage": "Usage",
-    "upgrade": "Upgrade",
+    "upgrade": "Change plan",
     "manage": "Manage",
     "account": "Account",
     "dashboard": "Dashboard",
@@ -573,7 +573,16 @@
     "agentLocked": "Upgrade your plan to unlock this agent",
     "teamRoomLabel": "Team room",
     "projectSection": "PROJECT",
-    "conversationLabel": "Conversation"
+    "conversationLabel": "Conversation",
+    "usageLine": "{used} / {limit} messages today",
+    "settings": "Settings",
+    "groupOverview": "Overview",
+    "groupProjects": "Projects",
+    "groupProject": "This project",
+    "groupAccount": "Account",
+    "whispers": "Signals",
+    "overview": "Dashboard",
+    "conversation": "Conversation"
   },
   "projectMenu": {
     "ariaLabel": "Project options",
@@ -629,7 +638,7 @@
     "time_fulltime_label": "Full-time",
     "time_fulltime_desc": "I'm 100% on this.",
     "contextQuestion": "Tell us about yourself.",
-    "contextHelp": "Your background, what you do, what drives you. The more you share, the sharper your agents get. (Min 10 chars)",
+    "contextHelp": "Your background, what you do, what drives you. The more you share, the better Mendly knows where to push back. (Min 10 chars)",
     "contextPlaceholder": "Ex: Math student in Rennes, I spend most of my free time coding. I've built an obsession with South Korea and want to launch my company there by 2027…",
     "goalsQuestion": "What do you want to build, and why?",
     "goalsHelp": "Your vision, ambitions, your 'why'. Be concrete. (Min 10 chars)",
@@ -637,8 +646,8 @@
   },
   "teamIntro": {
     "skip": "Skip intro",
-    "title": "Meet your team.",
-    "sub": "8 specialists assembled around your project.",
+    "title": "Here is who works on your project.",
+    "sub": "The specialists your project needs, and none of the others.",
     "ceoIntro": "I'm your CEO. I'll keep your vision sharp and your decisions clear. Every call we make together will be intentional.",
     "ctoIntro": "I'm your CTO. Architecture, stack, technical risk — I'll make sure we build things that actually scale.",
     "cmoIntro": "I'm your CMO. Audience, positioning, channels — I'll find the story that makes people stop scrolling.",
@@ -664,7 +673,7 @@
     "emailLabel": "Email",
     "planLabel": "Current plan",
     "profileTitle": "Founder profile",
-    "profileSubtitle": "This info is injected into every conversation with your AI agents. The more precise it is, the sharper their advice.",
+    "profileSubtitle": "This goes into the context of every conversation with Mendly. The more specific it is, the less generic its answers.",
     "stageLabel": "Stage",
     "stage_first_time": "First-time",
     "stage_second_time": "Second-time",
@@ -907,5 +916,129 @@
     "createCta": "Open this project",
     "creating": "Assembling your team",
     "switchToForm": "Fill in a form instead"
+  },
+  "home": {
+    "meta": {
+      "title": "Mendly — the counsel that dares to contradict you",
+      "description": "Mendly is not an assistant that agrees. It is the board of directors that challenges your plan, exposes its own contradictions, decides — and keeps working while you are away."
+    },
+    "nav": {
+      "product": "Product",
+      "method": "Method",
+      "pricing": "Pricing",
+      "signin": "Sign in",
+      "cta": "Try for free",
+      "dashboard": "My workspace",
+      "menu": "Open menu",
+      "close": "Close menu"
+    },
+    "hero": {
+      "title1": "A board of directors",
+      "title2": "that dares to contradict you.",
+      "sub": "Mendly challenges your plan while there is still time to change it. And it keeps working when you are away.",
+      "ctaPrimary": "Try for free",
+      "ctaSecondary": "See the workspace"
+    },
+    "disciplines": {
+      "label": "Eight angles of leadership, one voice",
+      "items": [
+        "Finance",
+        "Growth",
+        "Engineering",
+        "Product",
+        "Strategy",
+        "Data",
+        "Execution",
+        "Communication"
+      ]
+    },
+    "proof": {
+      "stat1Value": "8",
+      "stat1Label": "angles of leadership carried by a single voice",
+      "stat2Value": "24 h",
+      "stat2Label": "the team convenes without you calling it",
+      "quote": "An assistant that says yes costs you three months. Mendly says no, and puts the number next to it.",
+      "quoteAuthor": "Mendly's position",
+      "quoteRole": "What the product does, in one sentence"
+    },
+    "showcase": {
+      "eyebrow": "The workspace",
+      "title": "This is the screen where it happens",
+      "sub": "One project, one conversation that holds the thread, and a memory that does not empty itself between sessions.",
+      "cta": "Open a project",
+      "caption": "The Mendly workspace — conversation, project memory, deliverables."
+    },
+    "features": {
+      "title": "Three moments where Mendly changes your decision",
+      "sub": "None of the three is what an assistant does.",
+      "contradiction": {
+        "eyebrow": "The contradiction",
+        "title": "It challenges your plan, not your enthusiasm.",
+        "items": [
+          "It asks what you are basing this on before validating anything",
+          "It exposes its own internal contradiction instead of smoothing it over",
+          "It decides: one position, not five equal options",
+          "It remembers what you decided last week"
+        ],
+        "caption": "Mendly answers, and flags the tension it cannot resolve."
+      },
+      "room": {
+        "eyebrow": "The meeting room",
+        "title": "When the question deserves a debate, it takes you there.",
+        "items": [
+          "It spots the questions that need several angles",
+          "It opens the room with your question already written",
+          "The specialists assigned to your project genuinely disagree",
+          "You leave with a verdict, not minutes"
+        ],
+        "caption": "The meeting room — your project's specialists, disagreeing."
+      },
+      "night": {
+        "eyebrow": "Autonomous work",
+        "title": "It carries on when you close the laptop.",
+        "items": [
+          "An action stalled for eleven days triggers a session",
+          "The team convenes without you calling it",
+          "You find the debrief when you wake up",
+          "Every decision enters the project's memory"
+        ],
+        "caption": "An autonomous session, produced overnight."
+      }
+    },
+    "start": {
+      "title": "Getting started takes five minutes",
+      "sub": "No setup, no connectors to wire up. You talk, it listens.",
+      "step1": "You tell Mendly about your project. It asks questions, you answer.",
+      "step2": "It assigns the specialists your project needs — and none of the others.",
+      "step3": "You work. It challenges, it decides, it remembers.",
+      "caption": "Project creation: an interview, not a form."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": "How is Mendly different from ChatGPT?",
+      "a1": "A general assistant is trained to satisfy you: it validates your idea, then gives you five steps to pull it off. Mendly starts by asking what you are basing this on. When two of its angles disagree, it says so instead of picking the smoothest answer. Then it decides.",
+      "q2": "What is the meeting room?",
+      "a2": "A place separate from the daily conversation. Mendly convenes the specialists assigned to your project — finance, growth, engineering depending on the case — and they genuinely argue over your question before a verdict is reached. Mendly takes you there on its own when a question deserves it.",
+      "q3": "Does Mendly really work when I am away?",
+      "a3": "Yes. When an action on your project stays stalled, the team opens a session on its own and leaves you the debrief. You trigger nothing, you read it when you wake up. The cadence depends on your plan.",
+      "q4": "How many projects can I create?",
+      "a4": "One on Free, three on Starter, ten on Pro. A project keeps its own memory: decisions, risks, assumptions, milestones. It is not one more chat thread.",
+      "q5": "What happens to what I write?",
+      "a5": "Your projects and conversations are hosted in the European Union and are never used to train any model. Delete a project and its memory goes with it.",
+      "q6": "Can I stop whenever I want?",
+      "a6": "Yes, in one click from your settings, without writing to anyone. The plan stays active until the end of the period you already paid for."
+    },
+    "closing": {
+      "title": "The only counsel that dares to tell you you are wrong.",
+      "sub": "Start for free. You will find out quickly whether it is right.",
+      "cta": "Try for free",
+      "note": "No card required."
+    }
+  },
+  "app": {
+    "askMendly": "Ask Mendly",
+    "emptyProjectsTitle": "No projects yet",
+    "emptyProjectsBody": "A project keeps its own memory: decisions, risks, assumptions. Start by describing one.",
+    "emptyProjectsCta": "New project"
   }
 }

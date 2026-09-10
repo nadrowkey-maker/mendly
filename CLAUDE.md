@@ -27,72 +27,118 @@ Any copy or UI that presents Mendly as a team of eight is obsolete.
 
 ## DESIGN PRINCIPLES
 
-### Visual direction: "Contrôle Mission"
+### Two grounds, one system
 
-Dark technological, glassmorphism, the feel of a mission control console.
-Reference: the VEXEL landing page. **The category alone is not the point** —
-"dark with glows" is also what every generated AI landing looks like. What
-separates this system from that is a small number of execution rules, and they
-are non-negotiable:
+The site is **light**. The workspace is **dark**. This is deliberate and it is
+the first thing to understand before touching anything visual.
 
-1. **The accent NEVER touches running text.** Azure lives in light, halos,
-   graphics and data. Headings stay white. Coloured headline text is the single
-   most recognisable tell of a generated page.
-2. **The ground is `#000000`.** Not a violet-black, not charcoal. A tinted black
-   dates the page on its own.
-3. **One accent hue only.** The multi-accent gradient (violet + cyan + fuchsia)
-   is the number-one marker of the AI template. The previous charter mandated
-   four accents — that was the problem, not the solution.
-4. **Generative graphics are computed, never faked.** Particle structures are
-   real-time canvas/WebGL. A CSS gradient imitating one is spotted instantly.
-5. **No emoji in UI chrome.** Markers are typographic: a rule, a mono label.
+The landing is read once, often on a phone, sometimes outdoors: it has to hold
+up in daylight. The workspace is stared at for hours: it has to tire the eye as
+little as possible. One charter for both would serve one of them badly. What
+carries across is not the background — it is the type, the accent, the shapes
+and the one signature device.
 
-The amber signal is the one exception to rule 3, and it is reserved for a single
-use: the moment Mendly contradicts itself. Used anywhere else it stops meaning
-anything.
+### The signature device: the grainy gradient
+
+`components/ui/GrainGradient.tsx`. Soft colour fields with fine film grain,
+**computed in the browser, never a video or an image file**. It is the single
+most recognisable element of the identity. Rules:
+
+1. It is **generated**. No `.mp4`, no `.webp` of a gradient, and never an asset
+   lifted from another site. It costs a few kilobytes of code instead of
+   megabytes of asset, scales to any size, and belongs to the product.
+2. It renders in **two layers**: the gradient at quarter resolution (blurred by
+   nature, so nobody sees the upscale) and the grain at 1:1 on top. Putting the
+   grain in the same canvas stretches it ×4 and turns the material into TV
+   static. This was tried; it looked cheap.
+3. The **colorway carries meaning**: `azure` for the product, `signal` (amber)
+   for internal contradiction, `verdict` (green) for a decision reached, `ash`
+   when the content on top must win, `dusk` for dark panels.
+4. Grain stays subtle. Past roughly `grain={0.6}` it stops breaking the banding
+   it exists to break and becomes the subject.
+
+The **ribbon** (`components/ui/Ribbon.tsx`) is the second generated graphic:
+the wave across the top of the landing. Same rule — computed, never a file.
+
+### The pill is the only button
+
+`components/ui/Pill.tsx`, four tones, and the tone names the **ground it sits
+on**, never an abstract level of importance:
+
+- `ink` — primary action on a light ground
+- `paper` — secondary action on a light ground
+- `light` — primary action on a dark ground
+- `ghost` — quiet action, either ground
+
+One radius, one height scale. A second button shape is what makes an interface
+start to feel assembled from parts.
+
+### The workspace is panels on a floor
+
+The sidebar is a rounded panel with a margin all around it; the work area is
+the floor itself, with no panel of its own. That margin is what makes it read
+as an object rather than a screen edge, and giving the work area its own panel
+puts two near-identical values side by side — at which point it reads as a file
+explorer.
+
+Nav entries are grouped under small section labels. The active entry is a
+filled pill, never a coloured border.
 
 ### Typography
-- Display + body: **Manrope** via `next/font` — weight **200** for large
-  display, 400/500 for text. The weight contrast does the work of a second
-  family; that thin-and-huge headline is central to the look.
-- Technical/telemetry: **JetBrains Mono** — counters, timestamps, labels.
-- Headlines are sentence case, tight tracking (`-0.03em` to `-0.038em`), and end
-  with a full stop. The punctuation closes the sentence and gives it poise.
+- Display + body: **Manrope** via `next/font`. Weight 300 for the landing
+  display (`.display`), 600/700 for workspace headings.
+  The landing whispers, the workspace states. Do not swap them: a thin heading
+  in a tool you use daily becomes decoration you stop reading.
+- Technical/telemetry: **JetBrains Mono** — counters, timestamps, small caps
+  labels.
 - Geist is banned: Vercel's font has become the AI-startup uniform.
 
-### Color tokens (use these CSS vars, never hardcode)
+### Colour tokens (use these CSS vars, never hardcode)
 ```css
---bg-base: #000000          /* absolute black, the ground */
---bg-raised: #06080B        /* sections, panels */
---bg-overlay: #0B0F14       /* menus, popovers */
---glass: rgba(255,255,255,0.045)
---glass-line: rgba(255,255,255,0.09)
---glass-hi: rgba(255,255,255,0.17)   /* top edge highlight */
+/* Light — landing, marketing, legal */
+--paper: #FBFAF8        /* warm off-white, never #FFF */
+--paper-raised: #F3F1ED /* cards, insets */
+--paper-line: rgba(14,14,15,0.09)
+--ink: #0E0E0F          /* text black, never #000 */
+--ink-soft: #55555B
+--ink-muted: #8B8B92
+
+/* Dark — the workspace */
+--shell: #0A0A0B        /* the floor */
+--panel: #161617        /* panels resting on it */
+--panel-raised: #1E1E20 /* hover, active */
+--panel-line: rgba(255,255,255,0.07)
+
+/* Shared */
 --accent-primary: #3AA8FF   /* azure — the only accent */
 --accent-glow: #8FD4FF
---accent-halo: rgba(58,168,255,0.28)
 --signal: #FFB454           /* internal contradiction ONLY */
---text-primary: #FFFFFF
---text-secondary: #9AA4AE
---text-muted: #5D666F
 ```
 
-### Signature effects
-1. **The entity** — one fixed full-screen particle field that morphs between
-   states as you scroll (torus, sphere, wave, helix). The same points
-   reorganise; nothing appears or disappears.
-2. **Liquid glass** — `blur(20px) saturate(140%)`, a 9% white border, and a
-   luminous hairline on the **top edge**. That hairline is what separates Apple
-   glass from a plain translucent panel; without it the surface reads cheap.
-3. **The pill + pellet button** — a circular badge holding an arrow, inside the
-   pill, always inverting the button's own background. This is the detail people
-   recognise before they read the logo.
-4. **3D-tilted product console** — `perspective` + `rotateX(9deg)`, real UI
-   inside, never an abstract illustration.
-5. **Scroll-triggered reveals** via Framer Motion, restrained.
+Two rules survive from every previous charter and still hold:
+**the accent never touches running text**, and **there is one accent hue**.
+Amber is the single exception and is reserved for the moment Mendly
+contradicts itself. Used anywhere else it stops meaning anything.
 
-Banned, they belong to the old charter: aurora gradients, meteors, shooting
-stars, glow pulses on CTAs, noise texture, magnetic buttons.
+### Product screenshots
+
+The landing shows the **real interface**, never a drawing of it. Mock UI on a
+sales page is spotted instantly, and the visitor concludes — often rightly —
+that the product does not exist yet.
+
+- Scenes live under `app/[locale]/preview/[shot]` and render the real shell,
+  sidebar, header and message components with a fictional demo project. They
+  are closed in production.
+- `node scripts/capture-product.mjs` (with `npm run dev` running) writes them to
+  `public/product/`. It waits for fonts and entry animations before shooting —
+  Chrome's own `--screenshot` fires on `load` and produced blank pages.
+- Never put a real account in a screenshot.
+
+### Banned
+Belonging to earlier charters, all removed: the full-screen particle field
+(`EntityField`), aurora gradients and multi-accent text, meteors, shooting
+stars, glow pulses on CTAs, magnetic buttons, the pill-with-pellet button,
+liquid-glass panels on the landing, `#000000` as a ground.
 
 ## CODE RULES (non-negotiable)
 
@@ -123,10 +169,15 @@ stars, glow pulses on CTAs, noise texture, magnetic buttons.
 
 ### File structure
 components/
-  sections/      → big landing page sections (Hero, Problem, etc.)
-  ui/            → shadcn + custom atomic UI
-  3d/            → Three.js / R3F scenes
-  layout/        → Nav, Footer
+  home/          → the landing page, light ground (PaperNav, Hero, Features…)
+  app/           → the workspace shell (AppShell, AppSidebar, AppHeader…)
+  auth/          → the split-panel sign-in screens
+  onboarding/    → the five-step welcome
+  settings/      → the settings screens
+  preview/       → demo scenes used to shoot the product screenshots
+  sections/      → editorial pages (manifesto, contact, security…)
+  ui/            → atomic UI (Pill, GrainGradient, Ribbon…)
+  layout/        → Nav + Footer for the dark editorial pages
 lib/
   utils.ts       → cn, helpers
   ai/agents/mendly.ts → the single entity (agents.ts = legacy 8-agent data)
@@ -135,18 +186,22 @@ lib/
 ## INTERACTION RULES
 
 ### When adding a new section
-1. Always create it under `components/sections/` as its own file
-2. Export as named export: `export function HeroSection() { ... }`
-3. Use translations via `useTranslations`
+1. Landing sections go in `components/home/`, workspace screens in
+   `components/app/`. `components/sections/` is now only for the editorial
+   pages (manifesto, contact, security).
+2. Export as a named export: `export function Features() { ... }`
+3. Use translations via `useTranslations` — the landing namespace is `home`
 4. Mobile-responsive by default
-5. Animate on scroll entrance (Framer Motion's `whileInView`)
+5. Animate on scroll entrance (Framer Motion's `whileInView`), restrained
 
 ### When using 21st.dev components
 - **FIRST**: Read `@21ST-COMPONENTS-MENDLY.md` to check if there's a pre-approved component for the section/feature you're building.
 - If yes, use that component's URL via `/ui` or `npx shadcn@latest add <url>`.
 - If no pre-approved component fits, use `/ui` to search for alternatives, but prioritize the approved list.
-- **Always customize** the generated component to match Mendly's "Contrôle Mission" system (never leave `bg-blue-500`, always use `bg-[var(--accent-primary)]`, and never introduce a second accent hue).
-- **Always respect section ambiance**: each section has its own visual mood (see `21ST-COMPONENTS-MENDLY.md`).
+- **Always customize** the generated component to the tokens above (never leave `bg-blue-500`; use `--ink`/`--paper` on the landing and `--panel`/`--shell` in the workspace, and never introduce a second accent hue).
+- **Replace its buttons with `Pill`.** A generated component always ships its
+  own button shape, and that is exactly how an interface starts looking
+  assembled from parts.
 - Install via `npx shadcn@latest add <component-url>` when prompted.
 
 ### When writing copy
@@ -190,42 +245,57 @@ Before writing any component:
 ## EXAMPLES OF DONE RIGHT
 
 ### Good button
+Never hand-roll one. There is a single button component and four tones:
+
 ```tsx
-<button
-  className="px-6 py-3 rounded-full bg-[var(--accent-primary)] text-white font-semibold
-             shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:shadow-[0_0_60px_rgba(139,92,246,0.6)]
-             transition-shadow duration-300"
->
-  Join the waitlist
-</button>
+import { PillLink, PillAction } from "@/components/ui/Pill";
+
+// Primary action on the light landing
+<PillLink href="/signup" tone="ink" size="md">Essayer gratuitement</PillLink>
+
+// Primary action inside the dark workspace
+<PillAction tone="light" size="lg" block onClick={save}>Enregistrer</PillAction>
 ```
 
-### Good section wrapper
+### Good landing section
 ```tsx
 "use client";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
-export function ProblemSection() {
-  const t = useTranslations("problem");
+export function Method() {
+  const t = useTranslations("home.method");
 
   return (
-    <section className="relative py-24 md:py-32 px-6 md:px-12 overflow-hidden">
+    <section className="mx-auto max-w-6xl px-5 md:px-8">
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 26 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-        viewport={{ once: true, margin: "-100px" }}
-        className="max-w-4xl mx-auto text-center"
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-xl"
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--accent-glow)] mb-4">
-          {t("eyebrow")}
+        {/* Small caps label, mono, muted — never the accent on running text */}
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-(--ink-muted)">
+          {t("label")}
         </p>
-        <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+        <h2 className="display mt-3 text-[28px] text-(--ink) md:text-[38px]">
           {t("title")}
         </h2>
+        <p className="mt-3 text-[14px] leading-relaxed text-(--ink-soft)">
+          {t("sub")}
+        </p>
       </motion.div>
     </section>
   );
 }
+```
+
+### Good workspace screen
+```tsx
+<AppShell groups={groups} usageUsed={used} usageLimit={limit}
+          userPlan={plan} userEmail={email}>
+  <AppHeader title={t("title")} subtitle={t("subtitle")} />
+  <div className="px-6 py-8 md:px-10">{/* … */}</div>
+</AppShell>
 ```

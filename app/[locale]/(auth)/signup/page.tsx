@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/client";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthNotice } from "@/components/auth/AuthNotice";
 import { AuthField } from "@/components/auth/AuthField";
-import { AuthSubmit } from "@/components/auth/AuthSubmit";
 
 /**
  * Inscription.
@@ -53,18 +53,15 @@ export default function SignupPage() {
 
   if (status === "success") {
     return (
-      <AuthShell
+      <AuthNotice
         title={t("signupSuccessTitle")}
         subtitle={t("signupSuccessBody")}
+        highlightLabel={t("emailLabel")}
+        highlight={email}
+        ctaLabel={t("loginLink")}
+        ctaHref="/login"
         backLabel={t("backHome")}
-      >
-        <div className="space-y-3 text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-(--accent-glow)">
-            {t("emailLabel")}
-          </p>
-          <p className="text-sm text-white">{email}</p>
-        </div>
-      </AuthShell>
+      />
     );
   }
 
@@ -73,57 +70,48 @@ export default function SignupPage() {
       title={t("signupTitle")}
       subtitle={t("signupSubtitle")}
       backLabel={t("backHome")}
+      onSubmit={handleSubmit}
+      loading={status === "loading"}
+      error={status === "error" ? errorMsg : null}
+      submitLabel={status === "loading" ? t("signupLoading") : t("signupCta")}
+      colorway="signal"
+      seed={26}
       footer={
         <>
           {t("haveAccount")}{" "}
           <Link
             href="/login"
-            className="font-semibold text-white underline decoration-(--glass-hi) underline-offset-4 transition-colors hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
+            className="font-medium text-white underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-white"
           >
             {t("loginLink")}
           </Link>
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t("signupTitle")}>
-        {status === "error" && errorMsg && (
-          <div
-            role="alert"
-            className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-          >
-            {errorMsg}
-          </div>
-        )}
+      <AuthField
+        id="email"
+        label={t("emailLabel")}
+        type="email"
+        value={email}
+        onChange={setEmail}
+        placeholder={t("emailPlaceholder")}
+        required
+        disabled={status === "loading"}
+        autoComplete="email"
+      />
 
-        <AuthField
-          id="email"
-          label={t("emailLabel")}
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder={t("emailPlaceholder")}
-          required
-          disabled={status === "loading"}
-          autoComplete="email"
-        />
-
-        <AuthField
-          id="password"
-          label={t("passwordLabel")}
-          type="password"
-          value={password}
-          onChange={setPassword}
-          placeholder="••••••••"
-          required
-          minLength={6}
-          disabled={status === "loading"}
-          autoComplete="new-password"
-        />
-
-        <AuthSubmit loading={status === "loading"}>
-          {status === "loading" ? t("signupLoading") : t("signupCta")}
-        </AuthSubmit>
-      </form>
+      <AuthField
+        id="password"
+        label={t("passwordLabel")}
+        type="password"
+        value={password}
+        onChange={setPassword}
+        placeholder="••••••••"
+        required
+        minLength={6}
+        disabled={status === "loading"}
+        autoComplete="new-password"
+      />
     </AuthShell>
   );
 }

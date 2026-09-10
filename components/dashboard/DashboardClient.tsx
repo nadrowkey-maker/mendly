@@ -2,27 +2,33 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
-import { motion } from "framer-motion";
-import { createClient } from "@/lib/supabase/client";
+import { LayoutDashboard, Radio, FolderClosed, Compass } from "lucide-react";
+import { AppShell } from "@/components/app/AppShell";
+import { AppHeader } from "@/components/app/AppHeader";
+import { EmptyState } from "@/components/app/EmptyState";
+import { AskMendly } from "@/components/app/AskMendly";
+import { PillLink } from "@/components/ui/Pill";
 import { EditProjectModal } from "@/components/dashboard/EditProjectModal";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { StatStrip } from "@/components/dashboard/StatStrip";
 import { OpenActionsPanel } from "@/components/dashboard/OpenActionsPanel";
-import { PrivacyReassurance } from "@/components/project/PrivacyReassurance";
 import type { Project } from "@/lib/types/project";
 import type { ActionItem } from "@/lib/types/tracking";
 import type { DashboardStats } from "@/lib/actions/dashboard-stats";
+import type { NavGroup } from "@/components/app/nav-types";
 
 /**
  * Le tableau de bord.
  *
- * Réécrit en console : un bandeau de compteurs en tête, puis les actions
- * ouvertes, puis les projets. C'est ce que la landing promet, et l'ordre suit
- * l'urgence — ce qui attend le fondateur avant ce qu'il peut explorer.
+ * Il ne porte plus sa propre mise en page : le châssis, la barre latérale et le
+ * titre viennent de `components/app`, partagés avec les paramètres et l'écran
+ * de conversation. Chaque écran qui redéfinissait son en-tête finissait par en
+ * avoir un légèrement différent, et l'application donnait l'impression d'avoir
+ * été assemblée à partir de trois produits.
  *
- * La carte de projet et le bandeau de compteurs sont sortis dans leurs propres
- * fichiers : ce composant faisait 326 lignes pour une charte qui en impose 200.
+ * Le rappel de confidentialité a quitté cet écran : il est à sa place dans les
+ * paramètres, où l'on va justement se demander ce que deviennent ses données,
+ * pas sur l'écran qu'on ouvre vingt fois par jour.
  */
 interface ProjectBriefing {
   lastDecision?: string;
@@ -36,6 +42,9 @@ interface DashboardClientProps {
   whisperCounts: Record<string, number>;
   briefings: Record<string, ProjectBriefing>;
   stats: DashboardStats;
+  userPlan: string;
+  usageUsed: number;
+  usageLimit: number;
 }
 
 export function DashboardClient({
@@ -45,16 +54,16 @@ export function DashboardClient({
   whisperCounts,
   briefings,
   stats,
+  userPlan,
+  usageUsed,
+  usageLimit,
 }: DashboardClientProps) {
   const t = useTranslations("dashboard");
+  const tSide = useTranslations("sidebar");
+  const tApp = useTranslations("app");
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [editing, setEditing] = useState<Project | null>(null);
   const [, startTransition] = useTransition();
-
-  const handleSignOut = async () => {
-    await createClient().auth.signOut();
-    window.location.href = "/login";
-  };
 
   const stageLabel = (stage: string) =>
     ({
@@ -65,103 +74,95 @@ export function DashboardClient({
     })[stage] ?? stage;
 
   const projectName = (id: string) => projects.find((p) => p.id === id)?.name ?? "—";
+  const unreadWhispers = Object.values(whisperCounts).reduce((a, b) => a + b, 0);
+
+  const groups: NavGroup[] = [
+    {
+      label: tSide("groupOverview"),
+      items: [
+        { label: tSide("overview"), icon: LayoutDashboard, href: "/dashboard", active: true },
+        {
+          label: tSide("whispers"),
+          icon: Radio,
+          href: "/dashboard/whispers",
+          count: unreadWhispers,
+        },
+      ],
+    },
+    {
+      label: tSide("groupProjects"),
+      action: { label: tSide("newProject"), href: "/dashboard/new" },
+      items: projects.map((p) => ({
+        label: p.name,
+        icon: FolderClosed,
+        href: `/dashboard/projects/${p.id}`,
+      })),
+    },
+  ];
 
   return (
-    <main className="relative min-h-screen bg-black px-6 py-10 md:px-12">
-      <div className="relative z-10 mx-auto max-w-5xl">
-        <header className="mb-8 flex items-start justify-between gap-6">
-          <div>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-(--text-muted)">
-              {t("stats.eyebrow")}
-            </p>
-            <h1 className="text-3xl font-extralight tracking-[-0.03em] text-white md:text-4xl">
-              {t("welcome")}
-            </h1>
-          </div>
-          <div className="flex shrink-0 items-center gap-4 pt-1">
-            <Link
-              href="/settings"
-              className="font-mono text-[10px] uppercase tracking-[0.18em] text-(--text-muted) transition-colors hover:text-white"
-            >
-              {t("settings")}
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="cursor-pointer font-mono text-[10px] uppercase tracking-[0.18em] text-(--text-muted) transition-colors hover:text-white"
-            >
-              {t("signOut")}
-            </button>
-          </div>
-        </header>
+    <AppShell
+      groups={groups}
+      usageUsed={usageUsed}
+      usageLimit={usageLimit}
+      userPlan={userPlan}
+      userEmail={userEmail}
+    >
+      <AppHeader
+        title={t("welcome")}
+        subtitle={t("stats.eyebrow")}
+        actions={
+          projects.length > 0 ? (
+            <PillLink href="/dashboard/new" tone="light" size="sm">
+              {t("newProject")}
+            </PillLink>
+          ) : undefined
+        }
+      />
 
-        <StatStrip
-          projects={projects.length}
-          decisions={stats.decisions}
-          openActions={openActions.length}
-          unseenSessions={stats.unseenSessions}
+      {projects.length === 0 ? (
+        <EmptyState
+          icon={Compass}
+          title={tApp("emptyProjectsTitle")}
+          body={tApp("emptyProjectsBody")}
+          ctaLabel={tApp("emptyProjectsCta")}
+          ctaHref="/dashboard/new"
         />
+      ) : (
+        <div className="px-6 py-8 md:px-10">
+          <StatStrip
+            projects={projects.length}
+            decisions={stats.decisions}
+            openActions={openActions.length}
+            unseenSessions={stats.unseenSessions}
+          />
 
-        <OpenActionsPanel actions={openActions} projectName={projectName} />
+          <OpenActionsPanel actions={openActions} projectName={projectName} />
 
-        {projects.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="rounded-2xl border border-(--glass-line) bg-(--glass) p-10 text-center backdrop-blur-xl md:p-16"
-          >
-            <h2 className="mb-4 text-2xl font-extralight tracking-tight text-white md:text-3xl">
-              {t("emptyTitle")}
-            </h2>
-            <p className="mx-auto mb-8 max-w-md text-(--text-secondary)">{t("emptyBody")}</p>
-            <Link
-              href="/dashboard/new"
-              className="inline-block rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all hover:-translate-y-px"
-            >
-              {t("createFirstProject")}
-            </Link>
-          </motion.div>
-        ) : (
-          <>
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-(--text-muted)">
-                {t("yourProjects")}
-              </h2>
-              <Link
-                href="/dashboard/new"
-                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-all hover:-translate-y-px"
-              >
-                {t("newProject")}
-              </Link>
-            </div>
+          <h2 className="mt-10 mb-4 text-[11px] font-semibold tracking-tight text-white/38">
+            {t("yourProjects")}
+          </h2>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {projects.map((project, i) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={i}
-                  whispers={whisperCounts[project.id] ?? 0}
-                  briefing={briefings[project.id]}
-                  stageLabel={stageLabel(project.stage)}
-                  onEdit={setEditing}
-                  onDeleted={(id) =>
-                    startTransition(() => setProjects((prev) => prev.filter((p) => p.id !== id)))
-                  }
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            {projects.map((project, i) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                index={i}
+                whispers={whisperCounts[project.id] ?? 0}
+                briefing={briefings[project.id]}
+                stageLabel={stageLabel(project.stage)}
+                onEdit={setEditing}
+                onDeleted={(id) =>
+                  startTransition(() => setProjects((prev) => prev.filter((p) => p.id !== id)))
+                }
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
-            {userEmail && (
-              <p className="mt-12 text-center font-mono text-[11px] text-(--text-muted)">
-                {t("loggedInAs")} <span className="text-(--text-secondary)">{userEmail}</span>
-              </p>
-            )}
-          </>
-        )}
-
-        <PrivacyReassurance className="mx-auto mt-12 max-w-md" />
-      </div>
+      <AskMendly projectId={projects[0]?.id ?? null} />
 
       <EditProjectModal
         project={editing}
@@ -172,6 +173,6 @@ export function DashboardClient({
           )
         }
       />
-    </main>
+    </AppShell>
   );
 }

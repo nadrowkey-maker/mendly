@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 /**
  * Le bandeau de compteurs du tableau de bord.
  *
- * C'est la première tenue de la promesse faite par la console de la landing :
- * le fondateur y voit d'un coup d'œil ce que son conseil a accumulé.
+ * Les chiffres sont en gras et non en display fin : ils se lisent en diagonale,
+ * plusieurs fois par jour, et la finesse qui donne de l'aplomb à un titre de
+ * vitrine rend un compteur illisible à 30 px.
  *
  * Les sessions non lues portent l'accent azur quand il y en a, et retombent en
  * gris quand il n'y en a plus. Une couleur permanente ne signalerait rien —
@@ -31,32 +32,32 @@ export function StatStrip({ projects, decisions, openActions, unseenSessions }: 
   ];
 
   return (
-    <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {items.map((item, i) => (
         <motion.div
           key={item.key}
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-          className={`rounded-2xl border p-4 backdrop-blur-xl ${
+          transition={{ duration: 0.45, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+          className={[
+            "rounded-2xl border p-4",
             item.highlight
               ? "border-(--accent-primary)/35 bg-(--accent-primary)/8"
-              : "border-(--glass-line) bg-(--glass)"
-          }`}
+              : "border-(--panel-line) bg-white/2",
+          ].join(" ")}
         >
-          <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-(--text-muted)">
+          <span className="block text-[11px] font-medium text-white/38">
             {t(`${item.key}.label`)}
           </span>
           <span
-            className={`mt-1.5 block text-3xl font-extralight leading-none tracking-tight tabular-nums ${
-              item.highlight ? "text-(--accent-glow)" : "text-white"
-            }`}
+            className={[
+              "mt-1.5 block text-[28px] leading-none font-bold tracking-[-0.03em] tabular-nums",
+              item.highlight ? "text-(--accent-glow)" : "text-white",
+            ].join(" ")}
           >
             {item.value}
           </span>
-          <span className="mt-1.5 block text-xs text-(--text-secondary)">
-            {t(`${item.key}.hint`)}
-          </span>
+          <span className="mt-2 block text-[12px] text-white/40">{t(`${item.key}.hint`)}</span>
         </motion.div>
       ))}
     </div>

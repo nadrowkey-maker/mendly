@@ -2,66 +2,124 @@
 
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/routing";
-import { EntityField } from "@/components/3d/EntityField";
+import { GrainGradient, type GrainColorway } from "@/components/ui/GrainGradient";
+import { PillAction } from "@/components/ui/Pill";
 
 /**
  * La coque des écrans d'authentification.
  *
- * Les quatre pages (connexion, inscription, mot de passe oublié, réinitialisation)
- * dupliquaient chacune leur propre fond, leur propre carte et leurs propres
- * styles de champ. Une correction de charte en touchait une sur quatre.
+ * Un panneau coupé en deux : l'adresse à gauche sur fond sombre, les champs à
+ * droite posés sur le dégradé granuleux. La séparation n'est pas décorative —
+ * elle sépare ce qu'on lit une fois de ce qu'on remplit. Un formulaire centré
+ * sur fond uni mélange les deux et donne à la connexion l'allure d'un péage.
  *
- * Elle reprend l'entité de la landing plutôt qu'un dégradé statique : c'est le
- * premier écran après la page d'accueil, et voir la même chose respirer
- * derrière la carte fait la continuité. Une rupture visuelle à cet instant
- * précis casse la confiance qu'on vient d'obtenir.
+ * Le bouton de validation vit dans le panneau sombre, en bas à gauche, à
+ * l'opposé du dernier champ. Ce n'est pas un accident de maquette : il ferme
+ * la phrase commencée par le titre.
+ *
+ * La grille est explicite plutôt que faite de deux colonnes empilées, parce
+ * que l'ordre change avec la largeur. Sur téléphone il faut lire le titre,
+ * remplir, puis valider ; en colonnes, le bouton se retrouverait au-dessus des
+ * champs.
  */
 interface AuthShellProps {
   title: string;
   subtitle: string;
+  /** Les champs — posés sur le dégradé. */
   children: React.ReactNode;
+  /** Libellé du bouton de validation. */
+  submitLabel: string;
+  loading?: boolean;
+  /** Message d'erreur, affiché au-dessus des champs. */
+  error?: string | null;
+  onSubmit: (e: React.FormEvent) => void;
+  /** Le lien de bascule — s'inscrire, se connecter, mot de passe oublié. */
   footer?: React.ReactNode;
   backLabel: string;
+  /** Change le coloris du dégradé pour distinguer les quatre écrans. */
+  colorway?: GrainColorway;
+  seed?: number;
 }
 
-export function AuthShell({ title, subtitle, children, footer, backLabel }: AuthShellProps) {
+export function AuthShell({
+  title,
+  subtitle,
+  children,
+  submitLabel,
+  loading = false,
+  error,
+  onSubmit,
+  footer,
+  backLabel,
+  colorway = "azure",
+  seed = 19,
+}: AuthShellProps) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-black px-6 py-20">
-      <EntityField />
-
+    <main className="flex min-h-screen flex-col items-center justify-center bg-(--shell) px-4 py-10 md:px-6">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-md"
+        className="w-full max-w-4xl"
       >
-        <div className="mb-9 text-center">
+        <div className="mb-6 flex items-center justify-between px-1">
           <Link
             href="/"
-            className="mb-8 inline-block text-sm font-bold uppercase tracking-[0.16em] text-white transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
+            className="text-[15px] font-semibold tracking-tight text-white transition-opacity hover:opacity-65"
           >
-            Mend<span className="text-(--accent-primary)">l</span>y
+            mendly
           </Link>
-          <h1 className="text-balance text-3xl font-extralight leading-tight tracking-[-0.03em] text-white md:text-4xl">
-            {title}
-          </h1>
-          <p className="mx-auto mt-3 max-w-xs text-sm text-(--text-secondary)">{subtitle}</p>
-        </div>
-
-        <div className="relative overflow-hidden rounded-2xl border border-(--glass-line) bg-[rgba(8,11,15,0.72)] p-6 shadow-[inset_0_1px_0_var(--glass-hi),0_40px_100px_-50px_var(--accent-halo)] backdrop-blur-2xl md:p-8">
-          {children}
-        </div>
-
-        {footer && <div className="mt-6 text-center text-sm text-(--text-secondary)">{footer}</div>}
-
-        <div className="mt-5 text-center">
           <Link
             href="/"
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-(--text-muted) transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
+            className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 transition-colors hover:text-white"
           >
             {backLabel}
           </Link>
         </div>
+
+        <form
+          onSubmit={onSubmit}
+          aria-label={title}
+          className="grid overflow-hidden rounded-[26px] bg-(--panel) md:grid-cols-2 md:grid-rows-[1fr_auto]"
+        >
+          <div className="order-1 bg-(--panel) px-7 pt-9 pb-6 md:order-none md:col-start-1 md:row-start-1 md:px-10 md:pt-12">
+            <h1 className="text-balance text-[27px] leading-[1.12] font-semibold tracking-[-0.03em] text-white md:text-[32px]">
+              {title}
+            </h1>
+            <p className="mt-3 max-w-xs text-[13.5px] leading-relaxed text-white/45">{subtitle}</p>
+          </div>
+
+          <div className="relative order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1">
+            <GrainGradient
+              colorway={colorway}
+              seed={seed}
+              grain={0.6}
+              className="absolute inset-0 size-full"
+            />
+            <div className="relative space-y-5 px-6 py-9 md:px-10 md:py-12">
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-red-500/30 bg-white/85 px-4 py-3 text-[13px] font-medium text-red-700 backdrop-blur-sm"
+                >
+                  {error}
+                </div>
+              )}
+              {children}
+            </div>
+          </div>
+
+          <div className="order-3 bg-(--panel) px-7 pt-2 pb-9 md:order-none md:col-start-1 md:row-start-2 md:px-10 md:pb-12">
+            <PillAction type="submit" tone="light" size="lg" block disabled={loading}>
+              {submitLabel}
+            </PillAction>
+            {footer && (
+              <div className="mt-5 text-center text-[13px] text-white/40 md:text-left">
+                {footer}
+              </div>
+            )}
+          </div>
+        </form>
       </motion.div>
     </main>
   );

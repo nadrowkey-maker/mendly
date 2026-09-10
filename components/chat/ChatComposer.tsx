@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, ArrowUp, X, Image, FileText } from "lucide-react";
+import { Plus, ArrowUp, X, Image as ImageIcon, FileText } from "lucide-react";
 import type { FileAttachment } from "@/lib/ai/gemini";
 
 interface Props {
@@ -82,7 +82,7 @@ export function ChatComposer({
   const isPdf = selectedFile?.mimeType === "application/pdf";
 
   return (
-    <div className="px-3 md:px-8 pb-3 md:pb-6 pt-2 bg-linear-to-t from-(--bg-primary) via-(--bg-primary) to-transparent">
+    <div className="px-3 md:px-8 pb-3 md:pb-6 pt-2 bg-linear-to-t from-(--shell) via-(--shell) to-transparent">
       <div className="max-w-3xl mx-auto">
         {/* File preview chip */}
         <AnimatePresence>
@@ -97,7 +97,7 @@ export function ChatComposer({
               {isPdf ? (
                 <FileText className="w-4 h-4 text-(--accent-glow) shrink-0" />
               ) : (
-                <Image className="w-4 h-4 text-(--accent-warm) shrink-0" aria-hidden />
+                <ImageIcon className="w-4 h-4 text-(--accent-warm) shrink-0" aria-hidden />
               )}
               <span className="text-xs font-mono text-(--text-muted) truncate max-w-52">
                 {selectedFile.name}
@@ -141,10 +141,10 @@ export function ChatComposer({
         {/* Composer wrapper */}
         <div
           className={[
-            "relative rounded-3xl border bg-(--surface) transition-all",
+            "relative rounded-3xl border bg-(--panel) transition-all",
             busy
               ? "border-(--accent-glow)/40"
-              : "border-(--border-strong) hover:border-(--border-emphasis) focus-within:border-(--accent-glow)/60",
+              : "border-(--panel-line) hover:border-(--border-emphasis) focus-within:border-(--accent-glow)/60",
           ].join(" ")}
           style={{
             boxShadow: busy
@@ -176,7 +176,7 @@ export function ChatComposer({
                     onClick={() => imgInputRef.current?.click()}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--surface-elevated) border border-(--border) text-xs text-(--text-muted) hover:text-(--text-primary) hover:border-(--accent-glow)/50 transition-all cursor-pointer"
                   >
-                    <Image className="w-3.5 h-3.5" aria-hidden />
+                    <ImageIcon className="w-3.5 h-3.5" aria-hidden />
                     {t("attachImage")}
                   </button>
                   {fileError && (

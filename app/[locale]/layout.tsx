@@ -3,8 +3,6 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { Manrope, JetBrains_Mono, Cormorant_Garamond } from 'next/font/google';
 import { AuthProvider } from '@/lib/supabase/auth-context';
-// import { TubeCursor } from '@/components/ui/TubeCursor'; // disabled: causes Three.js double-import + global freeze on Hero
-// import { TransitionPortal } from '@/components/ui/TransitionPortal'; // disabled: GPU saturation
 import '../globals.css';
 
 // Manrope porte tout : le display en 200 et le texte en 400/500. Le contraste
@@ -59,8 +57,6 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <AuthProvider>{children}</AuthProvider>
         </NextIntlClientProvider>
-        {/* <TubeCursor /> — disabled: causes Three.js double-import + global freeze on Hero */}
-        {/* <TransitionPortal /> — disabled: WebGL shader running globally was saturating GPU */}
       </body>
     </html>
   );

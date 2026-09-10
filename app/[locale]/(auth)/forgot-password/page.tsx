@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/client";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthNotice } from "@/components/auth/AuthNotice";
 import { AuthField } from "@/components/auth/AuthField";
-import { AuthSubmit } from "@/components/auth/AuthSubmit";
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("auth");
@@ -37,18 +36,15 @@ export default function ForgotPasswordPage() {
 
   if (status === "success") {
     return (
-      <AuthShell
+      <AuthNotice
         title={t("forgotPasswordSuccessTitle")}
         subtitle={t("forgotPasswordSuccessBody")}
+        highlightLabel={t("emailLabel")}
+        highlight={email}
+        ctaLabel={t("loginLink")}
+        ctaHref="/login"
         backLabel={t("backHome")}
-      >
-        <div className="space-y-3 text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-(--accent-glow)">
-            {t("emailLabel")}
-          </p>
-          <p className="text-sm text-white">{email}</p>
-        </div>
-      </AuthShell>
+      />
     );
   }
 
@@ -57,41 +53,24 @@ export default function ForgotPasswordPage() {
       title={t("forgotPasswordTitle")}
       subtitle={t("forgotPasswordSubtitle")}
       backLabel={t("backHome")}
-      footer={
-        <Link
-          href="/login"
-          className="font-semibold text-white underline decoration-(--glass-hi) underline-offset-4 transition-colors hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
-        >
-          {t("loginLink")}
-        </Link>
-      }
+      onSubmit={handleSubmit}
+      loading={status === "loading"}
+      error={status === "error" ? errorMsg : null}
+      submitLabel={status === "loading" ? t("forgotPasswordLoading") : t("forgotPasswordCta")}
+      colorway="ash"
+      seed={33}
     >
-      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t("forgotPasswordTitle")}>
-        {status === "error" && errorMsg && (
-          <div
-            role="alert"
-            className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-          >
-            {errorMsg}
-          </div>
-        )}
-
-        <AuthField
-          id="email"
-          label={t("emailLabel")}
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder={t("emailPlaceholder")}
-          required
-          disabled={status === "loading"}
-          autoComplete="email"
-        />
-
-        <AuthSubmit loading={status === "loading"}>
-          {status === "loading" ? t("forgotPasswordLoading") : t("forgotPasswordCta")}
-        </AuthSubmit>
-      </form>
+      <AuthField
+        id="email"
+        label={t("emailLabel")}
+        type="email"
+        value={email}
+        onChange={setEmail}
+        placeholder={t("emailPlaceholder")}
+        required
+        disabled={status === "loading"}
+        autoComplete="email"
+      />
     </AuthShell>
   );
 }

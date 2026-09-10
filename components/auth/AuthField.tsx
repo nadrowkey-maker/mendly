@@ -3,13 +3,14 @@
 /**
  * Un champ de formulaire d'authentification.
  *
- * Étiquette en monospace espacé — le même traitement que la télémétrie de la
- * console produit, ce qui rattache les formulaires au reste du système au lieu
- * d'en faire des îlots.
+ * Le champ est blanc opaque, pas translucide. Posé sur un dégradé, un champ en
+ * verre laisse passer la couleur : la valeur saisie change de contraste selon
+ * l'endroit où la tache passe derrière, et sur un mot de passe on ne s'en rend
+ * même pas compte. Le blanc plein règle la question une fois pour toutes.
  *
- * L'anneau de focus est explicite et visible : ces écrans se remplissent
- * souvent au clavier, et un focus invisible y est un vrai défaut d'usage, pas
- * un détail d'accessibilité théorique.
+ * L'étiquette est en encre sombre et non en gris clair, pour la même raison :
+ * elle doit tenir sur la partie la plus claire comme sur la plus saturée du
+ * dégradé.
  */
 interface AuthFieldProps {
   id: string;
@@ -22,6 +23,8 @@ interface AuthFieldProps {
   minLength?: number;
   disabled?: boolean;
   autoComplete?: string;
+  /** Message affiché en regard de l'étiquette, à droite. */
+  hint?: string;
 }
 
 export function AuthField({
@@ -35,15 +38,16 @@ export function AuthField({
   minLength,
   disabled,
   autoComplete,
+  hint,
 }: AuthFieldProps) {
   return (
     <div className="space-y-2">
-      <label
-        htmlFor={id}
-        className="block font-mono text-[10px] uppercase tracking-[0.2em] text-(--text-muted)"
-      >
-        {label}
-      </label>
+      <div className="flex items-baseline justify-between gap-3">
+        <label htmlFor={id} className="text-[13px] font-semibold tracking-tight text-(--ink)">
+          {label}
+        </label>
+        {hint && <span className="text-[12px] text-(--ink)/55">{hint}</span>}
+      </div>
       <input
         id={id}
         type={type}
@@ -54,7 +58,7 @@ export function AuthField({
         minLength={minLength}
         disabled={disabled}
         autoComplete={autoComplete}
-        className="w-full rounded-xl border border-(--glass-line) bg-white/3 px-4 py-3 text-white transition-colors placeholder:text-(--text-muted) focus:border-(--accent-primary) focus:outline-2 focus:outline-offset-1 focus:outline-(--accent-glow) disabled:opacity-50"
+        className="h-11 w-full rounded-xl border border-black/8 bg-white px-4 text-[14px] text-(--ink) shadow-[0_1px_2px_rgba(0,0,0,0.06)] transition-shadow placeholder:text-(--ink-muted) focus:outline-2 focus:outline-offset-1 focus:outline-(--accent-primary) disabled:opacity-60"
       />
     </div>
   );

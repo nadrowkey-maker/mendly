@@ -27,7 +27,7 @@
     "col4Link4": "Remboursement",
     "col4Link5": "Mentions légales",
     "bottomLine1": "© 2026 Mendly. Tous droits réservés.",
-    "bottomLine2": "Conçu et développé en France 🇫🇷"
+    "bottomLine2": "Conçu et développé en France"
   },
   "comingSoon": {
     "eyebrow": "BIENTÔT",
@@ -163,7 +163,7 @@
     "title": "Conditions Générales d'Utilisation",
     "lastUpdated": "Dernière mise à jour : 2 mai 2026",
     "s1Title": "1. Présentation du service",
-    "s1Body": "Mendly est une plateforme SaaS qui propose une équipe de 8 spécialistes IA (CEO, CTO, CMO, CPO, CDO, CFO, Lead Dev, CCO) pour aider les fondateurs solos à lancer et développer leurs projets.",
+    "s1Body": "Mendly est une plateforme SaaS destinée aux fondateurs indépendants. Elle donne accès à un conseil de direction propulsé par intelligence artificielle : celui-ci porte plusieurs angles de décision — finance, croissance, technique, produit, stratégie, données, exécution, communication — et s'adresse à l'utilisateur comme un interlocuteur unique. Chaque projet dispose en outre d'une salle de réunion, dans laquelle une équipe de spécialistes assignée à ce projet peut être convoquée pour débattre d'une question, ainsi que de sessions de travail autonomes déclenchées sans intervention de l'utilisateur. Le nombre de projets, la cadence des sessions autonomes et l'accès à la salle de réunion dépendent de la formule souscrite.",
     "s2Title": "2. Acceptation des conditions",
     "s2Body": "En utilisant ce site ou en créant un compte, tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas le service.",
     "s3Title": "3. Création de compte & plans",
@@ -217,12 +217,12 @@
   },
   "auth": {
     "loginTitle": "Bon retour.",
-    "loginSubtitle": "Connecte-toi pour accéder à ton équipe.",
+    "loginSubtitle": "Reprends là où Mendly t'a laissé.",
     "loginCta": "Se connecter",
     "loginLoading": "Connexion…",
     "loginLink": "Se connecter",
-    "signupTitle": "Crée ton équipe.",
-    "signupSubtitle": "Quelques secondes et tu as accès à 8 spécialistes IA.",
+    "signupTitle": "Ouvre ton conseil.",
+    "signupSubtitle": "Deux minutes, et quelqu'un se met enfin à te contredire.",
     "signupCta": "Créer mon compte",
     "signupLoading": "Création…",
     "signupLink": "Créer un compte",
@@ -274,7 +274,7 @@
     "openActionsTitle": "Actions en cours",
     "whispersLabel": "Hors-micro en attente",
     "whispersCenterTitle": "Hors-micro",
-    "whispersCenterSub": "Ce que tes agents t'ont dit en aparté — sur tous tes projets.",
+    "whispersCenterSub": "Ce que Mendly a relevé sans que tu le lui demandes — sur tous tes projets.",
     "whispersMarkAll": "Tout marquer comme lu",
     "whispersEmpty": "Aucun aparté pour l'instant",
     "whispersEmptyBody": "Quand un agent te confie quelque chose en aparté pendant un débat, ça atterrit ici.",
@@ -308,9 +308,9 @@
     "back": "Retour au dashboard",
     "eyebrow": "NOUVEAU PROJET",
     "milestoneReached": "Jalon franchi",
-    "milestoneCelebrate": "Ton équipe est fière de toi.",
+    "milestoneCelebrate": "Une étape de passée. La suivante t'attend.",
     "title": "Crée ton projet.",
-    "subtitle": "Quelques infos pour que tes agents puissent t'aider efficacement.",
+    "subtitle": "Deux phrases suffisent. Mendly te posera le reste des questions.",
     "nameLabel": "Nom du projet",
     "namePlaceholder": "Ex: FitnessApp Korea",
     "descriptionLabel": "Description",
@@ -562,7 +562,7 @@
     "deliverables": "Livrables",
     "memory": "Mémoire",
     "usage": "Usage",
-    "upgrade": "Upgrade",
+    "upgrade": "Changer de plan",
     "manage": "Gérer",
     "account": "Compte",
     "dashboard": "Dashboard",
@@ -573,7 +573,16 @@
     "agentLocked": "Passe à un plan supérieur pour débloquer cet agent",
     "teamRoomLabel": "Salle de réunion",
     "projectSection": "PROJET",
-    "conversationLabel": "Conversation"
+    "conversationLabel": "Conversation",
+    "usageLine": "{used} / {limit} messages aujourd'hui",
+    "settings": "Paramètres",
+    "groupOverview": "Vue d'ensemble",
+    "groupProjects": "Projets",
+    "groupProject": "Le projet",
+    "groupAccount": "Compte",
+    "whispers": "Signaux",
+    "overview": "Tableau de bord",
+    "conversation": "Conversation"
   },
   "projectMenu": {
     "ariaLabel": "Options du projet",
@@ -595,8 +604,8 @@
   },
   "teamIntro": {
     "skip": "Passer l'intro",
-    "title": "Rencontre ton équipe.",
-    "sub": "8 spécialistes assemblés autour de ton projet.",
+    "title": "Voici qui travaille sur ton projet.",
+    "sub": "Les spécialistes dont ton projet a besoin, et pas les autres.",
     "ceoIntro": "Je suis ton CEO. Je garderai ta vision claire et tes décisions intentionnelles. Chaque choix qu'on fera ensemble sera assumé.",
     "ctoIntro": "Je suis ton CTO. Architecture, stack, risque technique — je m'assure qu'on construit des choses qui tiennent dans le temps.",
     "cmoIntro": "Je suis ton CMO. Audience, positionnement, canaux — je trouverai le récit qui fait arrêter de scroller.",
@@ -643,7 +652,7 @@
     "time_fulltime_label": "Plein temps",
     "time_fulltime_desc": "Je suis 100% sur le projet.",
     "contextQuestion": "Parle-nous un peu de toi.",
-    "contextHelp": "Ton parcours, ce que tu fais, ce qui te motive. Plus tu en dis, plus tes agents seront pertinents. (Min 10 caractères)",
+    "contextHelp": "Ton parcours, ce que tu fais, ce qui te motive. Plus tu en dis, plus Mendly saura sur quoi te contredire. (Min 10 caractères)",
     "contextPlaceholder": "Ex: Étudiant en maths à Rennes, je passe la majorité de mon temps libre à coder. J'ai construit une obsession pour la Corée du Sud et je veux y lancer ma boîte d'ici 2027…",
     "goalsQuestion": "Qu'est-ce que tu veux construire et pourquoi ?",
     "goalsHelp": "Ta vision, tes ambitions, ton 'pourquoi'. Sois concret. (Min 10 caractères)",
@@ -664,7 +673,7 @@
     "emailLabel": "Email",
     "planLabel": "Plan actuel",
     "profileTitle": "Profil fondateur",
-    "profileSubtitle": "Ces infos sont injectées dans toutes tes conversations avec tes agents IA. Plus c'est précis, plus leurs conseils seront pertinents.",
+    "profileSubtitle": "Ces informations partent dans le contexte de chacune de tes conversations avec Mendly. Plus elles sont précises, moins ses réponses sont génériques.",
     "stageLabel": "Parcours",
     "stage_first_time": "Premier projet",
     "stage_second_time": "Deuxième",
@@ -907,5 +916,129 @@
     "createCta": "Ouvrir ce projet",
     "creating": "Je constitue ton équipe",
     "switchToForm": "Remplir un formulaire à la place"
+  },
+  "home": {
+    "meta": {
+      "title": "Mendly — le conseil qui ose te contredire",
+      "description": "Mendly n'est pas un assistant qui acquiesce. C'est le conseil de direction qui conteste ton plan, expose ses propres contradictions, tranche — et continue de travailler quand tu n'es pas là."
+    },
+    "nav": {
+      "product": "Le produit",
+      "method": "La méthode",
+      "pricing": "Tarifs",
+      "signin": "Se connecter",
+      "cta": "Essayer gratuitement",
+      "dashboard": "Mon espace",
+      "menu": "Ouvrir le menu",
+      "close": "Fermer le menu"
+    },
+    "hero": {
+      "title1": "Un conseil de direction",
+      "title2": "qui ose te contredire.",
+      "sub": "Mendly conteste ton plan pendant qu'il est encore temps de le changer. Et il continue de travailler quand tu n'es pas là.",
+      "ctaPrimary": "Essayer gratuitement",
+      "ctaSecondary": "Voir l'atelier"
+    },
+    "disciplines": {
+      "label": "Huit angles de direction, une seule voix",
+      "items": [
+        "Finance",
+        "Croissance",
+        "Technique",
+        "Produit",
+        "Stratégie",
+        "Données",
+        "Exécution",
+        "Communication"
+      ]
+    },
+    "proof": {
+      "stat1Value": "8",
+      "stat1Label": "angles de direction portés par une seule voix",
+      "stat2Value": "24 h",
+      "stat2Label": "l'équipe se réunit sans que tu la convoques",
+      "quote": "Un assistant qui te dit oui te coûte trois mois. Mendly te dit non, et pose le chiffre qui va avec.",
+      "quoteAuthor": "La position de Mendly",
+      "quoteRole": "Ce que le produit fait, en une phrase"
+    },
+    "showcase": {
+      "eyebrow": "L'atelier",
+      "title": "Voici l'écran où tout se passe",
+      "sub": "Un projet, une conversation qui tient le fil, une mémoire qui ne se vide pas entre deux sessions.",
+      "cta": "Ouvrir un projet",
+      "caption": "L'atelier Mendly — conversation, mémoire du projet, livrables."
+    },
+    "features": {
+      "title": "Trois moments où Mendly change ta décision",
+      "sub": "Aucun des trois ne ressemble à ce que fait un assistant.",
+      "contradiction": {
+        "eyebrow": "La contradiction",
+        "title": "Il conteste ton plan, pas ton enthousiasme.",
+        "items": [
+          "Il demande sur quoi tu te bases avant de valider quoi que ce soit",
+          "Il expose sa propre contradiction interne au lieu de la lisser",
+          "Il tranche : une position, pas cinq options à égalité",
+          "Il se souvient de ce que tu as décidé la semaine dernière"
+        ],
+        "caption": "Mendly répond, et signale la tension qu'il n'arrive pas à résoudre."
+      },
+      "room": {
+        "eyebrow": "La salle de réunion",
+        "title": "Quand la question mérite un débat, il t'y emmène.",
+        "items": [
+          "Il repère les questions qui demandent plusieurs angles",
+          "Il ouvre la salle avec ta question déjà écrite",
+          "Les spécialistes assignés à ton projet s'y opposent pour de vrai",
+          "Tu repars avec un verdict, pas un compte rendu"
+        ],
+        "caption": "La salle de réunion — les spécialistes du projet, en désaccord."
+      },
+      "night": {
+        "eyebrow": "Le travail autonome",
+        "title": "Il continue quand tu fermes l'ordinateur.",
+        "items": [
+          "Une action enlisée depuis onze jours déclenche une session",
+          "L'équipe se réunit sans que tu la convoques",
+          "Tu retrouves le compte rendu au réveil",
+          "Chaque décision entre dans la mémoire du projet"
+        ],
+        "caption": "Une session autonome, produite pendant la nuit."
+      }
+    },
+    "start": {
+      "title": "Commencer prend cinq minutes",
+      "sub": "Pas de configuration, pas de connecteurs à brancher. Tu racontes, il écoute.",
+      "step1": "Tu racontes ton projet à Mendly. Il pose des questions, tu réponds.",
+      "step2": "Il assigne les spécialistes dont ton projet a besoin — et pas les autres.",
+      "step3": "Tu travailles. Il conteste, il tranche, il retient.",
+      "caption": "La création de projet : un entretien, pas un formulaire."
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "q1": "En quoi Mendly est différent de ChatGPT ?",
+      "a1": "Un assistant généraliste est entraîné à te satisfaire : il valide ton idée, puis te donne cinq étapes pour la réussir. Mendly commence par demander sur quoi tu te bases. Quand deux de ses angles ne sont pas d'accord, il le dit au lieu de choisir la réponse la plus lisse. Puis il tranche.",
+      "q2": "C'est quoi la salle de réunion ?",
+      "a2": "Un lieu séparé de la conversation quotidienne. Mendly y convoque les spécialistes assignés à ton projet — finance, croissance, technique selon les cas — et ils s'opposent réellement sur ta question avant qu'un verdict soit rendu. Mendly t'y emmène de lui-même quand une question le mérite.",
+      "q3": "Mendly travaille vraiment quand je ne suis pas là ?",
+      "a3": "Oui. Quand une action de ton projet reste enlisée, l'équipe ouvre une session d'elle-même et te laisse le compte rendu. Tu ne déclenches rien, tu lis au réveil. La fréquence dépend de ton plan.",
+      "q4": "Combien de projets puis-je créer ?",
+      "a4": "Un seul en gratuit, trois en Starter, dix en Pro. Un projet garde sa propre mémoire : décisions, risques, hypothèses, jalons. Ce n'est pas un fil de discussion de plus.",
+      "q5": "Que devient ce que j'écris ?",
+      "a5": "Tes projets et tes conversations sont hébergés dans l'Union européenne et ne servent à entraîner aucun modèle. Tu peux supprimer un projet, et ta mémoire part avec.",
+      "q6": "Je peux arrêter quand je veux ?",
+      "a6": "Oui, en un clic depuis tes paramètres, sans avoir à écrire à qui que ce soit. Le plan reste actif jusqu'à la fin de la période déjà payée."
+    },
+    "closing": {
+      "title": "Le seul conseil qui ose te dire que tu as tort.",
+      "sub": "Commence gratuitement. Tu verras vite s'il a raison.",
+      "cta": "Essayer gratuitement",
+      "note": "Aucune carte bancaire demandée."
+    }
+  },
+  "app": {
+    "askMendly": "Demander à Mendly",
+    "emptyProjectsTitle": "Aucun projet pour l'instant",
+    "emptyProjectsBody": "Un projet garde sa propre mémoire : décisions, risques, hypothèses. Commence par en décrire un.",
+    "emptyProjectsCta": "Nouveau projet"
   }
 }

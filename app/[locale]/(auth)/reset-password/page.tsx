@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/client";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthNotice } from "@/components/auth/AuthNotice";
 import { AuthField } from "@/components/auth/AuthField";
-import { AuthSubmit } from "@/components/auth/AuthSubmit";
 
 export default function ResetPasswordPage() {
   const t = useTranslations("auth");
@@ -57,23 +56,13 @@ export default function ResetPasswordPage() {
 
   if (status === "success") {
     return (
-      <AuthShell
+      <AuthNotice
         title={t("resetPasswordSuccessTitle")}
         subtitle={t("resetPasswordSuccessBody")}
+        ctaLabel={t("loginLink")}
+        ctaHref="/login"
         backLabel={t("backHome")}
-        footer={
-          <Link
-            href="/login"
-            className="font-semibold text-white underline decoration-(--glass-hi) underline-offset-4 transition-colors hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
-          >
-            {t("loginLink")}
-          </Link>
-        }
-      >
-        <p className="text-center text-sm text-(--text-secondary)">
-          {t("resetPasswordSuccessBody")}
-        </p>
-      </AuthShell>
+      />
     );
   }
 
@@ -82,53 +71,44 @@ export default function ResetPasswordPage() {
       title={t("resetPasswordTitle")}
       subtitle={t("resetPasswordSubtitle")}
       backLabel={t("backHome")}
+      onSubmit={handleSubmit}
+      loading={status === "loading"}
+      error={status === "error" ? errorMsg : null}
+      submitLabel={status === "loading" ? t("resetPasswordLoading") : t("resetPasswordCta")}
+      colorway="azure"
+      seed={52}
     >
-      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t("resetPasswordTitle")}>
-        {!ready && (
-          <p className="rounded-xl border border-(--glass-line) bg-white/3 px-4 py-3 text-sm text-(--text-secondary)">
-            {t("resetPasswordWaiting")}
-          </p>
-        )}
+      {!ready && (
+        <p className="rounded-xl bg-white/85 px-4 py-3 text-[13px] text-(--ink-soft) backdrop-blur-sm">
+          {t("resetPasswordWaiting")}
+        </p>
+      )}
 
-        {status === "error" && errorMsg && (
-          <div
-            role="alert"
-            className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-          >
-            {errorMsg}
-          </div>
-        )}
+      <AuthField
+        id="password"
+        label={t("resetPasswordNewLabel")}
+        type="password"
+        value={password}
+        onChange={setPassword}
+        placeholder="••••••••"
+        required
+        minLength={6}
+        disabled={status === "loading"}
+        autoComplete="new-password"
+      />
 
-        <AuthField
-          id="password"
-          label={t("resetPasswordNewLabel")}
-          type="password"
-          value={password}
-          onChange={setPassword}
-          placeholder="••••••••"
-          required
-          minLength={6}
-          disabled={status === "loading"}
-          autoComplete="new-password"
-        />
-
-        <AuthField
-          id="confirm"
-          label={t("resetPasswordConfirmLabel")}
-          type="password"
-          value={confirm}
-          onChange={setConfirm}
-          placeholder="••••••••"
-          required
-          minLength={6}
-          disabled={status === "loading"}
-          autoComplete="new-password"
-        />
-
-        <AuthSubmit loading={status === "loading"}>
-          {status === "loading" ? t("resetPasswordLoading") : t("resetPasswordCta")}
-        </AuthSubmit>
-      </form>
+      <AuthField
+        id="confirm"
+        label={t("resetPasswordConfirmLabel")}
+        type="password"
+        value={confirm}
+        onChange={setConfirm}
+        placeholder="••••••••"
+        required
+        minLength={6}
+        disabled={status === "loading"}
+        autoComplete="new-password"
+      />
     </AuthShell>
   );
 }
