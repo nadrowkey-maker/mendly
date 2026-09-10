@@ -417,7 +417,8 @@
       "actions": "open actions",
       "sessions": "sessions",
       "unseen": "{count, plural, =1 {1 session while you were away} other {# sessions while you were away}}"
-    }
+    },
+    "openRoomLabel": "Take this to the meeting room"
   },
   "teamRoom": {
     "eyebrow": "TEAM ROOM",

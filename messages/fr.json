@@ -417,7 +417,8 @@
       "actions": "actions ouvertes",
       "sessions": "sessions",
       "unseen": "{count, plural, =1 {1 session pendant ton absence} other {# sessions pendant ton absence}}"
-    }
+    },
+    "openRoomLabel": "Emmener en salle de réunion"
   },
   "teamRoom": {
     "eyebrow": "SALLE DE RÉUNION",

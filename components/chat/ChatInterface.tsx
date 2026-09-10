@@ -15,6 +15,7 @@ import { GenerateMemoButton } from "./GenerateMemoButton";
 import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
 import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
 import { ProjectConsoleStrip } from "@/components/chat/ProjectConsoleStrip";
+import { parseReply } from "@/lib/ai/room-suggestion";
 import type { ProjectStats } from "@/lib/actions/project-stats";
 import {
   getOrCreateConversation,
@@ -47,6 +48,8 @@ interface DisplayMessage {
   isStreaming?: boolean;
   attachmentName?: string | null;
   attachmentMime?: string | null;
+  /** Question que Mendly propose d'emmener en salle de réunion. */
+  roomSuggestion?: string | null;
 }
 
 interface AgentState {
@@ -194,8 +197,16 @@ export function ChatInterface({
   // (agent_role: "DEBATE" messages) regardless of which agent tab triggered
   // them. Forcing activeAgent back to CEO keeps activeConversationId (and so
   // handleDebate's target) pointed at the thread the room actually reads from.
-  const handleTeamRoomOpen = () => {
+  /**
+   * Ouvre la salle de réunion, éventuellement avec une question pré-remplie.
+   *
+   * Suivre un conseil de Mendly ne doit coûter qu'un clic : sans la question
+   * reprise automatiquement, le fondateur devrait la retaper de mémoire, et
+   * c'est exactement là qu'on perd les gens.
+   */
+  const handleTeamRoomOpen = (question?: string) => {
     if (busy) return;
+    if (question) setInput(question);
     setActiveAgent("CEO");
     setTeamRoomActive(true);
     setError(null);
@@ -321,23 +332,31 @@ export function ChatInterface({
         const { done, value } = await reader.read();
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
+        // Le marqueur de salle est retiré à chaque image du flux : laissé tel
+        // quel, il clignoterait en syntaxe brute avant d'être interprété.
+        const streamed = parseReply(accumulated);
         setAgentData((prev) => ({
           ...prev,
           [activeAgent]: {
             ...prev[activeAgent]!,
             messages: prev[activeAgent]!.messages.map((m) =>
-              m.id === assistantMsgId ? { ...m, content: accumulated } : m
+              m.id === assistantMsgId
+                ? { ...m, content: streamed.body, roomSuggestion: streamed.suggestion }
+                : m
             ),
           },
         }));
       }
 
+      const final = parseReply(accumulated);
       setAgentData((prev) => ({
         ...prev,
         [activeAgent]: {
           ...prev[activeAgent]!,
           messages: prev[activeAgent]!.messages.map((m) =>
-            m.id === assistantMsgId ? { ...m, isStreaming: false } : m
+            m.id === assistantMsgId
+              ? { ...m, content: final.body, roomSuggestion: final.suggestion, isStreaming: false }
+              : m
           ),
         },
       }));
@@ -845,7 +864,7 @@ export function ChatInterface({
           userPlan={userPlan}
           userEmail={userEmail}
           teamRoomActive={teamRoomActive}
-          onTeamRoomClick={handleTeamRoomOpen}
+          onTeamRoomClick={() => handleTeamRoomOpen()}
         />
       </div>
 
@@ -950,7 +969,7 @@ export function ChatInterface({
           )}
         </header>
 
-        <ProjectConsoleStrip stats={projectStats} onOpenTeamRoom={handleTeamRoomOpen} />
+        <ProjectConsoleStrip stats={projectStats} onOpenTeamRoom={() => handleTeamRoomOpen()} />
 
         <div className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8 py-8">
           <div className="max-w-3xl mx-auto space-y-6">
@@ -1041,17 +1060,33 @@ export function ChatInterface({
                   if (st) return <DebateView key={m.id} state={st} onAbort={() => {}} />;
                 }
                 return (
-                  <ChatMessage
-                    key={m.id}
-                    role={m.role}
-                    content={m.content}
-                    agentRole={m.agentRole}
-                    isStreaming={m.isStreaming}
-                    attachmentName={m.attachmentName}
-                    attachmentMime={m.attachmentMime}
-                    onInviteAccept={handleInviteAccept}
-                    busy={busy}
-                  />
+                  <div key={m.id}>
+                    <ChatMessage
+                      role={m.role}
+                      content={m.content}
+                      agentRole={m.agentRole}
+                      isStreaming={m.isStreaming}
+                      attachmentName={m.attachmentName}
+                      attachmentMime={m.attachmentMime}
+                      onInviteAccept={handleInviteAccept}
+                      busy={busy}
+                    />
+                    {m.roomSuggestion && !m.isStreaming && (
+                      <button
+                        onClick={() => handleTeamRoomOpen(m.roomSuggestion ?? undefined)}
+                        disabled={busy}
+                        className="mt-3 flex w-full items-start gap-3 rounded-2xl border border-(--accent-primary)/35 bg-(--accent-primary)/8 px-4 py-3 text-left transition-colors hover:bg-(--accent-primary)/14 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-glow) cursor-pointer"
+                      >
+                        <Users className="mt-0.5 size-4 shrink-0 text-(--accent-glow)" />
+                        <span className="min-w-0">
+                          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-(--accent-glow)">
+                            {t("openRoomLabel")}
+                          </span>
+                          <span className="mt-0.5 block text-sm text-white">{m.roomSuggestion}</span>
+                        </span>
+                      </button>
+                    )}
+                  </div>
                 );
               })
             )}
