@@ -31,6 +31,22 @@ const STRANDS = [
   { color: "#1d6fbd", phase: 5.7, amp: 0.16, freq: 3.1, width: 0.030, alpha: 0.24, speed: 0.00027 },
 ];
 
+/**
+ * La même couleur, en transparent.
+ *
+ * Les mèches s'éteignaient sur du blanc transparent, et le moteur interpolait
+ * vers ce blanc en même temps que vers l'opacité zéro : elles se délavaient
+ * avant de disparaître au lieu de s'effacer. Voir `GrainGradient`, où le même
+ * défaut avec du noir grisait tous les panneaux.
+ */
+function fadeOut(hex: string): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},0)`;
+}
+
 export function Ribbon({ className, animate = true }: RibbonProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,10 +105,10 @@ export function Ribbon({ className, animate = true }: RibbonProps) {
         ctx.closePath();
 
         const g = ctx.createLinearGradient(0, 0, w, 0);
-        g.addColorStop(0, "rgba(255,255,255,0)");
+        g.addColorStop(0, fadeOut(s.color));
         g.addColorStop(0.25, s.color);
         g.addColorStop(0.75, s.color);
-        g.addColorStop(1, "rgba(255,255,255,0)");
+        g.addColorStop(1, fadeOut(s.color));
         ctx.globalAlpha = s.alpha;
         ctx.fillStyle = g;
         ctx.fill();

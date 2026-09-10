@@ -73,6 +73,24 @@ interface GrainGradientProps {
   className?: string;
 }
 
+/**
+ * La même couleur, en transparent.
+ *
+ * Un dégradé radial qui se termine sur `rgba(0,0,0,0)` ne devient pas
+ * transparent : il devient NOIR transparent, et le moteur interpole vers ce
+ * noir en même temps que vers l'opacité zéro. Chaque tache traînait donc un
+ * halo gris, et tous les panneaux sortaient nettement plus sombres et plus
+ * sales que leur palette — une tache blanche sur fond crème donnait du gris à
+ * 55 %. Il faut s'éteindre sur sa propre teinte.
+ */
+function fadeOut(hex: string): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},0)`;
+}
+
 /** Générateur déterministe : une même graine redonne toujours le même visuel. */
 function makeRandom(seed: number) {
   let s = seed >>> 0 || 1;
@@ -206,7 +224,7 @@ export function GrainGradient({
 
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         g.addColorStop(0, s.color);
-        g.addColorStop(1, "rgba(0,0,0,0)");
+        g.addColorStop(1, fadeOut(s.color));
         ctx.globalAlpha = s.alpha;
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
