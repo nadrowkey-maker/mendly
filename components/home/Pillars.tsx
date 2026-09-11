@@ -2,7 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/home/Reveal";
-import { GrainGradient } from "@/components/ui/GrainGradient";
+import { GrainGradient, type GrainColorway } from "@/components/ui/GrainGradient";
+
+/** Un coloris par carte, dans l'ordre des cartes de `home.pillars`. */
+const COLORWAYS: GrainColorway[] = ["signal", "azure", "verdict"];
 
 /**
  * Les trois atouts, juste avant les tarifs.
@@ -12,16 +15,23 @@ import { GrainGradient } from "@/components/ui/GrainGradient";
  * dans trois mois », qui est la seule objection qui compte à cet endroit. Les
  * arguments de séduction, eux, sont déjà passés trois sections plus haut.
  *
- * Le dégradé ne remplit que la première carte. Trois cartes colorées feraient
- * un damier où rien ne prime ; une seule donne un point d'entrée à la rangée,
- * et les deux autres se lisent comme sa suite.
+ * Les trois cartes portent le même traitement, et chacune le coloris que son
+ * sujet a déjà ailleurs sur la page : ambre pour le travail nocturne, azur
+ * pour la mémoire, vert pour le verdict rendu. La couleur dit donc quelque
+ * chose au lieu de décorer, et une carte lue ici renvoie à la rangée de
+ * démonstration qui traite le même point.
  *
- * Cette carte-là est sombre. Elle a d'abord été claire, avec le coloris azur
- * de la vitrine : le texte gris du reste de la rangée devenait illisible
- * dessus, parce qu'un dégradé saturé ne laisse aucun contraste stable à un
- * texte sombre — il en a sur le bleu clair et plus aucun sur l'or. Fond
- * sombre, texte blanc : le contraste ne dépend plus de l'endroit où la tache
- * passe.
+ * Deux versions ont échoué avant celle-ci, et les deux échecs sont instructifs.
+ * Une seule carte colorée sur trois ne se lisait pas comme une hiérarchie mais
+ * comme deux cartes oubliées. Et cette carte-là, en dégradé saturé sous un
+ * texte clair, n'avait aucun contraste stable : le blanc tenait sur le bleu
+ * sombre et disparaissait sur le bleu moyen deux centimètres plus loin.
+ *
+ * D'où le lavis. La matière est posée à trente pour cent sur le fond clair
+ * des cartes : assez pour qu'on la voie, trop peu pour qu'elle fasse varier le
+ * contraste du texte sombre qui la traverse. C'est aussi ce qui empêche cette
+ * rangée de concurrencer les trois grands panneaux de démonstration, qui eux
+ * portent la couleur à pleine force.
  */
 export function Pillars() {
   const t = useTranslations("home.pillars");
@@ -38,34 +48,20 @@ export function Pillars() {
           <Reveal
             key={card.title}
             delay={i}
-            className="relative min-h-[220px] overflow-hidden rounded-3xl p-7 md:min-h-[260px] md:p-8"
+            className="relative min-h-[220px] overflow-hidden rounded-3xl bg-(--paper-raised) p-7 md:min-h-[260px] md:p-8"
           >
-            {i === 0 ? (
-              <GrainGradient
-                colorway="dusk"
-                seed={91}
-                grain={0.55}
-                className="absolute inset-0 size-full"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-(--paper-raised)" />
-            )}
+            <GrainGradient
+              colorway={COLORWAYS[i]}
+              seed={91 + i * 17}
+              grain={0.5}
+              className="absolute inset-0 size-full opacity-30"
+            />
 
             <div className="relative flex h-full flex-col">
-              <h3
-                className={[
-                  "text-[17px] font-semibold tracking-tight",
-                  i === 0 ? "text-white" : "text-(--ink)",
-                ].join(" ")}
-              >
+              <h3 className="text-[17px] font-semibold tracking-tight text-(--ink)">
                 {card.title}
               </h3>
-              <p
-                className={[
-                  "mt-3 max-w-xs text-[13.5px] leading-relaxed",
-                  i === 0 ? "text-white/70" : "text-(--ink-soft)",
-                ].join(" ")}
-              >
+              <p className="mt-3 max-w-xs text-[13.5px] leading-relaxed text-(--ink-soft)">
                 {card.body}
               </p>
             </div>
