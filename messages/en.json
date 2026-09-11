@@ -1111,6 +1111,23 @@
         ],
         "team": "Team assigned — Finance · Growth · Product"
       }
+    },
+    "pillars": {
+      "title": "What holds up once the novelty wears off",
+      "cards": [
+        {
+          "title": "It runs without you",
+          "body": "The team convenes overnight when an action stalls. You trigger nothing, you read the debrief when you wake up."
+        },
+        {
+          "title": "One memory per project",
+          "body": "Decisions, risks, assumptions, milestones. Nothing is lost between sessions, and nothing bleeds between projects."
+        },
+        {
+          "title": "French and English",
+          "body": "Mendly works in your language. Not a translation: two voices written separately."
+        }
+      ]
     }
   },
   "app": {

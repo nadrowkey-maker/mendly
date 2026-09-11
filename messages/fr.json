@@ -1111,6 +1111,23 @@
         ],
         "team": "Équipe assignée — Finance · Croissance · Produit"
       }
+    },
+    "pillars": {
+      "title": "Ce qui tient, une fois l'effet de nouveauté passé",
+      "cards": [
+        {
+          "title": "Il tourne sans toi",
+          "body": "L'équipe se réunit la nuit quand une action s'enlise. Tu ne déclenches rien, tu lis le compte rendu au réveil."
+        },
+        {
+          "title": "Une mémoire par projet",
+          "body": "Décisions, risques, hypothèses, jalons. Rien ne se perd entre deux sessions, et rien ne se mélange entre deux projets."
+        },
+        {
+          "title": "Français et anglais",
+          "body": "Mendly travaille dans ta langue, et te tutoie en français. Pas une traduction : deux voix écrites séparément."
+        }
+      ]
     }
   },
   "app": {

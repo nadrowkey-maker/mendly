@@ -6,6 +6,7 @@ import { Proof } from "@/components/home/Proof";
 import { Showcase } from "@/components/home/Showcase";
 import { Features } from "@/components/home/Features";
 import { GetStarted } from "@/components/home/GetStarted";
+import { Pillars } from "@/components/home/Pillars";
 import { PaperPricing } from "@/components/home/PaperPricing";
 import { Faq } from "@/components/home/Faq";
 import { Closing } from "@/components/home/Closing";
@@ -67,6 +68,9 @@ export default function HomePage() {
         </div>
         <div className="mt-28 md:mt-40">
           <GetStarted />
+        </div>
+        <div className="mt-28 md:mt-40">
+          <Pillars />
         </div>
         <div className="mt-28 md:mt-40">
           <PaperPricing />

@@ -81,7 +81,9 @@ export function MendlyOrb({ size = 72, speaking = false, className }: MendlyOrbP
    * précis où Mendly commence à répondre, ce qui est le pire moment possible.
    */
   const speakingRef = useRef(speaking);
-  speakingRef.current = speaking;
+  useEffect(() => {
+    speakingRef.current = speaking;
+  }, [speaking]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

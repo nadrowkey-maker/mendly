@@ -56,7 +56,6 @@ export function ProductStage({
   const [fit, setFit] = useState(0);
   const [step, setStep] = useState(0);
   const [running, setRunning] = useState(false);
-  const [clicking, setClicking] = useState(false);
 
   /*
    * Le facteur de réduction est mesuré plutôt que calculé en CSS.
@@ -103,15 +102,6 @@ export function ProductStage({
     return () => clearTimeout(timer);
   }, [running, step, steps]);
 
-  // L'onde de clic est un état séparé et bref : la garder pendant toute
-  // l'étape la transformerait en pastille posée sous le curseur.
-  useEffect(() => {
-    if (!running || !steps[step].click) return;
-    setClicking(true);
-    const timer = setTimeout(() => setClicking(false), 520);
-    return () => clearTimeout(timer);
-  }, [running, step, steps]);
-
   const active = running ? step : stillStep;
 
   // Le dernier cadrage et la dernière position connus : une étape qui ne les
@@ -142,7 +132,12 @@ export function ProductStage({
           {children(active)}
 
           {running && (
-            <Cursor x={cursor.x} y={cursor.y} zoom={camera.scale} clicking={clicking} />
+            <Cursor
+              x={cursor.x}
+              y={cursor.y}
+              zoom={camera.scale}
+              clickKey={steps[active].click ? active : null}
+            />
           )}
         </div>
       </div>
@@ -174,20 +169,30 @@ function Cursor({
   x,
   y,
   zoom,
-  clicking,
+  clickKey,
 }: {
   x: number;
   y: number;
   zoom: number;
-  clicking: boolean;
+  /** L'étape qui clique, ou `null`. Sert de clé de remontage, voir plus bas. */
+  clickKey: number | null;
 }) {
   return (
     <div
       className="pointer-events-none absolute top-0 left-0 z-50 transition-transform duration-[900ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
       style={{ transform: `translate(${x}px, ${y}px) scale(${1 / zoom})` }}
     >
-      {clicking && (
-        <span className="absolute -top-2 -left-2 size-9 animate-[stage-click_520ms_ease-out] rounded-full border-2 border-white/70" />
+      {/* L'onde ne passe par aucun état.
+          Une première version allumait un booléen puis l'éteignait par minuterie,
+          ce qui faisait deux rendus de l'arbre pour une décoration de 520 ms —
+          et React signale à juste titre l'écriture d'état depuis un effet.
+          Ici la clé change avec l'étape : React remonte le nœud, et le
+          navigateur rejoue l'animation CSS depuis le début. */}
+      {clickKey !== null && (
+        <span
+          key={clickKey}
+          className="absolute -top-2 -left-2 size-9 animate-[stage-click_520ms_ease-out] rounded-full border-2 border-white/70 opacity-0"
+        />
       )}
       <svg viewBox="0 0 20 22" className="size-5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
         <path

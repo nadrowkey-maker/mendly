@@ -21,20 +21,21 @@ export function useReveal(text: string, active: boolean, durationMs: number): st
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!active) {
-      setCount(0);
-      return;
-    }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setCount(text.length);
-      return;
-    }
+    if (!active) return;
 
+    /*
+     * Le cas « animations réduites » est traité DANS la boucle et non avant
+     * elle. Écrire l'état directement dans le corps de l'effet déclenche un
+     * rendu en cascade — et c'est aussi ce que React signale. Depuis la
+     * première image, la progression vaut un, donc le texte est complet
+     * immédiatement sans qu'on ait eu à court-circuiter quoi que ce soit.
+     */
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const start = performance.now();
     let frame = 0;
 
     const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / durationMs);
+      const progress = reduced ? 1 : Math.min(1, (now - start) / durationMs);
       setCount(Math.round(progress * text.length));
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
@@ -43,5 +44,8 @@ export function useReveal(text: string, active: boolean, durationMs: number): st
     return () => cancelAnimationFrame(frame);
   }, [text, active, durationMs]);
 
-  return text.slice(0, count);
+  // Hors période active, on rend le vide sans toucher au compteur : le
+  // remettre à zéro depuis l'effet serait un second rendu pour une valeur que
+  // personne ne lit.
+  return active ? text.slice(0, count) : "";
 }
