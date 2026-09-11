@@ -9,8 +9,8 @@ import { ChatComposer } from "./ChatComposer";
 import { DebateView } from "./DebateView";
 import { TeamRoomHeader, TeamRoomEmptyState } from "./TeamRoomView";
 import { AutonomousSessions } from "./AutonomousSessions";
-import { AISpeakingAura } from "./AISpeakingAura";
-import { AIAura } from "@/components/ui/AIAura";
+import { SpeakingBar } from "@/components/app/SpeakingBar";
+import { MendlyOrb } from "@/components/ui/MendlyOrb";
 import { GenerateMemoButton } from "./GenerateMemoButton";
 import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
 import { AppShell } from "@/components/app/AppShell";
@@ -897,7 +897,7 @@ export function ChatInterface({
       contextLabel={project.name}
       flush
     >
-      <AISpeakingAura active={busy} />
+      <SpeakingBar active={busy} />
       <AppHeader
         title={teamRoomActive ? t("teamRoomNav") : tSide("conversation")}
         subtitle={project.name}
@@ -942,13 +942,8 @@ export function ChatInterface({
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-16 md:py-24"
               >
-                <div className="relative flex justify-center mb-6 h-[120px]">
-                  <AIAura
-                    size={120}
-                    speed={15}
-                    opacity={0.9}
-                    className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                  />
+                <div className="mb-6 flex justify-center">
+                  <MendlyOrb size={104} speaking={busy} />
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-(--text-primary) mb-3 tracking-tight">
                   {t("welcomeTitle")}

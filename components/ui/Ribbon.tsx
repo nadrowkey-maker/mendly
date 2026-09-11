@@ -5,47 +5,67 @@ import { useEffect, useRef } from "react";
 /**
  * Le ruban — la grande onde qui traverse le haut de la page d'accueil.
  *
- * Plusieurs mèches suivent la même sinusoïde, décalées en phase et en
- * amplitude. C'est ce léger désaccord qui produit la torsion : des mèches
- * parfaitement parallèles donnent un ruban plat, des mèches désaccordées se
- * croisent et se recouvrent, et le recouvrement fait la matière.
+ * La première version empilait six mèches épaisses et floues. Le résultat
+ * était plat : six formes qui se recouvrent restent six formes, et aucune
+ * quantité de flou n'en fait de la matière.
  *
- * L'épaisseur s'annule aux deux extrémités. Un ruban coupé net au bord de
- * l'écran se lit comme une image tronquée ; un ruban qui s'affine jusqu'à
- * disparaître se lit comme un geste.
+ * Celle-ci traite le ruban comme ce qu'il est — une bande, pas un paquet de
+ * traits. On parcourt sa largeur en quarante-huit fils, chacun décalé
+ * PERPENDICULAIREMENT à la trajectoire, et on teinte le fil selon sa position
+ * dans la bande. Deux conséquences, et ce sont elles qui font la soie :
+ *
+ * — la bande se pince là où elle se présente de profil, ce qui se lit comme
+ *   une vrille ;
+ * — la couleur balaie l'or vers le bleu à travers la largeur, donc la lumière
+ *   semble tourner avec la matière.
+ *
+ * L'épaisseur s'annule aux deux extrémités. Un ruban coupé net au bord se lit
+ * comme une image tronquée ; un ruban qui s'affine jusqu'à disparaître se lit
+ * comme un geste.
  */
 
 interface RibbonProps {
   className?: string;
-  /** Coupe l'animation — utilisé pour les captures produit. */
+  /** Coupe l'animation. */
   animate?: boolean;
 }
 
-/** Deux teintes seulement : l'azur du produit, l'ambre du signal. */
-const STRANDS = [
-  { color: "#3aa8ff", phase: 0.0, amp: 0.30, freq: 1.9, width: 0.075, alpha: 0.38, speed: 0.00013 },
-  { color: "#8fd4ff", phase: 1.1, amp: 0.24, freq: 2.2, width: 0.055, alpha: 0.30, speed: 0.00017 },
-  { color: "#ffb454", phase: 2.4, amp: 0.34, freq: 1.7, width: 0.095, alpha: 0.42, speed: 0.00011 },
-  { color: "#ffd79a", phase: 3.6, amp: 0.27, freq: 2.4, width: 0.062, alpha: 0.34, speed: 0.00019 },
-  { color: "#f7e2b0", phase: 4.9, amp: 0.20, freq: 2.8, width: 0.042, alpha: 0.36, speed: 0.00023 },
-  { color: "#1d6fbd", phase: 5.7, amp: 0.16, freq: 3.1, width: 0.030, alpha: 0.24, speed: 0.00027 },
+/**
+ * La teinte à travers la largeur de la bande.
+ *
+ * Or d'un bord, azur de l'autre, crème au passage — les deux couleurs du
+ * produit et rien d'autre. Une troisième famille ferait un arc-en-ciel, qui
+ * est précisément la signature du fond génératif générique.
+ */
+const RAMP: [number, [number, number, number]][] = [
+  [0.00, [255, 180, 84]],   // ambre
+  [0.22, [255, 215, 154]],  // ambre clair
+  [0.42, [255, 243, 221]],  // crème
+  [0.58, [223, 233, 244]],  // bleu très pâle
+  [0.78, [143, 212, 255]],  // azur clair
+  [1.00, [58, 148, 235]],   // azur
 ];
 
-/**
- * La même couleur, en transparent.
- *
- * Les mèches s'éteignaient sur du blanc transparent, et le moteur interpolait
- * vers ce blanc en même temps que vers l'opacité zéro : elles se délavaient
- * avant de disparaître au lieu de s'effacer. Voir `GrainGradient`, où le même
- * défaut avec du noir grisait tous les panneaux.
- */
-function fadeOut(hex: string): string {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},0)`;
+function sample(v: number): [number, number, number] {
+  for (let i = 1; i < RAMP.length; i++) {
+    const [p1, c1] = RAMP[i - 1];
+    const [p2, c2] = RAMP[i];
+    if (v <= p2) {
+      const k = (v - p1) / (p2 - p1);
+      return [
+        c1[0] + (c2[0] - c1[0]) * k,
+        c1[1] + (c2[1] - c1[1]) * k,
+        c1[2] + (c2[2] - c1[2]) * k,
+      ];
+    }
+  }
+  return RAMP[RAMP.length - 1][1];
 }
+
+/** Nombre de fils à travers la largeur du ruban. */
+const THREADS = 48;
+/** Points échantillonnés le long du ruban. */
+const STEPS = 96;
 
 export function Ribbon({ className, animate = true }: RibbonProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -62,72 +82,89 @@ export function Ribbon({ className, animate = true }: RibbonProps) {
     const measure = () => {
       const rect = canvas.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return false;
-      // Demi-définition : le tracé est flou, le doubler ne se verrait pas.
-      w = Math.round(rect.width / 2);
-      h = Math.round(rect.height / 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.round(rect.width * dpr * 0.6);
+      h = Math.round(rect.height * dpr * 0.6);
       canvas.width = w;
       canvas.height = h;
       return true;
     };
 
-    const paint = (time: number) => {
-      ctx.clearRect(0, 0, w, h);
-      // Le flou est appliqué au contexte plutôt qu'en CSS : un filtre CSS sur
-      // le canvas entier flouterait aussi ses bords, et le ruban perdrait sa
-      // pointe.
-      ctx.filter = `blur(${Math.max(3, h * 0.030)}px)`;
-      ctx.globalCompositeOperation = "multiply";
-
-      const steps = 90;
-      for (const s of STRANDS) {
-        const t = time * s.speed + s.phase;
-        ctx.beginPath();
-
-        // Bord supérieur de gauche à droite, bord inférieur au retour : une
-        // seule forme fermée, donc un seul remplissage, sans couture visible.
-        for (let i = 0; i <= steps; i++) {
-          const p = i / steps;
-          const x = p * w;
-          const y = h * 0.5 + Math.sin(p * Math.PI * s.freq + t) * h * s.amp;
-          // sin(pi*p) vaut zéro aux deux bouts et un au milieu : l'épaisseur
-          // naît et meurt d'elle-même.
-          const th = Math.sin(p * Math.PI) * h * s.width;
-          if (i === 0) ctx.moveTo(x, y - th);
-          else ctx.lineTo(x, y - th);
-        }
-        for (let i = steps; i >= 0; i--) {
-          const p = i / steps;
-          const x = p * w;
-          const y = h * 0.5 + Math.sin(p * Math.PI * s.freq + t) * h * s.amp;
-          const th = Math.sin(p * Math.PI) * h * s.width;
-          ctx.lineTo(x, y + th);
-        }
-        ctx.closePath();
-
-        const g = ctx.createLinearGradient(0, 0, w, 0);
-        g.addColorStop(0, fadeOut(s.color));
-        g.addColorStop(0.25, s.color);
-        g.addColorStop(0.75, s.color);
-        g.addColorStop(1, fadeOut(s.color));
-        ctx.globalAlpha = s.alpha;
-        ctx.fillStyle = g;
-        ctx.fill();
-      }
-
-      ctx.globalAlpha = 1;
-      ctx.filter = "none";
-      ctx.globalCompositeOperation = "source-over";
+    /** La trajectoire de la bande et sa demi-largeur, au paramètre u. */
+    const path = (u: number, t: number) => {
+      const x = u * w;
+      // Deux harmoniques : une seule sinusoïde donne une vague de piscine.
+      const y =
+        h * 0.5 +
+        Math.sin(u * Math.PI * 2.4 + t) * h * 0.30 +
+        Math.sin(u * Math.PI * 4.6 + t * 1.31) * h * 0.12;
+      // La demi-largeur se pince deux fois le long du parcours : c'est ce
+      // pincement qu'on lit comme un ruban qui se retourne.
+      const twist = 0.30 + 0.70 * Math.abs(Math.sin(u * Math.PI * 2.1 + t * 0.7));
+      const half = Math.sin(u * Math.PI) * h * 0.34 * twist;
+      return { x, y, half, twist };
     };
 
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const paint = (time: number) => {
+      ctx.clearRect(0, 0, w, h);
+      const t = time * 0.00016;
+
+      // Un léger flou de contexte fond les fils entre eux. Sans lui on voit
+      // quarante-huit traits ; avec, on voit une surface.
+      ctx.filter = `blur(${Math.max(1.5, h * 0.012)}px)`;
+      ctx.lineCap = "round";
+
+      for (let n = 0; n < THREADS; n++) {
+        const v = n / (THREADS - 1);
+        const [r, g, b] = sample(v);
+
+        ctx.beginPath();
+        let alpha = 0;
+
+        for (let i = 0; i <= STEPS; i++) {
+          const u = i / STEPS;
+          const p = path(u, t);
+
+          // La normale à la trajectoire, obtenue par différence finie. Décaler
+          // les fils verticalement plutôt que perpendiculairement écraserait la
+          // bande à chaque virage — elle cesserait d'avoir une épaisseur.
+          const q = path(Math.min(1, u + 0.004), t);
+          const dx = q.x - p.x;
+          const dy = q.y - p.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const nx = -dy / len;
+          const ny = dx / len;
+
+          const off = (v - 0.5) * 2 * p.half;
+          const px = p.x + nx * off;
+          const py = p.y + ny * off;
+
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+
+          // On retient l'opacité du milieu du parcours : un fil a une seule
+          // couleur de trait, autant qu'elle corresponde à sa partie visible.
+          if (i === STEPS / 2) alpha = p.twist;
+        }
+
+        // Les bords de la bande s'estompent : une arête nette ferait un ruban
+        // découpé aux ciseaux.
+        const edge = Math.sin(v * Math.PI) ** 0.55;
+        ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.78 * edge * alpha})`;
+        ctx.lineWidth = Math.max(1, (h * 0.62) / THREADS);
+        ctx.stroke();
+      }
+
+      ctx.filter = "none";
+    };
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const moving = animate && !reduced;
 
     let frame = 0;
     let last = 0;
     const loop = (now: number) => {
-      if (now - last > 41) {
+      if (now - last > 33) {
         last = now;
         paint(now);
       }

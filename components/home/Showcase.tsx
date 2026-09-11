@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { GrainGradient } from "@/components/ui/GrainGradient";
 import { PillLink } from "@/components/ui/Pill";
-import { ShotFrame } from "@/components/home/ShotFrame";
+import { ConversationDemo } from "@/components/home/ConversationDemo";
 
 /**
  * Le grand panneau produit.
@@ -47,17 +47,10 @@ export function Showcase() {
             </PillLink>
           </div>
 
-          <div className="mx-auto mt-12 max-w-3xl md:mt-14">
-            {/* Marge basse négative : la capture est rognée par le bas du
-                panneau, et le produit a l'air de dépasser du cadre. */}
-            <ShotFrame
-              src="/product/workspace.png"
-              alt={t("caption")}
-              width={1440}
-              height={900}
-              priority
-              className="-mb-10 md:-mb-14"
-            />
+          {/* Marge basse négative : le plateau est rogné par le bas du
+              panneau, et le produit a l'air de continuer derrière la page. */}
+          <div className="mx-auto -mb-10 mt-12 max-w-5xl md:-mb-14 md:mt-14">
+            <ConversationDemo />
           </div>
         </div>
       </motion.div>

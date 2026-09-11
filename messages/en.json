@@ -1033,6 +1033,84 @@
       "sub": "Start for free. You will find out quickly whether it is right.",
       "cta": "Try for free",
       "note": "No card required."
+    },
+    "demo": {
+      "contradiction": {
+        "question": "Should I launch the winter collection this month?",
+        "tensionLabel": "Internal contradiction",
+        "tension": "Your collection holds up. Your channel does not.",
+        "body": "You have sold 34 pieces since June, 21 of them on a single market day. That is not a curve, it is an event.",
+        "verdictLabel": "My position",
+        "verdict": "Release three pieces this week to measure. You will know before 15 November whether your channel exists."
+      },
+      "room": {
+        "title": "Meeting room",
+        "question": "Release the whole collection, or three test pieces?",
+        "lines": [
+          {
+            "who": "Finance",
+            "text": "Twelve pieces tie up €4,200 of stock before a single euro comes in."
+          },
+          {
+            "who": "Growth",
+            "text": "Three pieces will not make an event. No event, no traffic."
+          },
+          {
+            "who": "Product",
+            "text": "The collection loses its point if you cut it up. It is a season, not a catalogue."
+          }
+        ],
+        "verdictLabel": "Verdict",
+        "verdict": "Three pieces, announced as the first chapter of a season."
+      },
+      "night": {
+        "title": "Autonomous session",
+        "badge": "No input needed",
+        "log": [
+          {
+            "time": "03:04",
+            "text": "Signal — an action has been stalled for eleven days."
+          },
+          {
+            "time": "03:07",
+            "text": "Team convened: finance, growth, product."
+          },
+          {
+            "time": "03:09",
+            "text": "The debate opens on the acquisition channel."
+          },
+          {
+            "time": "03:12",
+            "text": "Verdict reached. The session is waiting for you."
+          }
+        ]
+      },
+      "intake": {
+        "label": "Creating a project",
+        "turns": [
+          {
+            "who": "mendly",
+            "text": "Tell me about your project. What you sell, to whom, and since when."
+          },
+          {
+            "who": "founder",
+            "text": "Handmade ceramics, one collection per season. I started in June."
+          },
+          {
+            "who": "mendly",
+            "text": "Who buys today — people you know, or strangers?"
+          },
+          {
+            "who": "founder",
+            "text": "Mostly strangers, at a makers' market once a month."
+          },
+          {
+            "who": "mendly",
+            "text": "Understood. I am assigning finance, growth and product: your problem is not making them, it is selling without the stall."
+          }
+        ],
+        "team": "Team assigned — Finance · Growth · Product"
+      }
     }
   },
   "app": {

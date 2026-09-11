@@ -1033,6 +1033,84 @@
       "sub": "Commence gratuitement. Tu verras vite s'il a raison.",
       "cta": "Essayer gratuitement",
       "note": "Aucune carte bancaire demandée."
+    },
+    "demo": {
+      "contradiction": {
+        "question": "Je lance la collection d'hiver ce mois-ci ?",
+        "tensionLabel": "Contradiction interne",
+        "tension": "Ta collection tient debout. Ton canal, non.",
+        "body": "Tu as vendu 34 pièces depuis juin, dont 21 sur une seule journée de marché. Ce n'est pas une courbe, c'est un événement.",
+        "verdictLabel": "Ma position",
+        "verdict": "Sors trois pièces cette semaine pour mesurer. Tu sauras avant le 15 novembre si ton canal existe."
+      },
+      "room": {
+        "title": "Salle de réunion",
+        "question": "Sortir la collection entière, ou trois pièces de test ?",
+        "lines": [
+          {
+            "who": "Finance",
+            "text": "Douze pièces immobilisent 4 200 € de stock avant le premier euro encaissé."
+          },
+          {
+            "who": "Croissance",
+            "text": "Trois pièces ne feront pas d'événement. Sans événement, pas de trafic."
+          },
+          {
+            "who": "Produit",
+            "text": "La collection perd son sens si on la découpe. C'est une saison, pas un catalogue."
+          }
+        ],
+        "verdictLabel": "Verdict",
+        "verdict": "Trois pièces, mais annoncées comme le premier chapitre d'une saison."
+      },
+      "night": {
+        "title": "Session autonome",
+        "badge": "Sans intervention",
+        "log": [
+          {
+            "time": "03:04",
+            "text": "Signal — une action est enlisée depuis onze jours."
+          },
+          {
+            "time": "03:07",
+            "text": "Équipe convoquée : finance, croissance, produit."
+          },
+          {
+            "time": "03:09",
+            "text": "Le débat s'ouvre sur le canal d'acquisition."
+          },
+          {
+            "time": "03:12",
+            "text": "Verdict rendu. La session t'attend."
+          }
+        ]
+      },
+      "intake": {
+        "label": "Création d'un projet",
+        "turns": [
+          {
+            "who": "mendly",
+            "text": "Raconte-moi ton projet. Ce que tu vends, à qui, et depuis quand."
+          },
+          {
+            "who": "founder",
+            "text": "De la céramique artisanale, une collection par saison. J'ai commencé en juin."
+          },
+          {
+            "who": "mendly",
+            "text": "Qui achète aujourd'hui — des gens que tu connais, ou des inconnus ?"
+          },
+          {
+            "who": "founder",
+            "text": "Surtout des inconnus, sur un marché de créateurs une fois par mois."
+          },
+          {
+            "who": "mendly",
+            "text": "Compris. Je t'assigne la finance, la croissance et le produit : ton sujet n'est pas de fabriquer, il est de vendre sans le stand."
+          }
+        ],
+        "team": "Équipe assignée — Finance · Croissance · Produit"
+      }
     }
   },
   "app": {

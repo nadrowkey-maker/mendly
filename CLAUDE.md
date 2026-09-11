@@ -120,25 +120,58 @@ Two rules survive from every previous charter and still hold:
 Amber is the single exception and is reserved for the moment Mendly
 contradicts itself. Used anywhere else it stops meaning anything.
 
-### Product screenshots
+### The product is shown live, never photographed
 
-The landing shows the **real interface**, never a drawing of it. Mock UI on a
-sales page is spotted instantly, and the visitor concludes — often rightly —
-that the product does not exist yet.
+The landing shows the **real interface, running**, not a picture of it.
 
-- Scenes live under `app/[locale]/preview/[shot]` and render the real shell,
-  sidebar, header and message components with a fictional demo project. They
-  are closed in production.
-- `node scripts/capture-product.mjs` (with `npm run dev` running) writes them to
-  `public/product/`. It waits for fonts and entry animations before shooting —
-  Chrome's own `--screenshot` fires on `load` and produced blank pages.
-- Never put a real account in a screenshot.
+The first attempt used PNG captures of the workspace. They failed, and the
+reason is worth keeping: the problem was never resolution. A 1440 px workspace
+displayed in a 470 px frame renders its 13 px text at 4 px. No amount of
+sharpness fixes that — you have to stop showing everything at once.
+
+Two devices replace them, both rendering real components with the fictional
+project in `components/preview/fixtures.ts`:
+
+1. **`ProductStage`** — the whole workspace in DOM at its true size, with a
+   camera that pans and zooms to the region being discussed and a pointer that
+   moves and clicks. Text stays vector, so it is sharp at any zoom; the product
+   shown is the product shipped; and there is no file to load. Scripts live
+   next to the stage (`ConversationDemo`), one step per phase of the scene.
+2. **`DemoCard`** — a fragment of the interface at 1:1, floating on a grainy
+   panel. Used in the feature rows. This is what the reference does in its own
+   panels, and it is why the reference is legible.
+
+Rules: both pause when off-screen and when `prefers-reduced-motion` is set;
+both reset `text-white` and `text-left` on their root, because a fragment of
+the app must inherit nothing from the page that hosts it; never put a real
+account in either.
+
+Camera framing is arithmetic, not taste. At scale *s* the field is
+`1280/s × 800/s`; check that the text column (x 392→1160) and the header
+(y 0→130) still fall inside before committing a value. A demo that clips its
+own sentences demonstrates nothing.
+
+### The orb is the face of Mendly
+
+`components/ui/MendlyOrb.tsx` — a canvas sphere carrying the grainy-gradient
+material, the single representation of the entity. It replaced the conic
+multicolour ring and the per-role coloured pills: a counsel that speaks with
+one voice cannot have eight avatars in eight colours.
+
+It has two states and one path between them, interpolated frame by frame —
+never switched. At rest the material drifts at 12 fps; while Mendly writes it
+runs three times faster, brightens, and the halo comes up. `ORB_COLORS` is
+exported because `SpeakingBar`, the light along the top edge of the workspace,
+must use exactly those hues. Two near-but-different palettes on one screen do
+not read as two elements, they read as a defect.
 
 ### Banned
 Belonging to earlier charters, all removed: the full-screen particle field
 (`EntityField`), aurora gradients and multi-accent text, meteors, shooting
 stars, glow pulses on CTAs, magnetic buttons, the pill-with-pellet button,
-liquid-glass panels on the landing, `#000000` as a ground.
+liquid-glass panels on the landing, `#000000` as a ground, the multicolour
+`aurora-cloud`/`AIAura` rings, per-agent colour palettes, and static PNG
+screenshots of the product.
 
 ## CODE RULES (non-negotiable)
 
@@ -174,7 +207,7 @@ components/
   auth/          → the split-panel sign-in screens
   onboarding/    → the five-step welcome
   settings/      → the settings screens
-  preview/       → demo scenes used to shoot the product screenshots
+  preview/       → the demo project fixtures and the design-QA scenes
   sections/      → editorial pages (manifesto, contact, security…)
   ui/            → atomic UI (Pill, GrainGradient, Ribbon…)
   layout/        → Nav + Footer for the dark editorial pages

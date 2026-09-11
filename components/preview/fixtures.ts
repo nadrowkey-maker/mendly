@@ -55,6 +55,22 @@ Lancer maintenant, c'est brûler ta seule fenêtre de nouveauté pour découvrir
 **Ma position :** sors trois pièces au lieu de douze, dès cette semaine, uniquement pour mesurer. Tu sauras avant le 15 novembre si ton canal existe. S'il existe, tu lances le reste avec un chiffre en main.`,
   roomSuggestion:
     "Faut-il sortir la collection entière ou trois pièces de test avant décembre ?",
+  /*
+   * La version courte, pour le plateau de la vitrine.
+   *
+   * La réponse complète tient dans l'atelier, qui défile. Le plateau, lui, a
+   * une hauteur fixe : la version longue en déborderait, et la démonstration
+   * montrerait un texte coupé au milieu d'une phrase — soit exactement ce qu'on
+   * ne veut pas donner à lire à quelqu'un qui découvre le produit.
+   *
+   * Elle garde les trois gestes qui comptent : la question sur les chiffres,
+   * la contradiction assumée, la position tranchée.
+   */
+  stageAnswer: `Sur quoi tu te bases pour dire que c'est le bon mois ? Tu as vendu 34 pièces depuis juin, dont 21 sur une seule journée de marché. Ce n'est pas une courbe, c'est un événement.
+
+**Contradiction interne** — ta collection tient debout, ton canal ne tient pas. Tout ton volume vient d'un stand que tu ne peux pas répéter en décembre.
+
+**Ma position :** sors trois pièces cette semaine pour mesurer. Tu sauras avant le 15 novembre si ton canal existe.`,
 };
 
 export const DEMO_ACTIONS: ActionItem[] = [

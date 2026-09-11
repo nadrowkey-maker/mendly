@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { GrainGradient } from "@/components/ui/GrainGradient";
-import { ShotFrame } from "@/components/home/ShotFrame";
+import { IntakeCard } from "@/components/home/IntakeCard";
 
 /**
  * Les trois étapes de départ.
@@ -39,7 +39,7 @@ export function GetStarted() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-          className="relative overflow-hidden rounded-3xl p-6 md:p-10"
+          className="relative flex min-h-[380px] items-center overflow-hidden rounded-3xl p-6 md:min-h-[440px] md:p-10"
         >
           <GrainGradient
             colorway="ash"
@@ -47,8 +47,8 @@ export function GetStarted() {
             grain={0.5}
             className="absolute inset-0 size-full"
           />
-          <div className="relative">
-            <ShotFrame src="/product/intake.png" alt={t("caption")} width={1440} height={900} />
+          <div className="relative mx-auto w-full max-w-sm">
+            <IntakeCard />
           </div>
         </motion.div>
       </div>

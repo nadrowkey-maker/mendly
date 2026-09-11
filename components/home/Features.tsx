@@ -2,6 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { FeatureRow } from "@/components/home/FeatureRow";
+import { ContradictionCard } from "@/components/home/ContradictionCard";
+import { RoomCard } from "@/components/home/RoomCard";
+import { NightCard } from "@/components/home/NightCard";
 
 /**
  * Les trois rangées de démonstration.
@@ -27,8 +30,7 @@ export function Features() {
           eyebrow={t("contradiction.eyebrow")}
           title={t("contradiction.title")}
           items={t.raw("contradiction.items") as string[]}
-          caption={t("contradiction.caption")}
-          shot="/product/contradiction.png"
+          visual={<ContradictionCard />}
           colorway="azure"
           seed={21}
         />
@@ -36,8 +38,7 @@ export function Features() {
           eyebrow={t("room.eyebrow")}
           title={t("room.title")}
           items={t.raw("room.items") as string[]}
-          caption={t("room.caption")}
-          shot="/product/room.png"
+          visual={<RoomCard />}
           colorway="verdict"
           seed={34}
           flipped
@@ -46,8 +47,7 @@ export function Features() {
           eyebrow={t("night.eyebrow")}
           title={t("night.title")}
           items={t.raw("night.items") as string[]}
-          caption={t("night.caption")}
-          shot="/product/night.png"
+          visual={<NightCard />}
           colorway="signal"
           seed={47}
         />

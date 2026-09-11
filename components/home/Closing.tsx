@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { PillLink } from "@/components/ui/Pill";
 import { GrainGradient } from "@/components/ui/GrainGradient";
+import { Reveal } from "@/components/home/Reveal";
 
 /**
  * La dernière adresse au visiteur.
@@ -29,18 +30,24 @@ export function Closing() {
       </div>
 
       <div className="relative mx-auto max-w-2xl px-5 py-24 text-center md:px-8 md:py-32">
-        <h2 className="display text-[30px] text-(--ink) md:text-[44px]">{t("title")}</h2>
-        <p className="mx-auto mt-4 max-w-md text-[14px] leading-relaxed text-(--ink-soft)">
-          {t("sub")}
-        </p>
-        <div className="mt-8 flex justify-center">
-          <PillLink href="/signup" tone="ink" size="lg">
-            {t("cta")}
-          </PillLink>
-        </div>
-        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-(--ink-muted)">
-          {t("note")}
-        </p>
+        <Reveal>
+          <h2 className="display text-[30px] text-(--ink) md:text-[44px]">{t("title")}</h2>
+        </Reveal>
+        <Reveal delay={1}>
+          <p className="mx-auto mt-4 max-w-md text-[14px] leading-relaxed text-(--ink-soft)">
+            {t("sub")}
+          </p>
+        </Reveal>
+        <Reveal delay={2}>
+          <div className="mt-8 flex justify-center">
+            <PillLink href="/signup" tone="ink" size="lg">
+              {t("cta")}
+            </PillLink>
+          </div>
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-(--ink-muted)">
+            {t("note")}
+          </p>
+        </Reveal>
       </div>
     </section>
   );

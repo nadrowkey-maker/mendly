@@ -27,6 +27,15 @@ interface AppShellProps {
   children: React.ReactNode;
   /** Retire le rembourrage de la zone de travail — pour le chat, qui gère le sien. */
   flush?: boolean;
+  /**
+   * Rendu à l'intérieur du plateau de démonstration de la vitrine.
+   *
+   * Le châssis occupe normalement la hauteur de la fenêtre. Sur un plateau, il
+   * doit occuper celle de son conteneur : sans cela, la scène ferait la
+   * hauteur de l'écran du visiteur au lieu de celle du cadre, et le bas de
+   * l'interface sortirait du plateau.
+   */
+  inStage?: boolean;
 }
 
 export function AppShell({
@@ -38,6 +47,7 @@ export function AppShell({
   contextLabel,
   children,
   flush,
+  inStage,
 }: AppShellProps) {
   const [drawer, setDrawer] = useState(false);
 
@@ -53,8 +63,13 @@ export function AppShell({
   );
 
   return (
-    <div className="flex h-dvh gap-0 overflow-hidden bg-(--shell) p-2 md:gap-2">
-      <div className="hidden md:block">{sidebar}</div>
+    <div
+      className={[
+        "flex gap-0 overflow-hidden bg-(--shell) p-2 md:gap-2",
+        inStage ? "h-full" : "h-dvh",
+      ].join(" ")}
+    >
+      <div className={inStage ? "block" : "hidden md:block"}>{sidebar}</div>
 
       {/* Tiroir mobile : le voile ferme au clic, ce que l'ancienne barre
           réduite ne permettait pas — on restait coincé en mode icônes. */}
@@ -76,18 +91,25 @@ export function AppShell({
           fait ressembler un atelier à un explorateur de fichiers. */}
       <main
         className={[
-          "flex min-w-0 flex-1 flex-col overflow-hidden",
+          // `relative` ancre le bandeau de parole, qui est en position
+          // absolue. Sans lui, il remontait jusqu'au premier ancêtre positionné
+          // et débordait sur la barre latérale — la lumière de Mendly éclairait
+          // la navigation, qui n'a rien à voir avec ce qu'il est en train de
+          // dire.
+          "relative flex min-w-0 flex-1 flex-col overflow-hidden",
           flush ? "" : "overflow-y-auto",
         ].join(" ")}
       >
-        <button
-          type="button"
-          onClick={() => setDrawer((v) => !v)}
-          aria-label="menu"
-          className="m-3 grid size-9 shrink-0 place-items-center rounded-xl bg-white/6 text-white/70 transition-colors hover:bg-white/10 md:hidden"
-        >
-          {drawer ? <X className="size-4" /> : <Menu className="size-4" />}
-        </button>
+        {!inStage && (
+          <button
+            type="button"
+            onClick={() => setDrawer((v) => !v)}
+            aria-label="menu"
+            className="m-3 grid size-9 shrink-0 place-items-center rounded-xl bg-white/6 text-white/70 transition-colors hover:bg-white/10 md:hidden"
+          >
+            {drawer ? <X className="size-4" /> : <Menu className="size-4" />}
+          </button>
+        )}
         {children}
       </main>
     </div>

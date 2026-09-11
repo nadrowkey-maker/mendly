@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
+import { Reveal } from "@/components/home/Reveal";
 
 /**
  * L'accordéon des questions.
@@ -26,15 +27,17 @@ export function Faq() {
 
   return (
     <section className="mx-auto max-w-3xl px-5 md:px-8">
-      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-(--ink-muted)">
-        {t("title")}
-      </p>
+      <Reveal>
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-(--ink-muted)">
+          {t("title")}
+        </p>
+      </Reveal>
 
       <div className="mt-6 border-t border-(--paper-line)">
         {items.map((item, i) => {
           const isOpen = open === i;
           return (
-            <div key={item.q} className="border-b border-(--paper-line)">
+            <Reveal key={item.q} delay={i} className="border-b border-(--paper-line)">
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : i)}
@@ -70,7 +73,7 @@ export function Faq() {
                   </p>
                 </div>
               </div>
-            </div>
+            </Reveal>
           );
         })}
       </div>

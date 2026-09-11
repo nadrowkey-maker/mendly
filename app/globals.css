@@ -521,112 +521,16 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
   animation: shimmer 1.4s ease infinite;
   border-radius: var(--radius-sm);
 }
-
 /* ============================================================
-   LIVING MULTICOLOR CLOUD — "the AI is speaking" (Apple-Intelligence vibe)
-   A big, soft, multicolor cloud that drifts gently, and comes alive
-   (brighter + faster) when an agent is generating.
+   LA PAROLE DE MENDLY
+   Le filet qui balaie l'arête haute de l'atelier quand l'orbe parle.
+   Les teintes vivent dans MendlyOrb (ORB_COLORS) et sont passées en
+   ligne : une palette dupliquée ici finirait par diverger de l'orbe,
+   et c'est précisément ce défaut qu'on vient de corriger.
    ============================================================ */
-.aurora-cloud {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* Intense at the very top, fading gently down the full length — points down. */
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 24%, rgba(0, 0, 0, 0.4) 62%, rgba(0, 0, 0, 0) 100%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 24%, rgba(0, 0, 0, 0.4) 62%, rgba(0, 0, 0, 0) 100%);
-}
-.aurora-cloud .ac {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(64px);
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-}
-.aurora-cloud .ac-1 {
-  width: 60%; height: 80%; left: -10%; top: -22%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 1) 0%, transparent 64%);
-  animation: ac-drift-1 16s ease-in-out infinite;
-}
-.aurora-cloud .ac-2 {
-  width: 58%; height: 78%; right: -10%; top: -18%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 1) 0%, transparent 64%);
-  animation: ac-drift-2 20s ease-in-out infinite;
-}
-.aurora-cloud .ac-3 {
-  width: 54%; height: 72%; left: 22%; top: -26%;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.96) 0%, transparent 66%);
-  animation: ac-drift-3 18s ease-in-out infinite;
-}
-.aurora-cloud .ac-4 {
-  width: 52%; height: 70%; right: 22%; top: -16%;
-  background: radial-gradient(circle, rgba(236, 72, 153, 1) 0%, transparent 66%);
-  animation: ac-drift-4 22s ease-in-out infinite;
-}
-.aurora-cloud.is-live { animation: ac-pulse 2.8s ease-in-out infinite; }
-.aurora-cloud.is-live .ac { filter: blur(46px); animation-duration: 6s; }
-
-@keyframes ac-drift-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(12%, -10%) scale(1.18); }
-  66%      { transform: translate(-8%, 6%) scale(0.94); }
-}
-@keyframes ac-drift-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40%      { transform: translate(-14%, -8%) scale(1.12); }
-  70%      { transform: translate(10%, 8%) scale(0.9); }
-}
-@keyframes ac-drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(10%, -14%) scale(1.22); }
-}
-@keyframes ac-drift-4 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  45%      { transform: translate(-10%, -10%) scale(1.1); }
-  75%      { transform: translate(12%, 4%) scale(0.95); }
-}
-@keyframes ac-pulse {
-  0%, 100% { opacity: 0.9; }
-  50%      { opacity: 1; }
-}
-
-/* ============================================================
-   TOP AURORA — spills from the top edge of the site, pointing down.
-   Vivid multicolor on black (screen blend), gently alive.
-   ============================================================ */
-.top-aurora {
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 92vh;
-  overflow: hidden;
-  pointer-events: none;
-}
-.top-aurora .ta {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(88px);
-  mix-blend-mode: screen;
-  will-change: transform;
-}
-.top-aurora .ta-1 {
-  width: 62%; height: 62%; left: 5%; top: -32%;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.95) 0%, transparent 66%);
-  animation: ac-drift-1 19s ease-in-out infinite;
-}
-.top-aurora .ta-2 {
-  width: 56%; height: 56%; right: 3%; top: -28%;
-  background: radial-gradient(circle, rgba(91, 157, 255, 0.9) 0%, transparent 66%);
-  animation: ac-drift-2 23s ease-in-out infinite;
-}
-.top-aurora .ta-3 {
-  width: 50%; height: 50%; left: 28%; top: -36%;
-  background: radial-gradient(circle, rgba(52, 216, 180, 0.72) 0%, transparent 70%);
-  animation: ac-drift-3 21s ease-in-out infinite;
-}
-.top-aurora .ta-4 {
-  width: 48%; height: 48%; right: 20%; top: -30%;
-  background: radial-gradient(circle, rgba(244, 114, 182, 0.8) 0%, transparent 70%);
-  animation: ac-drift-4 25s ease-in-out infinite;
+@keyframes speaking-pan {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 /* ============================================================
@@ -796,4 +700,11 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
   letter-spacing: -0.035em;
   line-height: 1.04;
   text-wrap: balance;
+}
+
+/* L'onde de clic du plateau de démonstration : elle part du point touché et
+   s'efface. Un cercle qui reste serait un repère, pas un geste. */
+@keyframes stage-click {
+  0%   { transform: scale(0.35); opacity: 0.9; }
+  100% { transform: scale(1.5);  opacity: 0; }
 }

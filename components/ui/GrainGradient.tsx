@@ -35,22 +35,22 @@ export type GrainColorway = "azure" | "signal" | "verdict" | "ash" | "dusk";
 const COLORWAYS: Record<GrainColorway, { base: string; blobs: string[] }> = {
   // L'azur de Mendly sur un blanc chaud — le coloris principal.
   azure: {
-    base: "#f4f2ec",
-    blobs: ["#3aa8ff", "#8fd4ff", "#f7e2b0", "#dfe9f4", "#1d6fbd"],
+    base: "#eef1f6",
+    blobs: ["#1f8ce8", "#63bdff", "#ffc046", "#ffffff", "#0d4f92"],
   },
   // L'ambre du signal : réservé aux blocs qui parlent de contradiction.
   signal: {
-    base: "#faf3e6",
-    blobs: ["#ffb454", "#ffd79a", "#fff3dd", "#e08a2c", "#f6e0bb"],
+    base: "#fbf1df",
+    blobs: ["#ff9d1f", "#ffc266", "#fff3dd", "#c96a0d", "#ffd699"],
   },
   // Le verdict rendu — vert froid, pour les blocs qui parlent de décision.
   verdict: {
-    base: "#eef6ef",
-    blobs: ["#4bd39a", "#a9ecd0", "#e8f7ee", "#1e9a72", "#cdebd9"],
+    base: "#e9f5ec",
+    blobs: ["#17b87c", "#6fdcae", "#eefaf3", "#067a52", "#a5e6c8"],
   },
   // Neutre : quand le contenu posé dessus doit primer. Très clair et très peu
-  // contrasté — un gris moyen ferait un panneau plus lourd que la capture
-  // qu'il est censé mettre en valeur.
+  // contrasté — un gris moyen ferait un panneau plus lourd que la carte qu'il
+  // est censé mettre en valeur.
   ash: {
     base: "#f4f2ee",
     blobs: ["#ffffff", "#efe9dc", "#e8edf3", "#fbf7ee", "#e2ded4"],
@@ -61,7 +61,6 @@ const COLORWAYS: Record<GrainColorway, { base: string; blobs: string[] }> = {
     blobs: ["#1d6fbd", "#3aa8ff", "#0a0d12", "#123a5f", "#8fd4ff"],
   },
 };
-
 interface GrainGradientProps {
   colorway?: GrainColorway;
   /** Intensité du grain, 0 à 1. */
@@ -168,7 +167,7 @@ export function GrainGradient({
     }
     node.style.backgroundImage = `url(${getNoiseTile()})`;
     node.style.backgroundRepeat = "repeat";
-    node.style.opacity = String(grain * 0.2);
+    node.style.opacity = String(grain * 0.3);
   }, [grain]);
 
   useEffect(() => {
@@ -187,9 +186,9 @@ export function GrainGradient({
     const specs = Array.from({ length: 6 }, () => ({
       x: rand() * 1.5 - 0.25,
       y: rand() * 1.5 - 0.25,
-      radius: 0.4 + rand() * 0.55,
+      radius: 0.46 + rand() * 0.62,
       color: blobs[Math.floor(rand() * blobs.length)],
-      alpha: 0.55 + rand() * 0.35,
+      alpha: 0.62 + rand() * 0.30,
       // Chaque tache dérive sur sa propre ellipse, à sa propre vitesse : des
       // trajectoires synchronisées se liraient comme une pulsation.
       driftX: 0.03 + rand() * 0.06,
