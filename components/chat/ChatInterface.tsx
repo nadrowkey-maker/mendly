@@ -133,8 +133,18 @@ export function ChatInterface({
   const [activeAgent, setActiveAgent] = useState<AgentRole>("MENDLY");
   const [switchingAgent, setSwitchingAgent] = useState(false);
   const [teamRoomActive, setTeamRoomActive] = useState(false);
+  /*
+   * L'état de départ est rangé sous MENDLY, et c'est la seule clé correcte.
+   *
+   * La page serveur appelle `getOrCreateConversation(id, "MENDLY")` : le fil
+   * qu'elle transmet appartient à Mendly. Il était rangé ici sous CEO, hérité
+   * du produit à huit agents. Depuis que `activeAgent` démarre sur MENDLY,
+   * `agentData.MENDLY` valait donc `undefined`, `activeConversationId` valait
+   * la chaîne vide, et la garde en tête de `handleSubmit` renvoyait sans rien
+   * faire : plus aucun message ne partait, ni à la touche Entrée ni au bouton.
+   */
   const [agentData, setAgentData] = useState<Partial<Record<AgentRole, AgentState>>>({
-    CEO: {
+    MENDLY: {
       conversationId,
       messages: toDisplayMessages(initialMessages),
       loaded: true,
@@ -183,10 +193,6 @@ export function ChatInterface({
 
   const busy = isLoading || isDebating || switchingAgent;
 
-  // The team room reuses the CEO conversation — debates already live there
-  // (agent_role: "DEBATE" messages) regardless of which agent tab triggered
-  // them. Forcing activeAgent back to CEO keeps activeConversationId (and so
-  // handleDebate's target) pointed at the thread the room actually reads from.
   /**
    * Ouvre la salle de réunion, éventuellement avec une question pré-remplie.
    *
@@ -197,7 +203,9 @@ export function ChatInterface({
   const handleTeamRoomOpen = (question?: string) => {
     if (busy) return;
     if (question) setInput(question);
-    setActiveAgent("CEO");
+    // On ne change pas d'interlocuteur : la salle rejoue les débats du même
+    // fil. Basculer sur CEO, comme le faisait la version précédente, pointait
+    // `activeConversationId` sur une entrée qui n'existe plus.
     setTeamRoomActive(true);
     setError(null);
     setDebateState({ phase: "idle" });
@@ -228,7 +236,7 @@ export function ChatInterface({
     } catch (err) {
       console.error("Agent switch error:", err);
       setError(t("errorGeneric"));
-      setActiveAgent("CEO");
+      setActiveAgent("MENDLY");
     } finally {
       setSwitchingAgent(false);
     }
@@ -236,7 +244,20 @@ export function ChatInterface({
 
   const handleSubmit = async (override?: string, mode?: "viability" | "overwhelmed") => {
     const trimmed = (typeof override === "string" ? override : input).trim();
-    if (!trimmed || busy || !activeConversationId) return;
+    if (!trimmed || busy) return;
+
+    /*
+     * L'absence de fil est signalée, pas avalée.
+     *
+     * Cette garde renvoyait sans rien dire, et c'est ce qui a permis au défaut
+     * de clé de vivre aussi longtemps : le fondateur appuyait sur Entrée, rien
+     * ne partait, et l'interface n'avait aucun avis sur la question. Un état
+     * impossible doit se voir.
+     */
+    if (!activeConversationId) {
+      setError(t("errorGeneric"));
+      return;
+    }
 
     setError(null);
     setInput("");
@@ -368,7 +389,11 @@ export function ChatInterface({
 
   const handleDebate = async () => {
     const trimmed = input.trim();
-    if (!trimmed || busy || !activeConversationId) return;
+    if (!trimmed || busy) return;
+    if (!activeConversationId) {
+      setError(t("errorGeneric"));
+      return;
+    }
 
     setError(null);
     setInput("");
@@ -378,10 +403,10 @@ export function ChatInterface({
     const userMsgId = `user-${Date.now()}`;
     setAgentData((prev) => ({
       ...prev,
-      CEO: {
-        ...prev.CEO!,
+      MENDLY: {
+        ...prev.MENDLY!,
         messages: [
-          ...(prev.CEO?.messages ?? []),
+          ...(prev.MENDLY?.messages ?? []),
           { id: userMsgId, role: "user", content: trimmed },
         ],
       },
@@ -408,9 +433,9 @@ export function ChatInterface({
         setDebateState({ phase: "idle" });
         setAgentData((prev) => ({
           ...prev,
-          CEO: {
-            ...prev.CEO!,
-            messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId),
+          MENDLY: {
+            ...prev.MENDLY!,
+            messages: prev.MENDLY!.messages.filter((m) => m.id !== userMsgId),
           },
         }));
         return;
@@ -431,7 +456,7 @@ export function ChatInterface({
         setDebateState({ phase: "idle" });
         setAgentData((prev) => ({
           ...prev,
-          CEO: { ...prev.CEO!, messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId) },
+          MENDLY: { ...prev.MENDLY!, messages: prev.MENDLY!.messages.filter((m) => m.id !== userMsgId) },
         }));
         return;
       }
@@ -440,9 +465,9 @@ export function ChatInterface({
         setDebateState({ phase: "idle" });
         setAgentData((prev) => ({
           ...prev,
-          CEO: {
-            ...prev.CEO!,
-            messages: prev.CEO!.messages.filter((m) => m.id !== userMsgId),
+          MENDLY: {
+            ...prev.MENDLY!,
+            messages: prev.MENDLY!.messages.filter((m) => m.id !== userMsgId),
           },
         }));
         return;
@@ -902,7 +927,7 @@ export function ChatInterface({
         title={teamRoomActive ? t("teamRoomNav") : tSide("conversation")}
         subtitle={project.name}
         actions={
-          !teamRoomActive && activeAgent === "CEO" ? (
+          !teamRoomActive && activeAgent === "MENDLY" ? (
             <GenerateMemoButton projectId={project.id} userPlan={userPlan} />
           ) : undefined
         }
@@ -951,7 +976,7 @@ export function ChatInterface({
                 <p className="text-(--text-secondary) max-w-md mx-auto text-[15px] leading-relaxed">
                   {t(`welcomeBody${activeAgent}`, { projectName: project.name })}
                 </p>
-                {activeAgent === "CEO" && (
+                {activeAgent === "MENDLY" && (
                   <div className="mt-8 max-w-md mx-auto text-left">
                     <div className="flex flex-wrap gap-2 mb-4">
                       <button
