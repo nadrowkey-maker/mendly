@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { PLANS, type PlanTier } from "@/lib/stripe/plans";
+import { PLANS, resolvePlan, type PlanTier } from "@/lib/stripe/plans";
 
 export interface UserSubscription {
   plan: PlanTier;
@@ -48,7 +48,10 @@ export async function getUserSubscription(): Promise<UserSubscription> {
     };
   }
 
-  return data as UserSubscription;
+  // Le plan renvoyé est le plan effectif, statut compris : c'est lui que
+  // l'interface affiche et que les contrôles appliquent.
+  const row = data as UserSubscription;
+  return { ...row, plan: resolvePlan(row.plan, row.status) };
 }
 
 export async function getUserPlan(): Promise<PlanTier> {

@@ -50,3 +50,32 @@ export function getPlanFromPriceId(priceId: string): PlanTier | null {
   if (priceId === PLANS.pro.priceId) return "pro";
   return null;
 }
+
+/**
+ * Le plan qui ouvre RÉELLEMENT des droits.
+ *
+ * Chaque point de contrôle lisait la colonne `plan` telle quelle, sans regarder
+ * `status`. Un abonnement impayé (`unpaid`), expiré (`incomplete_expired`) ou
+ * annulé mais pas encore nettoyé gardait donc tous les avantages payants. Et
+ * une valeur hors liste — un « premium » saisi à la main — faisait planter les
+ * écrans qui indexent `PLANS[plan]` sans vérification.
+ *
+ * - valeur inconnue → gratuit ;
+ * - `active`, `trialing` → le plan ;
+ * - `past_due` → le plan : Stripe relance le paiement pendant plusieurs jours,
+ *   couper au premier échec de carte punirait un client qui paie ;
+ * - statut absent → le plan : c'est une ligne posée à la main par un
+ *   administrateur (les fondateurs n'ont pas le droit d'écrire dans cette
+ *   table), pas un abonnement Stripe ;
+ * - tout le reste → gratuit.
+ */
+const ENTITLED_STATUSES = new Set(["active", "trialing", "past_due"]);
+
+export function resolvePlan(
+  plan: string | null | undefined,
+  status: string | null | undefined
+): PlanTier {
+  if (plan !== "starter" && plan !== "pro") return "free";
+  if (!status) return plan;
+  return ENTITLED_STATUSES.has(status) ? plan : "free";
+}

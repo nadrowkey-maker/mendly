@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { LegalDocument } from "@/components/legal/LegalDocument";
+import { DocumentPage } from "@/components/home/DocumentPage";
 
 export async function generateMetadata({
   params,
@@ -23,5 +23,5 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
 
   const sections = KEYS.map((k) => ({ title: t(`${k}Title`), body: t(`${k}Body`) }));
 
-  return <LegalDocument title={t("title")} sections={sections} />;
+  return <DocumentPage title={t("title")} sections={sections} />;
 }

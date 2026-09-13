@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   getOrCreateConversation,
-  listMessages,
+  listThreadMessages,
 } from "@/lib/actions/conversations";
 import { listProjects } from "@/lib/actions/projects";
 import { getProjectStats } from "@/lib/actions/project-stats";
@@ -10,6 +10,12 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 import { checkRateLimit } from "@/lib/rate-limit/check";
 import { getUserSubscription } from "@/lib/actions/subscription";
 import type { Project } from "@/lib/types/project";
+
+/**
+ * Toujours rendue à la demande : l'historique d'une conversation ne doit
+ * jamais être servi depuis un cache, même bref.
+ */
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -43,7 +49,7 @@ export default async function ProjectChatPage({ params }: PageProps) {
   }
 
   const [messages, allProjects, usage, subscription, projectStats] = await Promise.all([
-    listMessages(conversation.id),
+    listThreadMessages(id, "MENDLY"),
     listProjects(),
     checkRateLimit(user.id),
     getUserSubscription(),
@@ -52,6 +58,9 @@ export default async function ProjectChatPage({ params }: PageProps) {
 
   return (
     <ChatInterface
+      // La clé force un montage neuf à chaque projet : sans elle, rien ne
+      // garantit que l'état d'un projet ne survive pas dans le suivant.
+      key={id}
       project={project as Project}
       conversationId={conversation.id}
       initialMessages={messages}

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { PLANS, type PlanTier } from "@/lib/stripe/plans";
+import { PLANS, resolvePlan, type PlanTier } from "@/lib/stripe/plans";
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -21,12 +21,11 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   // Fetch user's plan
   const { data: subData } = await supabase
     .from("subscriptions")
-    .select("plan")
+    .select("plan, status")
     .eq("user_id", userId)
     .maybeSingle();
 
-  const rawPlan = subData?.plan as string;
-  const plan: PlanTier = (rawPlan in PLANS) ? (rawPlan as PlanTier) : "free";
+  const plan: PlanTier = resolvePlan(subData?.plan, subData?.status);
   const limit = PLANS[plan].dailyMessageLimit;
   const tomorrow = new Date();
   tomorrow.setHours(24, 0, 0, 0);

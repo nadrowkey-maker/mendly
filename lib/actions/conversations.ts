@@ -27,8 +27,18 @@ export async function getProject(projectId: string): Promise<Project | null> {
 }
 
 /**
- * Récupère ou crée la conversation par défaut du CEO pour un projet.
- * Pour le MVP : 1 conversation par (projet, agent_role).
+ * Récupère ou crée LE fil d'un projet pour un rôle donné.
+ *
+ * La lecture passait par `maybeSingle()`, qui échoue dès qu'il existe deux
+ * lignes — et rien n'empêchait d'en créer deux : il suffisait de deux rendus
+ * simultanés de la page. À partir de là, chaque visite échouait en lecture,
+ * créait un nouveau fil vide, et le fondateur retrouvait sa conversation
+ * remise à zéro à chaque retour sur le projet.
+ *
+ * On lit donc le fil le plus récemment actif sans jamais exiger l'unicité.
+ * L'index unique de la migration 0006 empêche le doublon à la source ; si deux
+ * rendus se croisent malgré tout, le perdant relit le fil du gagnant au lieu
+ * d'abandonner.
  */
 export async function getOrCreateConversation(
   projectId: string,
@@ -41,18 +51,20 @@ export async function getOrCreateConversation(
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  // Try to find existing conversation
-  const { data: existing } = await supabase
-    .from("conversations")
-    .select("*")
-    .eq("project_id", projectId)
-    .eq("agent_role", agentRole)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const findThread = () =>
+    supabase
+      .from("conversations")
+      .select("*")
+      .eq("project_id", projectId)
+      .eq("agent_role", agentRole)
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
+  const { data: existing } = await findThread();
   if (existing) return existing as Conversation;
 
-  // Create new conversation
   const { data: created, error } = await supabase
     .from("conversations")
     .insert({
@@ -64,11 +76,58 @@ export async function getOrCreateConversation(
     .single();
 
   if (error) {
+    // 23505 : l'index unique a refusé un doublon créé en parallèle.
+    if (error.code === "23505") {
+      const { data: winner } = await findThread();
+      if (winner) return winner as Conversation;
+    }
     console.error("getOrCreateConversation error:", error);
     return null;
   }
 
   return created as Conversation;
+}
+
+/**
+ * Tous les messages d'un projet pour un rôle, tous fils confondus.
+ *
+ * Tant que la migration 0006 n'a pas fusionné les fils doublés, l'historique
+ * d'un fondateur peut être éclaté entre plusieurs conversations. En lire une
+ * seule n'en afficherait qu'un morceau ; on les lit toutes, dans l'ordre.
+ */
+export async function listThreadMessages(
+  projectId: string,
+  agentRole: AgentRole = "MENDLY"
+): Promise<Message[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: threads } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("agent_role", agentRole)
+    .eq("user_id", user.id);
+
+  const ids = (threads ?? []).map((row) => (row as { id: string }).id);
+  if (ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .in("conversation_id", ids)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("listThreadMessages error:", error);
+    return [];
+  }
+
+  return (data ?? []) as Message[];
 }
 
 /**

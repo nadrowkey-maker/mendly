@@ -34,6 +34,18 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
   trailingSlash: true,
+  /*
+   * La redirection automatique vers la barre oblique finale est coupée, et
+   * reprise à la main dans `proxy.ts` pour les seules pages.
+   *
+   * Laissée à Next, elle s'appliquait aussi aux routes d'API : un appel à
+   * `/api/stripe/webhook` recevait un 308 vers `/api/stripe/webhook/`. Or ni
+   * Stripe, ni les crons Vercel, ni les hooks Supabase ne suivent les
+   * redirections — ils comptent l'appel comme un échec. Selon l'adresse
+   * enregistrée, un paiement pouvait ne jamais débloquer le plan, et les
+   * tâches planifiées ne jamais s'exécuter.
+   */
+  skipTrailingSlashRedirect: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",

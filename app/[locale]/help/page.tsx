@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/routing";
-import { PageWrapper } from "@/components/layout/PageWrapper";
+import { PaperPage } from "@/components/home/PaperPage";
+import { PaperHeader } from "@/components/home/PaperHeader";
+import { PillLink } from "@/components/ui/Pill";
 
 export async function generateMetadata({
   params,
@@ -22,59 +23,53 @@ const QUESTIONS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
  * Le centre d'aide.
  *
  * Construit avec <details>/<summary> natifs plutôt qu'un accordéon en
- * JavaScript : le composant reste un composant serveur, fonctionne sans JS,
- * est navigable au clavier par défaut, et le texte des réponses est présent
- * dans le HTML — donc indexable et trouvable par la recherche du navigateur,
- * même replié.
+ * JavaScript : la page reste un composant serveur, fonctionne sans JS, est
+ * navigable au clavier par défaut, et le texte des réponses est présent dans
+ * le HTML — donc indexable et trouvable par la recherche du navigateur, même
+ * replié.
  *
- * Chaque réponse décrit ce que le produit fait réellement. Une page d'aide qui
- * promet plus que le code ne tient est pire que pas de page d'aide.
+ * Même dessin que les questions fréquentes de la page d'accueil : filets entre
+ * les questions, signe « plus » qui pivote. Deux accordéons différents sur le
+ * même site feraient deux manières d'apprendre à s'en servir.
  */
 export default async function HelpPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "help" });
 
   return (
-    <PageWrapper>
-      <div className="mx-auto max-w-2xl px-6 py-20 md:px-8 md:py-28">
-        <header className="mb-12 border-b border-(--glass-line) pb-10">
-          <h1 className="text-balance text-3xl font-extralight tracking-[-0.03em] text-white md:text-5xl">
-            {t("title")}
-          </h1>
-          <p className="mt-5 text-(--text-secondary)">{t("sub")}</p>
-        </header>
+    <PaperPage>
+      <PaperHeader title={t("title")} sub={t("sub")} colorway="azure" />
 
-        <div className="flex flex-col gap-2">
+      <section className="mx-auto max-w-3xl px-5 pt-14 md:px-8 md:pt-20">
+        <div className="border-t border-(--paper-line)">
           {QUESTIONS.map((n) => (
-            <details
-              key={n}
-              className="group rounded-2xl border border-(--glass-line) bg-(--glass) px-5 backdrop-blur-xl transition-colors open:bg-white/6 hover:border-(--glass-hi)"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-white marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-glow)">
-                <span className="text-[15px] font-medium">{t(`q${n}`)}</span>
+            <details key={n} className="group border-b border-(--paper-line)">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-primary)">
+                <span className="text-[15px] font-medium tracking-tight text-(--ink)">
+                  {t(`q${n}` as "q1")}
+                </span>
                 <svg
                   viewBox="0 0 16 16"
                   fill="none"
                   aria-hidden="true"
-                  className="size-4 shrink-0 text-(--text-muted) transition-transform group-open:rotate-45"
+                  className="size-4 shrink-0 text-(--ink-muted) transition-transform duration-300 group-open:rotate-45"
                 >
                   <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </summary>
-              <p className="pb-5 pr-8 leading-relaxed text-(--text-secondary)">{t(`a${n}`)}</p>
+              <p className="max-w-2xl pb-6 text-[14px] leading-relaxed text-(--ink-soft)">
+                {t(`a${n}` as "a1")}
+              </p>
             </details>
           ))}
         </div>
 
-        <div className="mt-12 border-t border-(--glass-line) pt-10 text-center">
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2.5 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
-          >
+        <div className="mt-14 flex justify-center">
+          <PillLink href="/contact" tone="ink" size="lg">
             {t("contactCta")}
-          </Link>
+          </PillLink>
         </div>
-      </div>
-    </PageWrapper>
+      </section>
+    </PaperPage>
   );
 }

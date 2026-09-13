@@ -44,64 +44,55 @@
     "section1Body1": "For 50 years, launching a startup has followed the same implicit rule: find cofounders, raise money, hire a team. Without it, your idea dies.",
     "section1Body2": "That rule did damage. Thousands of founders with brilliant ideas gave up — not from lack of talent, but lack of hands.",
     "section2Title": "AI changes the equation. Mendly embodies it.",
-    "section2Body1": "AI doesn't do everything for you. It does something better: it gives you what you've been missing from day one. A team. Not an assistant. A team.",
-    "section2Body2": "Eight specialists who debate each other. Who remember your project day after day. Who produce real deliverables — strategic memos, marketing plans, technical architectures, financial models, pitch decks.",
+    "section2Body1": "AI doesn't do everything for you. It does something better: it gives you what you've been missing from day one. Someone who pushes back. Not an assistant that nods along.",
+    "section2Body2": "Mendly carries every angle of a leadership team — finance, growth, engineering, product — in a single voice. It remembers your project day after day, exposes its own contradictions, and decides. When a question demands it, it convenes specialists who debate it without you.",
     "section3Title": "AI won't replace founders.",
-    "section3Body1": "But founders with AI teams will replace those without.",
+    "section3Body1": "But founders who get challenged in time will replace those who surround themselves with yes.",
     "section3Body2": "This isn't a threat or a promise. It's a description of the present.",
     "section4Title": "Who we build for",
-    "section4Body1": "We build for solo founders tired of being limited by their isolation. For those with a clear vision but no way to staff a team. For those who want to ship, not think.",
-    "section4Body2": "We don't build for people who want AI to type for them. We build for people who want a team that ships with them.",
+    "section4Body1": "We build for solo founders tired of being limited by their isolation. For those with a clear vision but nobody to stress-test it. For those who want to move fast without moving blind.",
+    "section4Body2": "We don't build for people who want AI to type for them. We build for people who want to hear when they're wrong — before it costs them.",
     "section5Title": "The question isn't if.",
     "section5Body": "It's when you join.",
-    "cta": "Start for free →"
+    "cta": "Start for free"
   },
   "contact": {
     "title": "Let's talk.",
     "subtitle": "We answer everything. For real.",
-    "card1Icon": "📩",
     "card1Title": "For general questions",
     "card1Email": "mendlyai01@gmail.com",
     "card1Note": "We reply within 48h on average, 24h for Pro.",
-    "card2Icon": "🤝",
     "card2Title": "For partnerships & investors",
     "card2Email": "mendlyai01@gmail.com",
-    "card2Note": "Or directly on LinkedIn",
-    "card3Icon": "🛡️",
+    "card2Note": "Introduce yourself in two lines, we'll get back to you.",
     "card3Title": "For security concerns",
     "card3Email": "mendlyai01@gmail.com",
     "card3Note": "If you've found a vulnerability, we take it very seriously.",
     "closingTitle": "No form.",
     "closingBody": "We'd rather you write us directly. We read everything. We answer everything.",
-    "cta": "Start for free →"
+    "cta": "Start for free"
   },
   "security": {
     "title": "Our security pledge",
     "subtitle": "Your ideas are yours. Forever.",
     "introTitle": "What we commit to",
     "introBody": "The moment you trust Mendly with your project, you trust us. We take that seriously. Here's exactly how we protect what you share with us.",
-    "p1Icon": "🔒",
-    "p1Title": "1. Military-grade encryption",
-    "p1Body": "All your data is encrypted at rest with AES-256 and in transit with TLS 1.3. These are the standards used by banks and government agencies.",
-    "p2Icon": "🇪🇺",
-    "p2Title": "2. European hosting",
-    "p2Body": "All your data is stored in data centers located in the European Union. No data ever leaves EU territory.",
-    "p3Icon": "🛡️",
-    "p3Title": "3. GDPR-compliant from day 1",
-    "p3Body": "You can access, export, or delete all your data with one click. No bureaucracy. It's a right, not a favor.",
-    "p4Icon": "🧠",
+    "p1Title": "1. Encrypted in transit and at rest",
+    "p1Body": "Your data travels encrypted (TLS) and is stored encrypted (AES-256) by our database host. These are our providers' standard mechanisms, not a home-made scheme we ask you to take on faith.",
+    "p2Title": "2. Where your data lives",
+    "p2Body": "Your database is hosted by Supabase and the site by Vercel. To answer you, the content of your messages is sent to Google's Gemini model. Several of these providers are based in the United States: those transfers are covered by the European Commission's standard contractual clauses. The details are in our privacy policy.",
+    "p3Title": "3. Your GDPR rights, no runaround",
+    "p3Body": "You can delete your account and all your data from your settings. To get a copy of your data, write to us: we send it within the timeframe set by the GDPR.",
     "p4Title": "4. We NEVER train on your data",
-    "p4Body": "Your ideas, documents, and conversations with your AI team — nothing is used to train models. Ever. This commitment is written into our Terms of Service.",
-    "p5Icon": "🚫",
+    "p4Body": "Your ideas, documents and conversations with Mendly — nothing is used to train models. Ever. This commitment is written into our Terms of Service.",
     "p5Title": "5. No third-party sharing",
     "p5Body": "We don't sell, rent, or share your data with anyone. Period.",
-    "p6Icon": "🔍",
-    "p6Title": "6. Regular security audits",
-    "p6Body": "We commission independent security audits every 6 months. Reports are available on request for Pro and Team customers.",
+    "p6Title": "6. What we don't claim",
+    "p6Body": "Mendly has not yet undergone an independent security audit. We will say so here the day it has. Meanwhile: database access limited to the people who run the service, dependencies kept up to date, strict security headers across the site.",
     "vulnTitle": "If you find a vulnerability",
-    "vulnBody": "Email us at mendlyai01@gmail.com. We respond within 48h. We value responsible security researchers — a bug bounty program will launch with the product.",
+    "vulnBody": "Email us at mendlyai01@gmail.com. We reply within 48 hours and keep you posted until it is fixed.",
     "closingTitle": "Got a question?",
-    "cta": "Contact us →"
+    "cta": "Contact us"
   },
   "refund": {
     "title": "Refund Policy",
@@ -522,7 +513,9 @@
       "f3": "500 messages per day",
       "f4": "Enriched memo — risks and blind spots",
       "f5": "Cold debrief, 30 days after each decision"
-    }
+    },
+    "manualPlan": "This plan was assigned directly, without a Stripe subscription: there is no billing to manage.",
+    "error": "Checkout could not open. Try again in a moment — if it keeps failing, write to us."
   },
   "dataPledge": {
     "title": "Your data, your rules",
@@ -706,7 +699,8 @@
     "deleteConfirmInstruction": "This action is irreversible. All your projects, conversations and deliverables will be deleted. Type \"{word}\" to confirm.",
     "deleteConfirmWord": "DELETE",
     "confirmDelete": "Delete permanently",
-    "deleting": "Deleting…"
+    "deleting": "Deleting…",
+    "manualPlan": "This plan was assigned directly, without a Stripe subscription: there is no billing to manage."
   },
   "landing": {
     "hero": {
@@ -930,7 +924,8 @@
       "cta": "Try for free",
       "dashboard": "My workspace",
       "menu": "Open menu",
-      "close": "Close menu"
+      "close": "Close menu",
+      "language": "Language"
     },
     "hero": {
       "title1": "A board of directors",
@@ -1024,7 +1019,7 @@
       "q4": "How many projects can I create?",
       "a4": "One on Free, three on Starter, ten on Pro. A project keeps its own memory: decisions, risks, assumptions, milestones. It is not one more chat thread.",
       "q5": "What happens to what I write?",
-      "a5": "Your projects and conversations are hosted in the European Union and are never used to train any model. Delete a project and its memory goes with it.",
+      "a5": "Your projects and conversations are never used to train any model. To answer you, their content goes through providers, some based in the United States, under standard contractual clauses — everything is detailed in the privacy policy. Delete a project and its memory goes with it.",
       "q6": "Can I stop whenever I want?",
       "a6": "Yes, in one click from your settings, without writing to anyone. The plan stays active until the end of the period you already paid for."
     },

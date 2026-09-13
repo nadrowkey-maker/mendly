@@ -33,6 +33,8 @@ interface SettingsClientProps {
   subscriptionPlan: string;
   subscriptionStatus: string;
   hasActiveSubscription: boolean;
+  /** Un client Stripe existe : le portail de facturation peut s'ouvrir. */
+  hasStripeCustomer: boolean;
   projects: Project[];
   usageUsed: number;
   usageLimit: number;
@@ -44,6 +46,7 @@ export function SettingsClient({
   subscriptionPlan,
   subscriptionStatus,
   hasActiveSubscription,
+  hasStripeCustomer,
   projects,
   usageUsed,
   usageLimit,
@@ -64,6 +67,11 @@ export function SettingsClient({
         body: JSON.stringify({ locale }),
       });
       const data = await res.json();
+      if (res.status === 409) {
+        setPortalLoading(false);
+        setPortalError(t("manualPlan"));
+        return;
+      }
       if (!res.ok || !data.url) throw new Error(data.error ?? "Portal error");
       window.location.href = data.url;
     } catch (err) {
@@ -127,6 +135,10 @@ export function SettingsClient({
             <PillLink href="/upgrade" tone="light" size="md">
               {t("seePlans")}
             </PillLink>
+          ) : !hasStripeCustomer ? (
+            // Plan attribué directement en base : aucun abonnement Stripe à
+            // gérer. Le bouton du portail ne pourrait qu'échouer.
+            <p className="max-w-md text-[13px] leading-relaxed text-white/55">{t("manualPlan")}</p>
           ) : (
             <button
               type="button"

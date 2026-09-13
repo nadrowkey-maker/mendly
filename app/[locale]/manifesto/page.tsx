@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { PageWrapper } from "@/components/layout/PageWrapper";
-import { ManifestoContent } from "@/components/sections/ManifestoContent";
+import { PaperPage } from "@/components/home/PaperPage";
+import { Manifesto } from "@/components/sections/Manifesto";
 
 export async function generateMetadata({
   params,
@@ -18,8 +18,8 @@ export async function generateMetadata({
 
 export default function ManifestoPage() {
   return (
-    <PageWrapper>
-      <ManifestoContent />
-    </PageWrapper>
+    <PaperPage>
+      <Manifesto />
+    </PaperPage>
   );
 }

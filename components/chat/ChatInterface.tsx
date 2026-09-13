@@ -21,6 +21,7 @@ import { parseReply } from "@/lib/ai/room-suggestion";
 import type { ProjectStats } from "@/lib/actions/project-stats";
 import {
   getOrCreateConversation,
+  listThreadMessages,
   listMessages,
 } from "@/lib/actions/conversations";
 import { harvestVerdict } from "@/lib/actions/harvest";
@@ -165,6 +166,31 @@ export function ChatInterface({
   const activeData = agentData[activeAgent];
   const activeMessages = activeData?.messages ?? [];
   const activeConversationId = activeData?.conversationId ?? "";
+
+  /*
+   * Le fil est relu au montage.
+   *
+   * Revenir sur un projet par le bouton « précédent », ou par un lien que le
+   * routeur a gardé en cache, restitue la page telle qu'elle était à son
+   * premier affichage — donc sans les messages envoyés depuis. Le fondateur
+   * voyait une conversation vide alors que tout était en base. On relit, et on
+   * ne remplace l'affichage que si la base en sait plus que l'écran : jamais
+   * pendant qu'une réponse est en train de s'écrire.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    void listThreadMessages(project.id, "MENDLY").then((fresh) => {
+      if (cancelled) return;
+      setAgentData((prev) => {
+        const current = prev.MENDLY;
+        if (!current || fresh.length <= current.messages.length) return prev;
+        return { ...prev, MENDLY: { ...current, messages: toDisplayMessages(fresh) } };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [project.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

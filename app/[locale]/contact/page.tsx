@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { PageWrapper } from "@/components/layout/PageWrapper";
-import { ContactContent } from "@/components/sections/ContactContent";
+import { PaperPage } from "@/components/home/PaperPage";
+import { ContactDesk } from "@/components/sections/ContactDesk";
 
 export async function generateMetadata({
   params,
@@ -18,8 +18,8 @@ export async function generateMetadata({
 
 export default function ContactPage() {
   return (
-    <PageWrapper>
-      <ContactContent />
-    </PageWrapper>
+    <PaperPage>
+      <ContactDesk />
+    </PaperPage>
   );
 }

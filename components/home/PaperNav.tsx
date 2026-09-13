@@ -2,22 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { PillLink } from "@/components/ui/Pill";
+import { LocaleSwitch } from "@/components/home/LocaleSwitch";
 import { Menu, X } from "lucide-react";
 
 /**
- * La barre de la vitrine.
+ * La barre de la vitrine — et de toutes les pages annexes.
  *
  * Elle ne flotte pas et ne porte pas de verre : elle est posée sur le papier,
  * et ne se détache qu'au défilement, par un filet. Une barre qui s'annonce dès
  * la première seconde vole l'attention au titre, qui est la seule chose que le
  * visiteur est venu lire.
+ *
+ * Les liens de section sont des ancres de la page d'accueil. Sur une page
+ * annexe, une ancre nue (`#tarifs`) ne mène nulle part ; on y passe donc par
+ * la page d'accueil (`/#tarifs`).
  */
+const SECTIONS = [
+  { key: "product", anchor: "#produit" },
+  { key: "method", anchor: "#methode" },
+  { key: "pricing", anchor: "#tarifs" },
+] as const;
+
+const LINK_CLASS =
+  "rounded-full px-3.5 py-2 text-[13.5px] text-(--ink-soft) transition-colors hover:text-(--ink)";
+
 export function PaperNav() {
   const t = useTranslations("home.nav");
   const { user } = useAuth();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -28,11 +44,16 @@ export function PaperNav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = [
-    { label: t("product"), href: "#produit" },
-    { label: t("method"), href: "#methode" },
-    { label: t("pricing"), href: "#tarifs" },
-  ];
+  const sectionLink = (anchor: string, label: string, className: string) =>
+    isHome ? (
+      <a key={anchor} href={anchor} onClick={() => setOpen(false)} className={className}>
+        {label}
+      </a>
+    ) : (
+      <Link key={anchor} href={`/${anchor}`} onClick={() => setOpen(false)} className={className}>
+        {label}
+      </Link>
+    );
 
   return (
     <header
@@ -51,28 +72,18 @@ export function PaperNav() {
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded-full px-3.5 py-2 text-[13.5px] text-(--ink-soft) transition-colors hover:text-(--ink)"
-            >
-              {l.label}
-            </a>
-          ))}
+          {SECTIONS.map((s) => sectionLink(s.anchor, t(s.key), LINK_CLASS))}
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
+          <LocaleSwitch className="mr-1" />
           {user ? (
             <PillLink href="/dashboard" tone="ink" size="sm">
               {t("dashboard")}
             </PillLink>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="rounded-full px-3.5 py-2 text-[13.5px] text-(--ink-soft) transition-colors hover:text-(--ink)"
-              >
+              <Link href="/login" className={LINK_CLASS}>
                 {t("signin")}
               </Link>
               <PillLink href="/signup" tone="ink" size="sm">
@@ -96,16 +107,19 @@ export function PaperNav() {
       {open && (
         <div className="border-t border-(--paper-line-soft) px-5 py-4 md:hidden">
           <div className="flex flex-col gap-1">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 text-[15px] text-(--ink-soft) transition-colors hover:bg-(--paper-raised) hover:text-(--ink)"
-              >
-                {l.label}
-              </a>
-            ))}
+            {SECTIONS.map((s) =>
+              sectionLink(
+                s.anchor,
+                t(s.key),
+                "rounded-xl px-3 py-2.5 text-[15px] text-(--ink-soft) transition-colors hover:bg-(--paper-raised) hover:text-(--ink)"
+              )
+            )}
+          </div>
+          <div className="mt-4 flex items-center justify-between px-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-(--ink-muted)">
+              {t("language")}
+            </span>
+            <LocaleSwitch />
           </div>
           <div className="mt-4 flex flex-col gap-2">
             {user ? (

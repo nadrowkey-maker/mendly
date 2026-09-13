@@ -28,11 +28,16 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .maybeSingle();
 
+    /*
+     * Pas de client Stripe : rien à gérer côté Stripe.
+     *
+     * C'est le cas d'un plan attribué à la main en base, sans passage par le
+     * paiement. Le code d'erreur est explicite pour que l'interface puisse le
+     * dire, au lieu d'afficher « une erreur est survenue » sur un compte qui
+     * fonctionne parfaitement.
+     */
     if (!sub?.stripe_customer_id) {
-      return NextResponse.json(
-        { error: "No active subscription to manage" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "no_stripe_customer" }, { status: 409 });
     }
 
     const origin = req.headers.get("origin") ?? "http://localhost:3000";

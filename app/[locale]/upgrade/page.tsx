@@ -145,6 +145,9 @@ export default async function UpgradePage() {
                   featured={plan.featured}
                   currentPlan={currentPlan}
                   manageLabel={t("manage")}
+                  errorLabel={t("error")}
+                  manualLabel={t("manualPlan")}
+                  canManage={Boolean(subscription.stripe_customer_id)}
                 />
               </div>
             );

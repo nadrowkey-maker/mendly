@@ -44,64 +44,55 @@
     "section1Body1": "Pendant 50 ans, lancer une startup a suivi la même règle implicite : trouve des cofondateurs, lève de l'argent, recrute une équipe. Sans ça, ton idée meurt.",
     "section1Body2": "Cette règle a fait des dégâts. Des milliers de fondateurs avec des idées brillantes ont abandonné parce qu'ils étaient seuls. Pas par manque de talent. Par manque de bras.",
     "section2Title": "L'IA change la donne. Mendly l'incarne.",
-    "section2Body1": "L'IA ne fait pas tout à ta place. Elle fait mieux : elle te donne ce qui te manquait depuis le début. Une équipe. Pas un assistant. Une équipe.",
-    "section2Body2": "Huit spécialistes qui débattent entre eux. Qui retiennent ton projet jour après jour. Qui produisent des livrables concrets — mémos stratégiques, plans marketing, architectures techniques, modèles financiers, pitch decks.",
+    "section2Body1": "L'IA ne fait pas tout à ta place. Elle fait mieux : elle te donne ce qui te manquait depuis le début. Quelqu'un qui te contredit. Pas un assistant qui acquiesce.",
+    "section2Body2": "Mendly porte tous les angles d'une direction — finance, croissance, technique, produit — dans une seule voix. Il retient ton projet jour après jour, expose ses propres contradictions, et tranche. Quand une question l'exige, il réunit des spécialistes qui en débattent sans toi.",
     "section3Title": "L'IA ne remplacera pas les fondateurs.",
-    "section3Body1": "Mais les fondateurs avec des équipes IA remplaceront ceux qui n'en ont pas.",
+    "section3Body1": "Mais les fondateurs qui se font contredire à temps remplaceront ceux qui s'entourent de oui.",
     "section3Body2": "Ce n'est ni une menace ni une promesse. C'est une description du présent.",
     "section4Title": "Pour qui on construit",
-    "section4Body1": "On construit pour les fondateurs solos qui en ont marre d'être bridés par leur isolement. Pour ceux qui ont une vision claire mais pas les moyens de monter une équipe. Pour ceux qui veulent ship, pas réfléchir.",
-    "section4Body2": "On construit pas pour ceux qui veulent une IA qui tape à leur place. On construit pour ceux qui veulent une équipe qui livre avec eux.",
+    "section4Body1": "On construit pour les fondateurs solos qui en ont marre d'être bridés par leur isolement. Pour ceux qui ont une vision claire mais personne pour la mettre à l'épreuve. Pour ceux qui veulent avancer vite sans avancer à l'aveugle.",
+    "section4Body2": "On ne construit pas pour ceux qui veulent une IA qui tape à leur place. On construit pour ceux qui veulent qu'on leur dise quand ils ont tort — avant que ça coûte.",
     "section5Title": "La question n'est plus si.",
     "section5Body": "C'est quand tu rejoins.",
-    "cta": "Commencer gratuitement →"
+    "cta": "Commencer gratuitement"
   },
   "contact": {
     "title": "Parlons.",
     "subtitle": "On répond à tout. Vraiment.",
-    "card1Icon": "📩",
     "card1Title": "Pour les questions générales",
     "card1Email": "mendlyai01@gmail.com",
     "card1Note": "On répond en moyenne sous 48h, sous 24h pour les Pro.",
-    "card2Icon": "🤝",
     "card2Title": "Pour les partenariats & investisseurs",
     "card2Email": "mendlyai01@gmail.com",
-    "card2Note": "Ou directement sur LinkedIn",
-    "card3Icon": "🛡️",
+    "card2Note": "Présente-toi en deux lignes, on revient vers toi.",
     "card3Title": "Pour les questions de sécurité",
     "card3Email": "mendlyai01@gmail.com",
     "card3Note": "Si tu as identifié une vulnérabilité, on prend ça très au sérieux.",
     "closingTitle": "Pas de formulaire.",
     "closingBody": "On préfère que tu nous écrives directement. On lit tout. On répond à tout.",
-    "cta": "Commencer gratuitement →"
+    "cta": "Commencer gratuitement"
   },
   "security": {
     "title": "Notre engagement sécurité",
     "subtitle": "Tes idées sont les tiennes. Pour toujours.",
     "introTitle": "Ce qu'on s'engage à faire",
     "introBody": "À l'instant où tu confies ton projet à Mendly, tu nous fais confiance. On prend ça au sérieux. Voici exactement comment on protège ce que tu nous confies.",
-    "p1Icon": "🔒",
-    "p1Title": "1. Chiffrement de niveau militaire",
-    "p1Body": "Toutes tes données sont chiffrées en AES-256 au repos et TLS 1.3 en transit. Ce sont les standards utilisés par les banques et les agences gouvernementales.",
-    "p2Icon": "🇪🇺",
-    "p2Title": "2. Hébergement européen",
-    "p2Body": "Toutes tes données sont stockées dans des centres de données situés dans l'Union européenne. Aucune donnée ne quitte le territoire de l'UE.",
-    "p3Icon": "🛡️",
-    "p3Title": "3. Conforme RGPD dès le jour 1",
-    "p3Body": "Tu peux accéder, exporter ou supprimer toutes tes données en un clic. Pas de bureaucratie. C'est un droit, pas une faveur.",
-    "p4Icon": "🧠",
+    "p1Title": "1. Chiffré en transit et au repos",
+    "p1Body": "Tes données circulent chiffrées (TLS) et sont stockées chiffrées (AES-256) par notre hébergeur de base de données. Ce sont les mécanismes standard de nos prestataires, pas un dispositif maison qu'on te demanderait de croire sur parole.",
+    "p2Title": "2. Où vivent tes données",
+    "p2Body": "Ta base de données est hébergée par Supabase et le site par Vercel. Pour te répondre, le contenu de tes messages est transmis au modèle Gemini de Google. Plusieurs de ces prestataires sont établis aux États-Unis : ces transferts sont encadrés par les clauses contractuelles types de la Commission européenne. Le détail est dans notre politique de confidentialité.",
+    "p3Title": "3. Tes droits RGPD, sans détour",
+    "p3Body": "Tu peux supprimer ton compte et toutes tes données depuis tes réglages. Pour obtenir une copie de tes données, écris-nous : on te l'envoie dans le délai prévu par le RGPD.",
     "p4Title": "4. On ne s'entraîne JAMAIS sur tes données",
-    "p4Body": "Tes idées, tes documents, tes conversations avec ton équipe IA — rien n'est utilisé pour entraîner des modèles. Jamais. Cet engagement est gravé dans nos conditions d'utilisation.",
-    "p5Icon": "🚫",
+    "p4Body": "Tes idées, tes documents, tes conversations avec Mendly — rien n'est utilisé pour entraîner des modèles. Jamais. Cet engagement figure dans nos conditions d'utilisation.",
     "p5Title": "5. Pas de partage à des tiers",
     "p5Body": "On ne vend pas, on ne loue pas, on ne partage pas tes données avec qui que ce soit. Point final.",
-    "p6Icon": "🔍",
-    "p6Title": "6. Audits de sécurité réguliers",
-    "p6Body": "On commande des audits de sécurité indépendants tous les 6 mois. Les rapports sont disponibles sur demande pour les clients Pro et Team.",
+    "p6Title": "6. Ce qu'on ne prétend pas",
+    "p6Body": "Mendly n'a pas encore fait l'objet d'un audit de sécurité indépendant. On l'écrira ici le jour où ce sera le cas. En attendant : accès à la base réservés aux personnes qui opèrent le service, dépendances tenues à jour, en-têtes de sécurité stricts sur tout le site.",
     "vulnTitle": "Si tu trouves une faille",
-    "vulnBody": "Écris-nous à mendlyai01@gmail.com. On répond sous 48h. On valorise les chercheurs en sécurité responsables — un programme de récompenses (bug bounty) sera lancé avec le produit.",
+    "vulnBody": "Écris-nous à mendlyai01@gmail.com. On répond sous 48 h, et on te tient au courant jusqu'à la correction.",
     "closingTitle": "Une question ?",
-    "cta": "Contacte-nous →"
+    "cta": "Nous contacter"
   },
   "refund": {
     "title": "Politique de remboursement",
@@ -522,7 +513,9 @@
       "f3": "500 messages par jour",
       "f4": "Mémo enrichi — risques et angles morts",
       "f5": "Debrief à froid, 30 jours après chaque décision"
-    }
+    },
+    "manualPlan": "Ce plan a été attribué directement, sans abonnement Stripe : il n'y a aucune facturation à gérer.",
+    "error": "Le paiement n'a pas pu s'ouvrir. Réessaie dans un instant — si ça persiste, écris-nous."
   },
   "dataPledge": {
     "title": "Tes données, tes règles",
@@ -706,7 +699,8 @@
     "deleteConfirmInstruction": "Cette action est irréversible. Tous tes projets, conversations et livrables seront supprimés. Tape \"{word}\" pour confirmer.",
     "deleteConfirmWord": "SUPPRIMER",
     "confirmDelete": "Supprimer définitivement",
-    "deleting": "Suppression…"
+    "deleting": "Suppression…",
+    "manualPlan": "Ce plan a été attribué directement, sans abonnement Stripe : il n'y a aucune facturation à gérer."
   },
   "landing": {
     "hero": {
@@ -930,7 +924,8 @@
       "cta": "Essayer gratuitement",
       "dashboard": "Mon espace",
       "menu": "Ouvrir le menu",
-      "close": "Fermer le menu"
+      "close": "Fermer le menu",
+      "language": "Langue"
     },
     "hero": {
       "title1": "Un conseil de direction",
@@ -1024,7 +1019,7 @@
       "q4": "Combien de projets puis-je créer ?",
       "a4": "Un seul en gratuit, trois en Starter, dix en Pro. Un projet garde sa propre mémoire : décisions, risques, hypothèses, jalons. Ce n'est pas un fil de discussion de plus.",
       "q5": "Que devient ce que j'écris ?",
-      "a5": "Tes projets et tes conversations sont hébergés dans l'Union européenne et ne servent à entraîner aucun modèle. Tu peux supprimer un projet, et ta mémoire part avec.",
+      "a5": "Tes projets et tes conversations ne servent à entraîner aucun modèle. Pour te répondre, leur contenu passe par des prestataires dont certains sont établis aux États-Unis, sous clauses contractuelles types — tout est détaillé dans la politique de confidentialité. Tu peux supprimer un projet, et sa mémoire part avec.",
       "q6": "Je peux arrêter quand je veux ?",
       "a6": "Oui, en un clic depuis tes paramètres, sans avoir à écrire à qui que ce soit. Le plan reste actif jusqu'à la fin de la période déjà payée."
     },

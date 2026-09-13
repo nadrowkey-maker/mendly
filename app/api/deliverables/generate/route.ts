@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { PLANS, type PlanTier } from "@/lib/stripe/plans";
+import { resolvePlan } from "@/lib/stripe/plans";
 import { geminiFlash } from "@/lib/ai/gemini";
 import { buildMendlyMemoPrompt } from "@/lib/ai/prompts/mendly-memo";
 import { withFounderContext } from "@/lib/ai/with-founder-context";
@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
     // ============= PLAN CHECK — starter+ only =============
     const { data: subData } = await supabase
       .from("subscriptions")
-      .select("plan")
+      .select("plan, status")
       .eq("user_id", user.id)
       .maybeSingle();
-    const plan = ((subData?.plan as string) in PLANS ? subData?.plan : "free") as PlanTier;
+    const plan = resolvePlan(subData?.plan, subData?.status);
     if (plan === "free") {
       return NextResponse.json({ error: "plan_required", message: "PDF export requires a paid plan" }, { status: 403 });
     }
@@ -55,13 +55,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Fetch recent conversation context (last 10 messages from CEO conversation)
+    // Le contexte du mémo : les derniers échanges avec Mendly. La requête visait
+    // encore le fil « CEO », vide depuis que Mendly est l'interlocuteur unique —
+    // les mémos payants étaient donc rédigés sans jamais lire la conversation.
     const { data: convo } = await supabase
       .from("conversations")
       .select("id")
       .eq("project_id", projectId)
-      .eq("agent_role", "CEO")
+      .eq("agent_role", "MENDLY")
       .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     let conversationContext = "";

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { track } from "@/lib/actions/analytics";
 import { createMemoryEvent } from "@/lib/actions/memory";
 import { assignProjectTeam } from "@/lib/ai/team/assign-team";
-import { PLANS, type PlanTier } from "@/lib/stripe/plans";
+import { PLANS, type PlanTier, resolvePlan } from "@/lib/stripe/plans";
 import type {
   CreateProjectInput,
   Project,
@@ -36,10 +36,10 @@ export async function createProject(input: CreateProjectInput): Promise<{
   // ============= PROJECT LIMIT CHECK =============
   const { data: subData } = await supabase
     .from("subscriptions")
-    .select("plan")
+    .select("plan, status")
     .eq("user_id", user.id)
     .maybeSingle();
-  const plan = ((subData?.plan as string) in PLANS ? subData?.plan : "free") as PlanTier;
+  const plan = resolvePlan(subData?.plan, subData?.status);
   const projectLimit = PLANS[plan].projectLimit;
   const { count } = await supabase
     .from("projects")

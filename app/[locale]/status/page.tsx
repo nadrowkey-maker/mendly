@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/routing";
-import { PageWrapper } from "@/components/layout/PageWrapper";
+import { PaperPage } from "@/components/home/PaperPage";
+import { PaperHeader } from "@/components/home/PaperHeader";
+import { PillLink } from "@/components/ui/Pill";
 
 export async function generateMetadata({
   params,
@@ -19,9 +20,9 @@ export async function generateMetadata({
 /**
  * La page d'état.
  *
- * Choix assumé : aucune pastille verte "tous les systèmes opérationnels".
+ * Choix assumé : aucune pastille verte « tous les systèmes opérationnels ».
  * Sans supervision continue, ce voyant serait décoratif — il afficherait
- * "opérationnel" pendant une panne, ce qui est pire que ne rien afficher.
+ * « opérationnel » pendant une panne, ce qui est pire que ne rien afficher.
  *
  * À la place, la page renvoie vers les pages d'état réelles des prestataires
  * dont Mendly dépend. C'est vérifiable, tenu à jour par leurs équipes, et
@@ -40,66 +41,66 @@ export default async function StatusPage({ params }: { params: Promise<{ locale:
   const t = await getTranslations({ locale, namespace: "status" });
 
   return (
-    <PageWrapper>
-      <div className="mx-auto max-w-2xl px-6 py-20 md:px-8 md:py-28">
-        <header className="mb-12 border-b border-(--glass-line) pb-10">
-          <h1 className="text-balance text-3xl font-extralight tracking-[-0.03em] text-white md:text-5xl">
-            {t("title")}
-          </h1>
-          <p className="mt-5 text-(--text-secondary)">{t("sub")}</p>
-        </header>
+    <PaperPage>
+      <PaperHeader title={t("title")} sub={t("sub")} colorway="ash" />
 
-        <section className="mb-12">
-          <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-(--text-muted)">
-            {t("depsTitle")}
-          </h2>
-          <p className="mb-6 text-sm text-(--text-secondary)">{t("depsSub")}</p>
+      <section className="mx-auto max-w-3xl px-5 pt-14 md:px-8 md:pt-20">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-(--ink-muted)">
+          {t("depsTitle")}
+        </p>
+        <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-(--ink-soft)">{t("depsSub")}</p>
 
-          <ul className="flex flex-col gap-2">
-            {DEPENDENCIES.map((dep) => (
-              <li key={dep.key}>
-                <a
-                  href={dep.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center justify-between gap-4 rounded-2xl border border-(--glass-line) bg-(--glass) px-5 py-4 backdrop-blur-xl transition-colors hover:border-(--glass-hi) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-glow)"
+        <ul className="mt-8 border-t border-(--paper-line)">
+          {DEPENDENCIES.map((dep) => (
+            <li key={dep.key} className="border-b border-(--paper-line)">
+              <a
+                href={dep.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between gap-6 py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-primary)"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-medium tracking-tight text-(--ink)">
+                    {dep.name}
+                  </span>
+                  <span className="mt-0.5 block text-[13.5px] text-(--ink-soft)">{t(dep.key)}</span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="shrink-0 font-mono text-[13px] text-(--ink-muted) transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-(--ink)"
                 >
-                  <span className="min-w-0">
-                    <span className="block text-[15px] font-medium text-white">{dep.name}</span>
-                    <span className="block text-sm text-(--text-secondary)">{t(dep.key)}</span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 font-mono text-xs text-(--text-muted) transition-colors group-hover:text-(--accent-glow)"
-                  >
-                    ↗
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
+                  ↗
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        <section className="mb-10 rounded-2xl border border-(--glass-line) bg-(--glass) p-6 backdrop-blur-xl">
-          <h2 className="mb-2 text-lg font-medium tracking-tight text-white">
+      <section className="mx-auto max-w-3xl px-5 pt-14 md:px-8">
+        <div className="rounded-3xl bg-(--paper-raised) p-7 md:p-10">
+          <h2 className="text-[17px] font-semibold tracking-tight text-(--ink)">
             {t("incidentTitle")}
           </h2>
-          <p className="mb-5 text-(--text-secondary)">{t("incidentBody")}</p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-all hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-glow)"
-          >
-            {t("incidentCta")}
-          </Link>
-        </section>
+          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-(--ink-soft)">
+            {t("incidentBody")}
+          </p>
+          <div className="mt-6">
+            <PillLink href="/contact" tone="ink" size="md">
+              {t("incidentCta")}
+            </PillLink>
+          </div>
+        </div>
 
-        <section className="border-t border-(--glass-line) pt-8">
-          <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-(--text-muted)">
+        <div className="mt-10">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-(--ink-muted)">
             {t("honestyTitle")}
-          </h2>
-          <p className="text-sm leading-relaxed text-(--text-secondary)">{t("honestyBody")}</p>
-        </section>
-      </div>
-    </PageWrapper>
+          </p>
+          <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-(--ink-soft)">
+            {t("honestyBody")}
+          </p>
+        </div>
+      </section>
+    </PaperPage>
   );
 }

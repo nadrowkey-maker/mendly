@@ -173,6 +173,55 @@ liquid-glass panels on the landing, `#000000` as a ground, the multicolour
 `aurora-cloud`/`AIAura` rings, per-agent colour palettes, and static PNG
 screenshots of the product.
 
+## SYSTEM RULES LEARNED THE HARD WAY
+
+These are not style preferences. Each one was a production bug.
+
+### No redirect may ever reach an API route
+`next.config.ts` has `trailingSlash: true`, which made Next answer
+`/api/stripe/webhook` with a 308 to `/api/stripe/webhook/`. **Stripe webhooks,
+Vercel crons and Supabase auth hooks do not follow redirects** — they record a
+failure. Payments could succeed without unlocking the plan, and every cron in
+`vercel.json` could silently never run.
+
+The automatic redirect is off (`skipTrailingSlashRedirect: true`) and
+`proxy.ts` re-adds the trailing slash for pages only (its matcher excludes
+`/api`). Never re-enable the global redirect, and never add a middleware
+redirect whose matcher includes `/api`.
+
+### Plan entitlement goes through `resolvePlan(plan, status)`
+Never read `subscriptions.plan` raw. `resolvePlan` in `lib/stripe/plans.ts`
+returns the plan that actually opens rights: unknown value → free; `active`,
+`trialing`, `past_due` → the plan; no status → the plan (a row set by hand by an
+admin); anything else → free. Reading `plan` alone kept paid benefits on unpaid
+and expired subscriptions, and a hand-typed `"premium"` crashed every screen
+indexing `PLANS[plan]`.
+
+Only the Stripe webhook writes `subscriptions`, with the service key.
+Migration 0006 leaves users a select-own-row policy and nothing else. The
+webhook must return 500 when a write fails, so Stripe retries — a 200 after a
+failed write is a customer who paid for nothing.
+
+### One conversation per (project, user, role)
+Never read a conversation with a bare `maybeSingle()`: it errors on two rows,
+and the old code then created a new empty thread on every visit — the
+founder's history looked wiped each time they came back. Read with
+`order("updated_at", desc).limit(1)`; display history with
+`listThreadMessages`, which reads every thread of the project/role. Migration
+0006 merges existing duplicates and adds the unique index.
+
+### Pages linked from the footer use the paper shell
+`PaperPage` (nav + footer on paper), `PaperHeader` (title on a grain wash under
+40 %), `DocumentPage` for legal texts. `PageWrapper` and the dark `Nav`/`Footer`
+are legacy and only survive on unlinked pages (`waitlist`).
+
+### Claims on trust pages must match the privacy policy
+The security page said no data ever left the EU while the privacy policy
+(correctly) lists US sub-processors, Gemini included; it also promised
+six-monthly independent audits that never existed. Before writing any claim
+about hosting, encryption, audits or GDPR rights, check `messages/*/privacy`
+and the code. A false security claim is a legal liability, not copy.
+
 ## CODE RULES (non-negotiable)
 
 ### TypeScript

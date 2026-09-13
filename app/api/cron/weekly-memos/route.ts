@@ -61,9 +61,20 @@ export async function GET(req: NextRequest) {
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+          // Les messages sont lus dans les fils de CE projet. La requête ne
+          // filtrait que par utilisateur : le mémo d'un projet résumait aussi
+          // les conversations de tous les autres.
+          const { data: threads } = await supabase
+            .from("conversations")
+            .select("id")
+            .eq("project_id", project.id);
+          const threadIds = (threads ?? []).map((c) => (c as { id: string }).id);
+          if (threadIds.length === 0) continue;
+
           const { data: messages } = await supabase
             .from("messages")
             .select("role, agent_role, content")
+            .in("conversation_id", threadIds)
             .eq("user_id", sub.user_id)
             .gte("created_at", sevenDaysAgo.toISOString())
             .order("created_at", { ascending: true })

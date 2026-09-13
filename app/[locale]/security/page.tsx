@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { PageWrapper } from "@/components/layout/PageWrapper";
-import { SecurityContent } from "@/components/sections/SecurityContent";
+import { PaperPage } from "@/components/home/PaperPage";
+import { SecurityPledge } from "@/components/sections/SecurityPledge";
 
 export async function generateMetadata({
   params,
@@ -18,8 +18,8 @@ export async function generateMetadata({
 
 export default function SecurityPage() {
   return (
-    <PageWrapper>
-      <SecurityContent />
-    </PageWrapper>
+    <PaperPage>
+      <SecurityPledge />
+    </PaperPage>
   );
 }

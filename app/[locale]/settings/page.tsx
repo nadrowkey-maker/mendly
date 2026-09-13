@@ -37,6 +37,7 @@ export default async function SettingsPage() {
       subscriptionPlan={subscription.plan}
       subscriptionStatus={subscription.status}
       hasActiveSubscription={subStatus.hasActive}
+      hasStripeCustomer={Boolean(subscription.stripe_customer_id)}
       projects={projects}
       usageUsed={usage.used}
       usageLimit={usage.limit}
