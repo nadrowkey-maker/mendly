@@ -5,17 +5,25 @@ import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 import type { Project } from "@/lib/types/project";
 
-// Same palette as DebateView.tsx — the header roster and the debate bubbles
-// underneath it must read as the same room, not two different UIs.
+/*
+ * Une seule teinte pour tous les spécialistes.
+ *
+ * Chaque rôle avait sa couleur — rose, ambre, turquoise… Huit pastilles de
+ * huit couleurs reconstituaient visuellement le produit à huit agents, et
+ * l'ambre attribué au CFO détournait la seule teinte réservée à la
+ * contradiction interne. Ce qui distingue un spécialiste, c'est son nom et ce
+ * qu'il dit.
+ */
+const SPECIALIST_TONE = "#9aa4ae";
 const AGENT_COLORS: Record<string, string> = {
-  CEO: "#0071e3",
-  CTO: "#5b9dff",
-  CMO: "#f472b6",
-  CFO: "#fbbf24",
-  CPO: "#34d8b4",
-  CDO: "#38bdf8",
-  DEV: "#94A3B8",
-  CCO: "#fb7185",
+  CEO: SPECIALIST_TONE,
+  CTO: SPECIALIST_TONE,
+  CMO: SPECIALIST_TONE,
+  CFO: SPECIALIST_TONE,
+  CPO: SPECIALIST_TONE,
+  CDO: SPECIALIST_TONE,
+  DEV: SPECIALIST_TONE,
+  CCO: SPECIALIST_TONE,
 };
 
 interface TeamRoomHeaderProps {
@@ -45,7 +53,7 @@ export function TeamRoomHeader({ project }: TeamRoomHeaderProps) {
       {agents.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap mb-4">
           {agents.map((role, i) => {
-            const color = AGENT_COLORS[role] ?? "#94A3B8";
+            const color = AGENT_COLORS[role] ?? SPECIALIST_TONE;
             return (
               <motion.div
                 key={role}

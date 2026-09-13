@@ -596,18 +596,45 @@
     "errorGeneric": "Impossible d'enregistrer. Réessaie."
   },
   "teamIntro": {
-    "skip": "Passer l'intro",
     "title": "Voici qui travaille sur ton projet.",
     "sub": "Les spécialistes dont ton projet a besoin, et pas les autres.",
-    "ceoIntro": "Je suis ton CEO. Je garderai ta vision claire et tes décisions intentionnelles. Chaque choix qu'on fera ensemble sera assumé.",
-    "ctoIntro": "Je suis ton CTO. Architecture, stack, risque technique — je m'assure qu'on construit des choses qui tiennent dans le temps.",
-    "cmoIntro": "Je suis ton CMO. Audience, positionnement, canaux — je trouverai le récit qui fait arrêter de scroller.",
-    "cpoIntro": "Je suis ton CPO. Scope, priorités, user stories — je m'assure qu'on construit les bonnes choses dans le bon ordre.",
-    "cdoIntro": "Je suis ton CDO. Data, métriques, analytics — je te dirai ce qui se passe vraiment derrière les chiffres.",
-    "cfoIntro": "Je suis ton CFO. Runway, unit economics, levée de fonds — pas de bullshit sur l'argent.",
-    "devIntro": "Je suis ton DEV. Code, architecture, automatisation — des livrables concrets, pas des slides.",
-    "ccoIntro": "Je suis ton CCO. Pitch decks, cold emails, communiqués de presse — le monde extérieur, c'est mon terrain.",
-    "letsGo": "Au boulot →"
+    "mendlyLine": "Au quotidien, c'est à Mendly que tu parles. Quand une question mérite un débat, il réunit ces spécialistes en salle de réunion — et ils travaillent aussi sans toi.",
+    "noTeam": "L'équipe de ce projet n'a pas encore été assemblée. Les spécialistes seront choisis selon la question, au premier débat en salle de réunion.",
+    "letsGo": "Au travail",
+    "roles": {
+      "CEO": {
+        "name": "Stratégie",
+        "focus": "Vision, arbitrages, le cap à tenir."
+      },
+      "CTO": {
+        "name": "Technique",
+        "focus": "Architecture, stack, risque technique."
+      },
+      "CMO": {
+        "name": "Croissance",
+        "focus": "Audience, positionnement, canaux."
+      },
+      "CPO": {
+        "name": "Produit",
+        "focus": "Périmètre, priorités, ordre de construction."
+      },
+      "CDO": {
+        "name": "Données",
+        "focus": "Métriques, et ce que disent vraiment les chiffres."
+      },
+      "CFO": {
+        "name": "Finance",
+        "focus": "Trésorerie, prix, rentabilité unitaire."
+      },
+      "DEV": {
+        "name": "Exécution",
+        "focus": "Code, automatisation, livrables concrets."
+      },
+      "CCO": {
+        "name": "Communication",
+        "focus": "Pitch, e-mails, prise de parole."
+      }
+    }
   },
   "onboarding": {
     "eyebrow": "BIENVENUE",

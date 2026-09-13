@@ -13,15 +13,25 @@ import type {
   VoteVerdict,
 } from "@/lib/types/debate";
 
+/*
+ * Une seule teinte pour tous les spécialistes.
+ *
+ * Chaque rôle avait sa couleur — rose, ambre, turquoise… Huit pastilles de
+ * huit couleurs reconstituaient visuellement le produit à huit agents, et
+ * l'ambre attribué au CFO détournait la seule teinte réservée à la
+ * contradiction interne. Ce qui distingue un spécialiste, c'est son nom et ce
+ * qu'il dit.
+ */
+const SPECIALIST_TONE = "#9aa4ae";
 const AGENT_COLORS: Record<string, string> = {
-  CEO: "#0071e3",
-  CTO: "#5b9dff",
-  CMO: "#f472b6",
-  CFO: "#fbbf24",
-  CPO: "#34d8b4",
-  CDO: "#38bdf8",
-  DEV: "#94A3B8",
-  CCO: "#fb7185",
+  CEO: SPECIALIST_TONE,
+  CTO: SPECIALIST_TONE,
+  CMO: SPECIALIST_TONE,
+  CFO: SPECIALIST_TONE,
+  CPO: SPECIALIST_TONE,
+  CDO: SPECIALIST_TONE,
+  DEV: SPECIALIST_TONE,
+  CCO: SPECIALIST_TONE,
 };
 
 const VIOLET = "#0071e3";
@@ -73,7 +83,7 @@ function SelectionCard({ selection, onAbort }: { selection: AgentSelection; onAb
 
 function SurpriseJoinBanner({ agent }: { agent: string }) {
   const t = useTranslations("chat");
-  const color = AGENT_COLORS[agent] ?? "#fbbf24";
+  const color = AGENT_COLORS[agent] ?? SPECIALIST_TONE;
   return (
     <motion.div
       initial={{ opacity: 0, y: -6, scale: 0.97 }}
@@ -94,7 +104,7 @@ function SurpriseJoinBanner({ agent }: { agent: string }) {
 
 function TurnBubble({ message, index }: { message: DebateMessage; index: number }) {
   const t = useTranslations("chat");
-  const color = AGENT_COLORS[message.agent] ?? "#fff";
+  const color = AGENT_COLORS[message.agent] ?? SPECIALIST_TONE;
   const turned = !message.isStreaming && detectTurnaround(message.content);
 
   return (
@@ -279,7 +289,7 @@ function ConsensusPanel({ votes }: { votes: ConsensusVote[] }) {
 
       <div className="space-y-2.5">
         {votes.map((v, i) => {
-          const agentColor = AGENT_COLORS[v.agent] ?? "#fff";
+          const agentColor = AGENT_COLORS[v.agent] ?? SPECIALIST_TONE;
           const icon = VERDICT_ICON[v.verdict];
           const vColor = VERDICT_COLOR[v.verdict];
           return (

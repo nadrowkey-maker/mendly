@@ -12,7 +12,7 @@ import { AutonomousSessions } from "./AutonomousSessions";
 import { SpeakingBar } from "@/components/app/SpeakingBar";
 import { MendlyOrb } from "@/components/ui/MendlyOrb";
 import { GenerateMemoButton } from "./GenerateMemoButton";
-import { TeamIntroSequence } from "@/components/dashboard/TeamIntroSequence";
+import { TeamIntro } from "@/components/chat/TeamIntro";
 import { AppShell } from "@/components/app/AppShell";
 import { AppHeader } from "@/components/app/AppHeader";
 import type { NavGroup } from "@/components/app/nav-types";
@@ -130,7 +130,10 @@ export function ChatInterface({
   const t = useTranslations("chat");
   const tSide = useTranslations("sidebar");
 
-  const [showIntro, setShowIntro] = useState(true);
+  // L'accueil d'équipe s'affiche tant que la conversation du projet est vide.
+  // Aucun stockage : la page est remontée par projet, donc chaque nouveau
+  // projet est présenté, et un projet déjà entamé ne l'est plus.
+  const [showIntro, setShowIntro] = useState(initialMessages.length === 0);
   const [activeAgent, setActiveAgent] = useState<AgentRole>("MENDLY");
   const [switchingAgent, setSwitchingAgent] = useState(false);
   const [teamRoomActive, setTeamRoomActive] = useState(false);
@@ -937,7 +940,7 @@ export function ChatInterface({
   return (
     <>
     {showIntro && (
-      <TeamIntroSequence projectId={project.id} onDone={() => setShowIntro(false)} />
+      <TeamIntro project={project} onDone={() => setShowIntro(false)} />
     )}
     <AppShell
       groups={navGroups}

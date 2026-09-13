@@ -638,18 +638,45 @@
     "goalsPlaceholder": "Ex: I want to build the first premium social sport network for Korean Gen MZ. Goal: be in Seoul summer 2027, get into Born2Global, raise seed by end of 2027…"
   },
   "teamIntro": {
-    "skip": "Skip intro",
     "title": "Here is who works on your project.",
     "sub": "The specialists your project needs, and none of the others.",
-    "ceoIntro": "I'm your CEO. I'll keep your vision sharp and your decisions clear. Every call we make together will be intentional.",
-    "ctoIntro": "I'm your CTO. Architecture, stack, technical risk — I'll make sure we build things that actually scale.",
-    "cmoIntro": "I'm your CMO. Audience, positioning, channels — I'll find the story that makes people stop scrolling.",
-    "cpoIntro": "I'm your CPO. Scope, priorities, user stories — I'll make sure we build the right things in the right order.",
-    "cdoIntro": "I'm your CDO. Data, metrics, analytics — I'll tell you what's actually happening behind the numbers.",
-    "cfoIntro": "I'm your CFO. Runway, unit economics, fundraising — no bullshit on money.",
-    "devIntro": "I'm your DEV. Code, architecture, automation — concrete deliverables, not slides.",
-    "ccoIntro": "I'm your CCO. Pitch decks, cold emails, press releases — the outside world is my territory.",
-    "letsGo": "Let's get to work →"
+    "mendlyLine": "Day to day, you talk to Mendly. When a question deserves a debate, it convenes these specialists in the meeting room — and they also work without you.",
+    "noTeam": "This project's team has not been assembled yet. Specialists will be chosen for the question at your first meeting-room debate.",
+    "letsGo": "Let's get to work",
+    "roles": {
+      "CEO": {
+        "name": "Strategy",
+        "focus": "Vision, trade-offs, holding the course."
+      },
+      "CTO": {
+        "name": "Engineering",
+        "focus": "Architecture, stack, technical risk."
+      },
+      "CMO": {
+        "name": "Growth",
+        "focus": "Audience, positioning, channels."
+      },
+      "CPO": {
+        "name": "Product",
+        "focus": "Scope, priorities, build order."
+      },
+      "CDO": {
+        "name": "Data",
+        "focus": "Metrics, and what the numbers really say."
+      },
+      "CFO": {
+        "name": "Finance",
+        "focus": "Cash, pricing, unit economics."
+      },
+      "DEV": {
+        "name": "Execution",
+        "focus": "Code, automation, concrete deliverables."
+      },
+      "CCO": {
+        "name": "Communication",
+        "focus": "Pitch, emails, public voice."
+      }
+    }
   },
   "settings": {
     "eyebrow": "SETTINGS",
