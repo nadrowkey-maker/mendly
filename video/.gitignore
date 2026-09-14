@@ -1,2 +1,8 @@
 node_modules
 out
+.env
+# Sons sous licence Epidemic Sound : le dépôt est public, les redistribuer
+# violerait la licence. Ils se retéléchargent avec scripts/fetch-epidemic.mjs.
+public/audio
+# Effets de synthèse : régénérés à l’identique par `npm run sfx` (graine fixe).
+public/sfx

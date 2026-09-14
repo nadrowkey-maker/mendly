@@ -264,6 +264,15 @@ video/           → the vertical video ad (Remotion), its OWN package.json.
                    Excluded from the Next tsconfig and eslint: its dependencies
                    are not installed on Vercel. `cd video && npm run studio`
                    to edit, `npm run render` to export out/*.mp4.
+                   Sound: every effect AND the music bed are synthesized
+                   (`scripts/synth-sfx.mjs`, `scripts/synth-bed.mjs`), so they
+                   carry no licence. `src/audio/cues.ts` is the cue sheet — one
+                   sound per visible event, timed from the scene constants.
+                   A licensed track goes in `src/audio/music.ts` + public/audio/
+                   (git-ignored: the repo is public). The Epidemic Sound API
+                   FREE tier forbids published use — never ship its files.
+                   `npm run master` normalizes to -14 LUFS; check with
+                   `npm run analyze` (no filters in Remotion's ffmpeg).
 lib/
   utils.ts       → cn, helpers
   ai/agents/mendly.ts → the single entity (agents.ts = legacy 8-agent data)
