@@ -260,6 +260,10 @@ components/
   sections/      → editorial pages (manifesto, contact, security…)
   ui/            → atomic UI (Pill, GrainGradient, Ribbon…)
   layout/        → Nav + Footer for the dark editorial pages
+video/           → the vertical video ad (Remotion), its OWN package.json.
+                   Excluded from the Next tsconfig and eslint: its dependencies
+                   are not installed on Vercel. `cd video && npm run studio`
+                   to edit, `npm run render` to export out/*.mp4.
 lib/
   utils.ts       → cn, helpers
   ai/agents/mendly.ts → the single entity (agents.ts = legacy 8-agent data)

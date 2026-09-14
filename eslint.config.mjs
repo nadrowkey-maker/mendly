@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // La vidéo publicitaire (Remotion) a son propre projet et ses dépendances.
+    "video/**",
   ]),
 ]);
 

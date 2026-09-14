@@ -1,0 +1,28 @@
+{
+  "name": "mendly-ad",
+  "version": "1.0.0",
+  "description": "Publicité vidéo Mendly (Remotion) — format vertical TikTok / Reels / Shorts",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:fr": "remotion render src/index.ts MendlyAd-FR out/mendly-ad-fr.mp4",
+    "render:en": "remotion render src/index.ts MendlyAd-EN out/mendly-ad-en.mp4",
+    "render": "npm run render:fr && npm run render:en",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.524",
+    "@remotion/google-fonts": "^4.0.524",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.524"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "private": true
+}
