@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { PreviewChat } from "@/components/preview/PreviewChat";
 import { PreviewDashboard } from "@/components/preview/PreviewDashboard";
 import { PreviewIntake } from "@/components/preview/PreviewIntake";
+import { PreviewDebate } from "@/components/preview/PreviewDebate";
 
 /**
  * Les scènes de capture.
@@ -22,7 +23,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-const SHOTS = ["workspace", "contradiction", "room", "night", "intake"] as const;
+const SHOTS = ["workspace", "contradiction", "room", "debate", "night", "intake"] as const;
 type Shot = (typeof SHOTS)[number];
 
 export default async function PreviewPage({
@@ -46,5 +47,7 @@ export default async function PreviewPage({
       return <PreviewDashboard />;
     case "intake":
       return <PreviewIntake />;
+    case "debate":
+      return <PreviewDebate />;
   }
 }

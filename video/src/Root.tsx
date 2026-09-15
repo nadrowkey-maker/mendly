@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
-import { Ad, AD_DURATION } from "./Ad";
-import { FPS, H, W } from "./theme";
+import { Film } from "./film/Film";
+import { FPS, TOTAL } from "./film/timing";
+import { H, W } from "./theme";
 
 /**
  * Deux compositions, une par langue, sur le même montage.
@@ -12,21 +13,21 @@ export const RemotionRoot: React.FC = () => (
   <>
     <Composition
       id="MendlyAd-FR"
-      component={Ad}
-      durationInFrames={AD_DURATION}
+      component={Film}
+      durationInFrames={TOTAL}
       fps={FPS}
       width={W}
       height={H}
-      defaultProps={{ locale: "fr" }}
+      defaultProps={{ locale: "fr" as const }}
     />
     <Composition
       id="MendlyAd-EN"
-      component={Ad}
-      durationInFrames={AD_DURATION}
+      component={Film}
+      durationInFrames={TOTAL}
       fps={FPS}
       width={W}
       height={H}
-      defaultProps={{ locale: "en" }}
+      defaultProps={{ locale: "en" as const }}
     />
   </>
 );

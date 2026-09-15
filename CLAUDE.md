@@ -264,13 +264,25 @@ video/           → the vertical video ad (Remotion), its OWN package.json.
                    Excluded from the Next tsconfig and eslint: its dependencies
                    are not installed on Vercel. `cd video && npm run studio`
                    to edit, `npm run render` to export out/*.mp4.
-                   Sound: every effect AND the music bed are synthesized
-                   (`scripts/synth-sfx.mjs`, `scripts/synth-bed.mjs`), so they
-                   carry no licence. `src/audio/cues.ts` is the cue sheet — one
-                   sound per visible event, timed from the scene constants.
-                   A licensed track goes in `src/audio/music.ts` + public/audio/
-                   (git-ignored: the repo is public). The Epidemic Sound API
-                   FREE tier forbids published use — never ship its files.
+                   The film lives in `src/film/`. It is cut on the MUSIC's bar
+                   grid (`timing.ts`: 63 frames = one bar of "Zone", 114.3 BPM):
+                   every shot lasts a whole number of bars, which is what keeps
+                   the pacing even. Camera moves in a real 3D volume
+                   (`components/Space.tsx`); product shots are real captures
+                   placed on planes (`npm run capture` with `npm run dev`
+                   running → public/product/<locale>/, git-ignored).
+                   Motion: bezier curves only (`ease.ts`), no springs, no shake
+                   — the first cut used them and looked cheap.
+                   Glass: `backdrop-filter` does not render inside a 3D volume,
+                   so light glass is a near-opaque white with a bright edge.
+                   Sound: effects are synthesized "creamy" (`synth-film-sfx.mjs`:
+                   body under 5 kHz, attacks ≥ 4 ms, keyboard = damped case
+                   resonances), cue sheet in `sound/cues.ts` computed from the
+                   scene constants. The music is a licensed track in
+                   public/audio/zone.mp3 (git-ignored: the repo is public);
+                   check that the licence covers paid ads. The Epidemic Sound
+                   API FREE tier forbids published use. Optional voice-over
+                   slot: `VOICE` in `sound/FilmSound.tsx`.
                    `npm run master` normalizes to -14 LUFS; check with
                    `npm run analyze` (no filters in Remotion's ffmpeg).
 lib/

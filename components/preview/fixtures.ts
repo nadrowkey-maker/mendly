@@ -1,5 +1,6 @@
 import type { Project } from "@/lib/types/project";
 import type { ActionItem } from "@/lib/types/tracking";
+import type { DebateState } from "@/lib/types/debate";
 
 /**
  * Le projet de démonstration utilisé pour les captures de la vitrine.
@@ -111,3 +112,62 @@ export const DEMO_ACTIONS: ActionItem[] = [
     completed_at: null,
   },
 ];
+
+/**
+ * Un débat terminé, pour la salle de réunion de la vidéo publicitaire.
+ *
+ * Il montre ce qui distingue la salle d'un simple échange : trois angles qui
+ * s'opposent vraiment, un spécialiste qui change d'avis en cours de route, une
+ * synthèse chiffrée et un vote où l'un des trois reste réticent. Un consensus
+ * unanime aurait fait un débat de façade.
+ */
+export const DEMO_DEBATE: DebateState = {
+  phase: "done",
+  question: "Collection entière, ou trois pièces de test avant décembre ?",
+  selection: {
+    agents: ["CFO", "CMO", "CPO"],
+    rationale: "Stock, lancement et cohérence de la collection sont en tension.",
+  },
+  messages: [
+    {
+      id: "d1",
+      agent: "CFO",
+      turnIndex: 0,
+      isStreaming: false,
+      content:
+        "Douze pièces, c'est **4 200 €** de stock immobilisé avant le premier euro encaissé. Avec 34 ventes depuis juin, je ne finance pas ça.",
+    },
+    {
+      id: "d2",
+      agent: "CMO",
+      turnIndex: 1,
+      isStreaming: false,
+      content:
+        "Trois pièces ne créent aucun événement. Sans lancement, pas de trafic — et on conclura que le canal ne marche pas pour de mauvaises raisons.",
+    },
+    {
+      id: "d3",
+      agent: "CPO",
+      turnIndex: 2,
+      isStreaming: false,
+      content:
+        "Une collection se lit comme une saison. La découper en trois pièces isolées, c'est vendre un catalogue, pas une histoire.",
+    },
+    {
+      id: "d4",
+      agent: "CFO",
+      turnIndex: 3,
+      isStreaming: false,
+      content:
+        "Soit, on garde l'histoire : trois pièces, annoncées comme le premier chapitre. Le stock reste **sous 1 100 €**.",
+    },
+  ],
+  ceoCall:
+    "**Trois pièces cette semaine, annoncées comme le premier chapitre de la collection d'hiver.** Mesure la conversion jusqu'au 15 novembre : au-dessus de 2 %, tu lances le reste avec un chiffre en main.",
+  consensus: [
+    { agent: "CFO", verdict: "agree", note: "Le stock reste maîtrisé." },
+    { agent: "CMO", verdict: "reluctant", note: "Le récit sauve le lancement, de justesse." },
+    { agent: "CPO", verdict: "agree", note: "La saison reste lisible." },
+  ],
+  tensionMap: null,
+};

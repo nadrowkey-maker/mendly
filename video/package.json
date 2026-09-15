@@ -8,7 +8,9 @@
     "render:en": "remotion render src/index.ts MendlyAd-EN out/mendly-ad-en.mp4",
     "render": "npm run sfx && npm run render:fr && npm run render:en && npm run master",
     "typecheck": "tsc --noEmit",
-    "sfx": "node scripts/synth-sfx.mjs && node scripts/synth-bed.mjs",
+    "sfx": "node scripts/synth-film-sfx.mjs",
+    "capture": "node ../scripts/capture-video-shots.mjs fr && node ../scripts/capture-video-shots.mjs en",
+    "beats": "node scripts/track-map.mjs",
     "master": "node scripts/master.mjs out/mendly-ad-fr.mp4 out/mendly-ad-en.mp4",
     "music:search": "node scripts/fetch-epidemic.mjs search",
     "music:get": "node scripts/fetch-epidemic.mjs get",
@@ -26,6 +28,8 @@
     "remotion": "^4.0.524"
   },
   "devDependencies": {
+    "@remotion/install-whisper-cpp": "^4.0.524",
+    "@remotion/motion-blur": "^4.0.524",
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2"
   },
