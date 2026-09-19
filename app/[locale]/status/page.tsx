@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { buildMetadata } from "@/lib/seo/metadata";
 import { PaperPage } from "@/components/home/PaperPage";
 import { PaperHeader } from "@/components/home/PaperHeader";
 import { PillLink } from "@/components/ui/Pill";
@@ -10,11 +11,8 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "status" });
-  return {
-    title: `${t("title")} · Mendly`,
-    description: t("sub"),
-    robots: { index: true, follow: true },
-  };
+  const seo = await getTranslations({ locale, namespace: "seo" });
+  return buildMetadata({ locale, path: "/status", title: t("title"), description: seo("status") });
 }
 
 /**

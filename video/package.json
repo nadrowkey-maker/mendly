@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "sfx": "node scripts/synth-film-sfx.mjs",
     "capture": "node ../scripts/capture-video-shots.mjs fr && node ../scripts/capture-video-shots.mjs en",
+    "social": "node scripts/render-social.mjs",
     "beats": "node scripts/track-map.mjs",
     "master": "node scripts/master.mjs out/mendly-ad-fr.mp4 out/mendly-ad-en.mp4",
     "music:search": "node scripts/fetch-epidemic.mjs search",

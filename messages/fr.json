@@ -1,4 +1,16 @@
 {
+  "seo": {
+    "manifesto": "Pourquoi Mendly contredit les fondateurs au lieu de les approuver : le parti pris derrière un conseil de direction IA qui tranche et assume ses désaccords.",
+    "help": "Comment marche Mendly : la conversation, la salle de réunion où les spécialistes débattent, la mémoire du projet et les sessions autonomes.",
+    "security": "Hébergement, chiffrement, sous-traitants et durée de conservation : comment Mendly protège tes projets et tes conversations.",
+    "contact": "Écrire à l'équipe Mendly : questions sur le produit, la facturation, la presse ou un partenariat.",
+    "status": "L'état du service Mendly et l'historique des incidents : conversation, débats en salle de réunion et sessions autonomes.",
+    "terms": "Les conditions générales d'utilisation de Mendly : abonnement, usage du service, responsabilités et résiliation.",
+    "privacy": "Comment Mendly traite tes données : ce qui est conservé, avec qui c'est partagé, et comment tout supprimer.",
+    "cookies": "Les cookies utilisés par Mendly, à quoi ils servent et comment les refuser.",
+    "refund": "La politique de remboursement et de résiliation de Mendly, plan par plan.",
+    "legal": "Éditeur, hébergeur et mentions légales du service Mendly."
+  },
   "nav": {
     "team": "Équipe",
     "howItWorks": "Fonctionnement",

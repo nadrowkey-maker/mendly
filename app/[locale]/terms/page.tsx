@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { buildMetadata } from "@/lib/seo/metadata";
 import { DocumentPage } from "@/components/home/DocumentPage";
 
 export async function generateMetadata({
@@ -8,11 +9,8 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "terms" });
-  return {
-    title: `${t("title")} · Mendly`,
-    description: "Les conditions générales d'utilisation de Mendly.",
-    robots: { index: true, follow: true },
-  };
+  const seo = await getTranslations({ locale, namespace: "seo" });
+  return buildMetadata({ locale, path: "/terms", title: t("title"), description: seo("terms") });
 }
 
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {

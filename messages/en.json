@@ -1,4 +1,16 @@
 {
+  "seo": {
+    "manifesto": "Why Mendly contradicts founders instead of agreeing with them: the stance behind an AI counsel that argues, decides and owns its disagreements.",
+    "help": "How Mendly works: the conversation, the meeting room where specialists debate, project memory, and sessions that run while you are away.",
+    "security": "Hosting, encryption, sub-processors and retention: how Mendly protects your projects and your conversations.",
+    "contact": "Get in touch with the Mendly team: product questions, billing, press or partnerships.",
+    "status": "Mendly service status and incident history: conversation, meeting-room debates and autonomous sessions.",
+    "terms": "Mendly's terms of service: subscription, acceptable use, liability and cancellation.",
+    "privacy": "How Mendly handles your data: what is stored, who it is shared with, and how to delete all of it.",
+    "cookies": "The cookies Mendly uses, what they are for, and how to refuse them.",
+    "refund": "Mendly's refund and cancellation policy, plan by plan.",
+    "legal": "Publisher, host and legal notices for the Mendly service."
+  },
   "nav": {
     "team": "Team",
     "howItWorks": "How it works",

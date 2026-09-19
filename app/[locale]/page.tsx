@@ -12,6 +12,9 @@ import { Faq } from "@/components/home/Faq";
 import { Closing } from "@/components/home/Closing";
 import { PaperFooter } from "@/components/home/PaperFooter";
 import { routing } from "@/i18n/routing";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildMetadata } from "@/lib/seo/metadata";
+import { faqSchema, graph, organizationSchema, softwareSchema, websiteSchema } from "@/lib/seo/schema";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -24,15 +27,47 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "home.meta" });
-  const title = t("title");
-  const description = t("description");
 
-  return {
-    title,
-    description,
-    openGraph: { title, description, type: "website", locale },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  return buildMetadata({
+    locale,
+    path: "/",
+    title: t("title"),
+    description: t("description"),
+    absoluteTitle: true,
+  });
+}
+
+/**
+ * Ce que la page déclare aux moteurs, en plus de ce qu'elle montre.
+ *
+ * Les six questions fréquentes sont reprises telles quelles : ce sont les
+ * questions que les gens posent vraiment, et c'est ce qui permet à une
+ * recherche du type « IA qui contredit » ou « alternative à ChatGPT pour
+ * fondateur » de tomber sur la réponse plutôt que sur la page d'accueil.
+ */
+async function homeGraph(locale: string) {
+  const meta = await getTranslations({ locale, namespace: "home.meta" });
+  const faq = await getTranslations({ locale, namespace: "home.faq" });
+  const pricing = await getTranslations({ locale, namespace: "landing.pricing" });
+  const description = meta("description");
+
+  const plans = (["free", "starter", "pro"] as const).map((tier) => ({
+    name: pricing(`${tier}.name`),
+    price: pricing(`${tier}.price`),
+    description: pricing(`${tier}.tagline`),
+  }));
+
+  const questions = [1, 2, 3, 4, 5, 6].map((i) => ({
+    question: faq(`q${i}`),
+    answer: faq(`a${i}`),
+  }));
+
+  return graph([
+    organizationSchema(locale),
+    websiteSchema(locale, description),
+    softwareSchema(locale, description, plans),
+    faqSchema(questions),
+  ]);
 }
 
 /**
@@ -51,9 +86,12 @@ export async function generateMetadata({
  * remplacent : même principe — calculé, jamais un fichier récupéré ailleurs —
  * mais posés là où ils servent le propos plutôt qu'en fond permanent.
  */
-export default function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+
   return (
     <div className="paper min-h-screen">
+      <JsonLd data={await homeGraph(locale)} />
       <PaperNav />
       <main>
         <Hero />

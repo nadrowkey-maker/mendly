@@ -210,6 +210,29 @@ founder's history looked wiped each time they came back. Read with
 `listThreadMessages`, which reads every thread of the project/role. Migration
 0006 merges existing duplicates and adds the unique index.
 
+### Every public page declares its canonical URL and its translations
+`lib/seo/` owns this. `SITE_URL` is **hardcoded** to `https://www.mendlyai.io`
+(the apex 307-redirects to `www`), never read from `NEXT_PUBLIC_SITE_URL` —
+that variable is `http://localhost:3000` in dev, and a canonical pointing at
+localhost removes the page from the index. URLs keep their trailing slash,
+because `trailingSlash: true` is what the server actually serves.
+
+A new public page is not finished until it is added to `INDEXED_PAGES`
+(`lib/seo/site.ts`) — that one list drives `/sitemap.xml`, and its `key` is the
+page's description in the `seo` namespace of `messages/*.json`. Its
+`generateMetadata` goes through `buildMetadata`, which is what produces the
+canonical link, the `hreflang` pair plus `x-default`, and the share image.
+Anything private (workspace, settings, onboarding, auth, preview) stays out of
+the list and is disallowed in `app/robots.ts`.
+
+Meta descriptions live in the `seo` namespace, in both languages. They were
+hardcoded French strings before, which meant English pages advertised
+themselves in French in Google's results.
+
+The share image and the icons are rendered from the Remotion project
+(`cd video && npm run social` → `public/og/`, `public/icons/`) so they carry
+the real orb and the real charter. They are committed: crawlers fetch files.
+
 ### Pages linked from the footer use the paper shell
 `PaperPage` (nav + footer on paper), `PaperHeader` (title on a grain wash under
 40 %), `DocumentPage` for legal texts. `PageWrapper` and the dark `Nav`/`Footer`
